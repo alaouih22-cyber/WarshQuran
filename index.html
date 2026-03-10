@@ -4,15 +4,15 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>القرآن الكريم - ورش</title>
+<title>القرآن الكريم ورش ملون</title>
 
 <style>
 
 body{
 margin:0;
-font-family:"Amiri",serif;
+font-family: "Amiri", serif;
 background:#f3f3f3;
 }
 
@@ -37,9 +37,9 @@ font-size:16px;
 }
 
 button{
-padding:8px 14px;
-background:#0b6b50;
+padding:8px 15px;
 border:none;
+background:#0b6b50;
 color:white;
 margin:5px;
 }
@@ -53,7 +53,7 @@ padding:10px;
 width:100%;
 max-width:900px;
 border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.25);
+box-shadow:0 3px 12px rgba(0,0,0,0.25);
 }
 
 audio{
@@ -66,11 +66,7 @@ background:#121212;
 color:white;
 }
 
-.dark header{
-background:#000;
-}
-
-#tafsirBox{
+#tafsir{
 position:fixed;
 bottom:0;
 left:0;
@@ -126,15 +122,9 @@ Pagina
 
 <audio id="audio" controls></audio>
 
-<br>
-
-<button onclick="saveBookmark()">⭐ Segnalibro</button>
-
-<button onclick="loadBookmark()">📑 Vai al segnalibro</button>
-
 </div>
 
-<div id="tafsirBox">
+<div id="tafsir">
 
 <button onclick="closeTafsir()">Chiudi</button>
 
@@ -200,33 +190,9 @@ document.body.classList.toggle("dark")
 
 }
 
-function saveBookmark(){
-
-localStorage.setItem("quranPage",page)
-
-alert("Segnalibro salvato")
-
-}
-
-function loadBookmark(){
-
-let saved=localStorage.getItem("quranPage")
-
-if(saved){
-
-page=saved
-
-document.getElementById("pageInput").value=saved
-
-loadPage()
-
-}
-
-}
-
 function closeTafsir(){
 
-document.getElementById("tafsirBox").style.display="none"
+document.getElementById("tafsir").style.display="none"
 
 }
 
