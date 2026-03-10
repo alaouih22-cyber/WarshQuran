@@ -6,27 +6,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>مصحف ورش الملون</title>
+<title>القرآن ورش ملون</title>
 
 <style>
 
 body{
+font-family: "Amiri", serif;
 margin:0;
-font-family:sans-serif;
 background:#f2f2f2;
-text-align:center;
 }
 
 header{
 background:#0b6b50;
 color:white;
 padding:15px;
+text-align:center;
 font-size:22px;
 }
 
 .controls{
-background:white;
 padding:10px;
+background:white;
+text-align:center;
 }
 
 select,input{
@@ -35,23 +36,24 @@ margin:5px;
 font-size:16px;
 }
 
-button{
-padding:8px 15px;
-background:#0b6b50;
-color:white;
-border:none;
-margin:5px;
+.ayah{
+background:white;
+margin:10px;
+padding:15px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.15);
 }
 
-#pageContainer{
-padding:10px;
+.ar{
+font-size:30px;
+line-height:2.2;
 }
 
-#pageImg{
-width:100%;
-max-width:800px;
-border-radius:8px;
-box-shadow:0 3px 10px rgba(0,0,0,0.2);
+.it{
+direction:ltr;
+font-size:16px;
+color:#444;
+margin-top:10px;
 }
 
 audio{
@@ -59,9 +61,34 @@ width:100%;
 margin-top:10px;
 }
 
+#tafsirBox{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:white;
+max-height:60%;
+overflow:auto;
+display:none;
+padding:20px;
+border-top:4px solid #0b6b50;
+}
+
 .dark{
-background:#111;
+background:#121212;
 color:white;
+}
+
+.dark .ayah{
+background:#1e1e1e;
+}
+
+button{
+padding:8px 14px;
+border:none;
+background:#0b6b50;
+color:white;
+margin:5px;
 }
 
 </style>
@@ -71,91 +98,131 @@ color:white;
 <body>
 
 <header>
-📖 مصحف ورش الملون
+📖 القرآن الكريم – رواية ورش
 </header>
 
 <div class="controls">
 
-Pagina
-
-<input type="number" id="pageInput" value="1" min="1" max="604">
-
-<button onclick="loadPage()">Apri</button>
-
-<button onclick="prevPage()">◀</button>
-<button onclick="nextPage()">▶</button>
-
-<br>
+<select id="surah"></select>
 
 <select id="reciter">
 
-<option value="omar-al-qazabri">القزابري (ورش)</option>
-<option value="abdellah-kamel">عبد الله كامل</option>
-<option value="yassin-jazaery">ياسين الجزائري</option>
+<option value="ar.alafasy">العفاسي</option>
+<option value="ar.minshawi">المنشاوي</option>
+<option value="ar.husary">الحصري</option>
 
 </select>
+
+<input id="search" placeholder="🔍 Cerca parola">
 
 <button onclick="toggleDark()">🌙</button>
 
 </div>
 
-<div id="pageContainer">
+<div id="quran"></div>
 
-<img id="pageImg">
+<div id="tafsirBox">
 
-<audio id="audio" controls></audio>
+<button onclick="closeTafsir()">Chiudi</button>
+
+<div id="tafsirText"></div>
 
 </div>
 
 <script>
 
-let page=1
+const surahSelect=document.getElementById("surah")
+const quran=document.getElementById("quran")
 
-function loadPage(){
+async function loadSurahList(){
 
-page=document.getElementById("pageInput").value
+let res=await fetch("https://api.alquran.cloud/v1/surah")
+let data=await res.json()
 
-document.getElementById("pageImg").src=
-"https://raw.githubusercontent.com/quran-data/warsh-mushaf/main/pages/"+page+".jpg"
+data.data.forEach(s=>{
 
-loadAudio()
+let o=document.createElement("option")
+o.value=s.number
+o.text=s.number+" - "+s.englishName
 
-}
+surahSelect.appendChild(o)
 
-function prevPage(){
+})
 
-if(page>1){
-
-page--
-
-document.getElementById("pageInput").value=page
-
-loadPage()
+loadSurah(1)
 
 }
 
-}
+surahSelect.onchange=()=>{
 
-function nextPage(){
-
-if(page<604){
-
-page++
-
-document.getElementById("pageInput").value=page
-
-loadPage()
+loadSurah(surahSelect.value)
 
 }
 
+async function loadSurah(num){
+
+quran.innerHTML="Loading..."
+
+let rec=document.getElementById("reciter").value
+
+let res=await fetch(`https://api.alquran.cloud/v1/surah/${num}/editions/quran-uthmani,it.piccardo,${rec}`)
+
+let data=await res.json()
+
+let arabic=data.data[0].ayahs
+let trans=data.data[1].ayahs
+let audio=data.data[2].ayahs
+
+quran.innerHTML=""
+
+arabic.forEach((a,i)=>{
+
+let div=document.createElement("div")
+div.className="ayah"
+
+div.innerHTML=`
+
+<div class="ar">${a.text} ﴿${a.numberInSurah}﴾</div>
+
+<div class="it">${trans[i].text}</div>
+
+<audio controls src="${audio[i].audio}"></audio>
+
+<button onclick="bookmark(${num},${a.numberInSurah})">⭐</button>
+
+`
+
+div.onclick=()=>loadTafsir(num,a.numberInSurah)
+
+quran.appendChild(div)
+
+})
+
 }
 
-function loadAudio(){
+async function loadTafsir(s,a){
 
-let reciter=document.getElementById("reciter").value
+document.getElementById("tafsirBox").style.display="block"
 
-document.getElementById("audio").src=
-"https://server8.mp3quran.net/"+reciter+"/001.mp3"
+document.getElementById("tafsirText").innerHTML="Loading..."
+
+let res=await fetch(`https://api.quran.com/api/v4/tafsirs/169/by_ayah/${s}:${a}`)
+
+let data=await res.json()
+
+if(data.tafsir)
+
+document.getElementById("tafsirText").innerHTML=data.tafsir.text
+
+else
+
+document.getElementById("tafsirText").innerHTML="Tafsir non disponibile"
+
+}
+
+function closeTafsir(){
+
+document.getElementById("tafsirBox").style.display="none"
 
 }
 
@@ -165,7 +232,15 @@ document.body.classList.toggle("dark")
 
 }
 
-loadPage()
+function bookmark(s,a){
+
+localStorage.setItem("bookmark",s+":"+a)
+
+alert("Segnalibro salvato")
+
+}
+
+loadSurahList()
 
 </script>
 
