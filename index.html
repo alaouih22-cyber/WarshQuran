@@ -3,52 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran App Professional</title>
+    <title>Easy Quran Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <main class="mushaf-container" id="mushaf-area">
-        <img id="quran-img" src="https://pwanew.mohib.me/tajweed_png/392.png" alt="Quran Page">
-    </main>
+    <div id="mushaf-container">
+        <div id="loading-overlay">جاري التحميل...</div>
+        <img id="quran-page" src="" alt="Quran Page">
+    </div>
 
-    <div id="ui-controls" class="hidden-ui">
-        <header class="app-header">
-            <button id="btn-main-menu"><i class="fas fa-bars"></i> الرئيسية</button>
-            <div class="header-icons">
+    <div id="ui-layer" class="hidden">
+        <header class="top-bar">
+            <button id="main-menu-btn"><i class="fas fa-bars"></i> الرئيسية</button>
+            <div class="top-left">
                 <i class="fas fa-search"></i>
-                <i class="fas fa-bookmark"></i>
-                <i class="fas fa-headphones"></i>
+                <i class="fas fa-bookmark" onclick="toggleBookmark()"></i>
                 <span class="hd-badge">HD</span>
             </div>
         </header>
 
-        <footer class="app-footer">
-            <div class="footer-right" id="btn-sub-menu">≡ القائمة الثانوية</div>
-            <div class="footer-center">صفحة <span id="page-num">392</span></div>
-            <div class="footer-left">سُورَةُ القَصَصِ</div>
+        <footer class="bottom-bar">
+            <div onclick="openModal('surah-list')">≡ السور</div>
+            <div>صفحة <span id="page-num">1</span></div>
+            <div id="surah-title">الفاتحة</div>
+            <button id="play-audio-btn"><i class="fas fa-play"></i></button>
         </footer>
     </div>
 
-    <div id="side-menu" class="modal hidden">
-        <div class="menu-content">
-            <div class="menu-item"><i class="fab fa-paypal"></i> تبرع</div>
-            <div class="menu-item"><i class="fas fa-book-open"></i> التفسير</div>
-            <div class="menu-split">
-                <div class="split-box">السور</div>
-                <div class="split-box">الصفحات</div>
+    <div id="surah-list" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                فهرس السور
+                <button class="close-modal" onclick="closeAll()">&times;</button>
             </div>
-            <div class="menu-split">
-                <div class="split-box">الأحزاب</div>
-                <div class="split-box">الأجزاء</div>
-            </div>
-            <div class="menu-item"><i class="fas fa-bookmark"></i> حفظ علامة | إنتقل للعلامة</div>
-            <div class="menu-item"><i class="fas fa-redo"></i> إسمع وكرّر</div>
-            <div class="menu-item"><i class="fas fa-hand-holding-heart"></i> دعاء الختم</div>
-            <div class="menu-item"><i class="fas fa-cog"></i> إعدادات الشاشة</div>
+            <div class="scroll-area" id="surah-index-container">
+                </div>
         </div>
     </div>
+
+    <audio id="quran-audio"></audio>
 
     <script src="app.js"></script>
 </body>
