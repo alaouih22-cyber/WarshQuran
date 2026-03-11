@@ -1,4 +1,4 @@
-// Database Completo delle 114 Sure (Medina Mushaf)
+// Database Completo delle 114 Sure
 const surahData = [
     {id:1, name:"الفاتحة", p:1}, {id:2, name:"البقرة", p:2}, {id:3, name:"آل عمران", p:50},
     {id:4, name:"النساء", p:77}, {id:5, name:"المائدة", p:106}, {id:6, name:"الأنعام", p:128},
@@ -43,52 +43,60 @@ const surahData = [
 let currentPage = 392; 
 const img = document.getElementById('quran-page');
 const loader = document.getElementById('loading-overlay');
+const cacheName = 'quran-warsh-cache-v1';
 
-// 1. Funzione Carica Pagina (Usa EasyQuran PNG)
-function loadPage(n) {
+// 1. Funzione Carica Pagina ULTRA VELOCE (con Cache)
+async function loadPage(n) {
     if (n < 1 || n > 604) return;
     currentPage = n;
     
-    loader.style.display = "block";
-    
-    // Formattazione numero a 3 cifre per il sito
-    let pNum = n.toString().padStart(3, '0');
-    let url = `https://easyquran.com/tajweed-warsh/warsh-${pNum}.png`;
+    const pNum = n.toString().padStart(3, '0');
+    const url = `https://easyquran.com/tajweed-warsh/warsh-${pNum}.png`;
 
-    img.src = url;
-    
-    img.onload = () => {
+    // Prova a prendere l'immagine dalla memoria locale
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(url);
+
+    if (cachedResponse) {
+        // Se è già salvata, caricala subito
+        const blob = await cachedResponse.blob();
+        img.src = URL.createObjectURL(blob);
         loader.style.display = "none";
-        document.getElementById('page-num').textContent = n;
-        updateSurahName(n);
-        preloadNext(n + 1); // Carica segretamente la prossima pagina
-    };
+    } else {
+        // Se non c'è, scaricala e mostrala
+        loader.style.display = "block";
+        img.src = url;
+        img.onload = async () => {
+            loader.style.display = "none";
+            // Salvala in memoria per la prossima volta
+            const response = await fetch(url);
+            if (response.ok) cache.put(url, response);
+        };
+    }
+
+    document.getElementById('page-num').textContent = n;
+    updateSurahName(n);
     
-    img.onerror = () => {
-        // Fallback se il server ha problemi
-        img.src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
-    };
+    // Pre-scarica le prossime 2 pagine per non far aspettare l'utente
+    preloadNext(n + 1);
+    preloadNext(n + 2);
 }
 
-// 2. Funzione Pre-caricamento (Rende l'app veloce)
-function preloadNext(n) {
-    if (n <= 604) {
-        let pNum = n.toString().padStart(3, '0');
-        const nextImg = new Image();
-        nextImg.src = `https://easyquran.com/tajweed-warsh/warsh-${pNum}.png`;
+// 2. Pre-caricamento in sottofondo
+async function preloadNext(n) {
+    if (n > 604) return;
+    const pNum = n.toString().padStart(3, '0');
+    const url = `https://easyquran.com/tajweed-warsh/warsh-${pNum}.png`;
+    const cache = await caches.open(cacheName);
+    const match = await cache.match(url);
+    
+    if (!match) {
+        const response = await fetch(url);
+        if (response.ok) cache.put(url, response);
     }
 }
 
-// 3. Funzione Download PNG (Per salvare la pagina sul telefono)
-function downloadPage() {
-    let pNum = currentPage.toString().padStart(3, '0');
-    const link = document.createElement('a');
-    link.href = img.src;
-    link.download = `Warsh_Page_${pNum}.png`;
-    link.click();
-}
-
-// 4. Aggiorna Nome Sura
+// 3. Nome Sura
 function updateSurahName(p) {
     let currentS = surahData[0].name;
     for(let s of surahData) {
@@ -98,7 +106,7 @@ function updateSurahName(p) {
     document.getElementById('surah-title').textContent = currentS;
 }
 
-// 5. Costruisci Indice
+// 4. Costruisci Indice
 function buildSurahIndex() {
     const container = document.getElementById('surah-index-container');
     let html = "";
@@ -106,7 +114,7 @@ function buildSurahIndex() {
         html += `<div class="index-item" onclick="goToSurah(${s.p})">
                     <span class="s-num">${i+1}</span>
                     <span class="s-name">${s.name}</span>
-                    <span class="s-page">صفحة ${s.p}</span>
+                    <span class="s-page">P. ${s.p}</span>
                  </div>`;
     });
     container.innerHTML = html;
@@ -117,7 +125,7 @@ function goToSurah(p) {
     closeAll();
 }
 
-// 6. Navigazione Touch
+// 5. Navigazione Touch
 document.getElementById('mushaf-container').onclick = (e) => {
     const x = e.clientX;
     const w = window.innerWidth;
@@ -126,9 +134,9 @@ document.getElementById('mushaf-container').onclick = (e) => {
     if (x > w * 0.3 && x < w * 0.7) {
         uiLayer.classList.toggle('hidden');
     } else if (x <= w * 0.3) {
-        loadPage(currentPage + 1); // Avanti a sinistra
+        loadPage(currentPage + 1);
     } else {
-        loadPage(currentPage - 1); // Indietro a destra
+        loadPage(currentPage - 1);
     }
 };
 
@@ -138,6 +146,6 @@ function closeAll() {
     document.getElementById('ui-layer').classList.add('hidden');
 }
 
-// Inizio
+// Inizializza
 buildSurahIndex();
 loadPage(currentPage);
