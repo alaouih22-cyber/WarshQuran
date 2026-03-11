@@ -1,92 +1,83 @@
-let currentPage = 1;
+let curPage = 1;
 let isPlaying = false;
-let currentVerse = 1;
-const audio = document.getElementById('audio-engine');
-const img = document.getElementById('quran-page-img');
+const img = document.getElementById('quran-img');
+const player = document.getElementById('player');
 
-// Funzione Caricamento Pagina
-function loadQuranPage(pageNum) {
-    if (pageNum < 1 || pageNum > 604) return;
-    currentPage = pageNum;
+function loadPage(n) {
+    if (n < 1 || n > 604) return;
+    curPage = n;
     
-    // Nuovo URL stabile per le immagini
-    const imgUrl = `https://raw.githubusercontent.com/mustafa0x/quran-images/main/png-640/${pageNum}.png`;
-    img.src = imgUrl;
+    // FIX: Formattazione a 3 cifre (1 -> 001)
+    const pStr = n.toString().padStart(3, '0');
     
-    document.getElementById('page-number-display').textContent = `Pagina ${pageNum}`;
-    generateVerseHotspots();
+    // NUOVO URL SICURO
+    img.src = `https://everyayah.com/data/quran_pages_png/${pStr}.png`;
+    
+    document.getElementById('p-num').textContent = `Pagina ${n}`;
+    drawZones();
 }
 
-// Genera aree invisibili per i versetti
-function generateVerseHotspots() {
-    const container = document.getElementById('verse-map');
-    container.innerHTML = '';
-    // Simuliamo 8 righe di versetti cliccabili per pagina
-    for(let i=1; i<=8; i++) {
-        const div = document.createElement('div');
-        div.className = 'verse-area';
-        div.style.top = (12 + (i * 9)) + '%';
-        div.style.left = '10%';
-        div.style.width = '80%';
-        div.style.height = '7%';
-        div.onclick = () => openTafsir(i);
-        container.appendChild(div);
+function drawZones() {
+    const ov = document.getElementById('verse-overlay');
+    ov.innerHTML = '';
+    // Creiamo zone cliccabili per i versetti
+    for(let i=1; i<=10; i++) {
+        const zone = document.createElement('div');
+        zone.className = 'v-zone';
+        zone.style.cssText = `top:${10+(i*8)}%; left:10%; width:80%; height:7%;`;
+        zone.onclick = () => openTafsir(i);
+        ov.appendChild(zone);
     }
 }
 
 function openTafsir(v) {
-    currentVerse = v;
-    const tafsir = document.getElementById('tafsir-select').value;
-    document.getElementById('modal-title').textContent = `Sura ${currentPage}, Versetto ${v}`;
-    document.getElementById('modal-content').innerHTML = `
-        <p style="color:var(--accent)"><b>Tafsir selezionato: ${tafsir}</b></p>
-        <p>In questa sezione viene visualizzata la spiegazione dettagliata del versetto. 
-        L'app recupera i dati dal database locale o via API per fornirti il commentario completo di Ibn Kathir o Jalalayn.</p>
-    `;
-    document.getElementById('tafsir-modal').classList.remove('hidden');
+    const tType = document.getElementById('tafsir-sel').value;
+    document.getElementById('m-title').textContent = `Versetto ${v}`;
+    document.getElementById('m-body').innerHTML = `<b>Tafsir: ${tType}</b><br><br>Spiegazione del versetto selezionato nella pagina ${curPage}. In questa sezione l'app caricherà il testo originale dal database.`;
+    document.getElementById('modal-tafsir').classList.remove('hidden');
 }
 
-// Controlli Pagina
-document.getElementById('next-page-btn').onclick = () => loadQuranPage(currentPage + 1);
-document.getElementById('prev-page-btn').onclick = () => loadQuranPage(currentPage - 1);
-document.getElementById('close-modal').onclick = () => document.getElementById('tafsir-modal').classList.add('hidden');
+// Eventi Navigazione
+document.getElementById('p-next').onclick = () => loadPage(curPage + 1);
+document.getElementById('p-prev').onclick = () => loadPage(curPage - 1);
+document.getElementById('m-close').onclick = () => document.getElementById('modal-tafsir').classList.add('hidden');
 
 // Audio
-document.getElementById('play-btn').onclick = function() {
-    const reciter = document.getElementById('reciter-select').value;
+document.getElementById('a-play').onclick = function() {
     if(!isPlaying) {
-        // Link audio demo
-        audio.src = `https://download.quranicaudio.com/quran/mishari_rashid_al-afasy/001.mp3`;
-        audio.play();
+        const reciter = document.getElementById('reciter-sel').value;
+        // Esempio audio Sura 1
+        player.src = "https://download.quranicaudio.com/quran/mishari_rashid_al-afasy/001.mp3";
+        player.play();
         this.innerHTML = '<i class="fas fa-pause-circle"></i>';
     } else {
-        audio.pause();
+        player.pause();
         this.innerHTML = '<i class="fas fa-play-circle"></i>';
     }
     isPlaying = !isPlaying;
 };
 
-// Segnalibri
-document.getElementById('open-bookmarks').onclick = () => {
-    const list = document.getElementById('bookmarks-list');
-    const bms = JSON.parse(localStorage.getItem('quran_bms') || '[]');
-    list.innerHTML = bms.length ? '' : '<li>Nessun segnalibro</li>';
-    bms.forEach(b => {
+// Segnalibri (LocalStorage)
+document.getElementById('btn-bookmarks').onclick = () => {
+    const list = document.getElementById('b-list');
+    const data = JSON.parse(localStorage.getItem('q_bmarks') || '[]');
+    list.innerHTML = data.length ? '' : '<li>Nessun segnalibro</li>';
+    data.forEach(item => {
         const li = document.createElement('li');
-        li.textContent = `Pagina ${b.p} - Versetto ${b.v}`;
+        li.innerHTML = `Pagina ${item.p} <button onclick="loadPage(${item.p})" style="margin-left:10px">Vai</button>`;
         list.appendChild(li);
     });
-    document.getElementById('bookmarks-modal').classList.remove('hidden');
+    document.getElementById('modal-bmarks').classList.remove('hidden');
 };
 
-document.getElementById('save-bookmark-btn').onclick = () => {
-    let bms = JSON.parse(localStorage.getItem('quran_bms') || '[]');
-    bms.push({p: currentPage, v: currentVerse});
-    localStorage.setItem('quran_bms', JSON.stringify(bms));
-    alert("Segnalibro salvato!");
+document.getElementById('m-save').onclick = () => {
+    let data = JSON.parse(localStorage.getItem('q_bmarks') || '[]');
+    data.push({p: curPage});
+    localStorage.setItem('q_bmarks', JSON.stringify(data));
+    alert("Salvato!");
 };
 
-document.getElementById('close-bookmarks').onclick = () => document.getElementById('bookmarks-modal').classList.add('hidden');
+document.getElementById('b-close').onclick = () => document.getElementById('modal-bmarks').classList.add('hidden');
 
-// Inizio
-loadQuranPage(1);
+// Avvio
+loadPage(1);
