@@ -1,29 +1,57 @@
-let currentPage = 392; // Pagina di esempio come nei tuoi screenshot
-
-function updatePage(n) {
-    if (n < 1 || n > 604) return;
-    currentPage = n;
-    
-    // Formattazione 001, 002...
-    const pStr = n.toString().padStart(3, '0');
-    const imgUrl = `https://everyayah.com/data/quran_pages_png/${pStr}.png`;
-    
-    document.getElementById('quran-page').src = imgUrl;
-    document.getElementById('page-label').textContent = `صفحة ${n}`;
-    
-    // Salva l'ultima pagina letta
-    localStorage.setItem('last_page', n);
+body, html {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: #000; font-family: 'Arial', sans-serif; overflow: hidden;
 }
 
-// Navigazione
-document.getElementById('p-next').onclick = () => updatePage(currentPage + 1);
-document.getElementById('p-prev').onclick = () => updatePage(currentPage - 1);
+/* Header stile App */
+.app-header {
+    position: fixed; top: 0; width: 100%; height: 60px;
+    background: rgba(20, 30, 45, 0.95); display: flex;
+    justify-content: space-between; align-items: center; padding: 0 15px;
+    z-index: 100; color: white; box-sizing: border-box;
+}
 
-// Gestione Menu
-const sideMenu = document.getElementById('side-menu');
-document.getElementById('menu-main').onclick = () => sideMenu.classList.toggle('hidden');
-sideMenu.onclick = (e) => { if(e.target === sideMenu) sideMenu.classList.add('hidden'); };
+/* Contenitore Pagina */
+.mushaf-viewer {
+    height: 100vh; display: flex; justify-content: center; align-items: center;
+    background: #111; padding-top: 60px; padding-bottom: 50px; box-sizing: border-box;
+}
 
-// Inizializzazione
-const saved = localStorage.getItem('last_page');
-updatePage(saved ? parseInt(saved) : 392);
+#page-container {
+    position: relative; height: 100%; display: flex; align-items: center;
+}
+
+#quran-img {
+    height: 100%; width: auto; max-width: 100vw;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    background: white; /* Per vedere la pagina mentre carica */
+}
+
+/* Frecce trasparenti sopra l'immagine */
+.nav-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.2); border: none; color: #fff;
+    width: 50px; height: 80px; font-size: 24px; cursor: pointer;
+    transition: 0.3s;
+}
+.nav-arrow:hover { background: rgba(0,0,0,0.5); }
+.prev { left: 0; border-radius: 0 10px 10px 0; }
+.next { right: 0; border-radius: 10px 0 0 10px; }
+
+/* Footer */
+.app-footer {
+    position: fixed; bottom: 0; width: 100%; height: 50px;
+    background: rgba(20, 30, 45, 0.95); color: white;
+    display: flex; align-items: center; z-index: 100;
+}
+
+.footer-content {
+    display: flex; justify-content: space-between; width: 100%;
+    padding: 0 20px; align-items: center;
+}
+
+.hd-tag {
+    border: 1px solid #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px;
+}
+
+.icon-btn { background: none; border: none; color: white; font-size: 20px; }
