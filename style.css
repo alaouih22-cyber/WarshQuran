@@ -1,80 +1,64 @@
 :root {
-    --dark-bg: #0f172a;
-    --panel-bg: #1e293b;
+    --bg-dark: #0f172a;
+    --panel-dark: #1e293b;
     --accent: #38bdf8;
-    --white: #ffffff;
+    --text: #f8fafc;
 }
 
 body, html {
     margin: 0; padding: 0;
     height: 100%; width: 100%;
-    background: var(--dark-bg);
-    color: white;
-    font-family: sans-serif;
-    overflow: hidden;
+    background-color: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex; flex-direction: column;
-}
-
-.top-bar, .bottom-bar {
-    background: var(--panel-bg);
-    padding: 10px;
-    display: flex; justify-content: space-between; align-items: center;
-    z-index: 20;
-}
-
-.reader-container {
-    flex: 1;
-    display: flex; justify-content: center; align-items: center;
-    background: #e2e8f0; /* Grigio chiaro per non essere "tutto scuro" */
-    position: relative;
     overflow: hidden;
 }
 
-#quran-container {
-    position: relative;
-    height: 100%;
-    max-width: 100%;
-    display: flex; justify-content: center;
+.top-nav, .bottom-nav {
+    background: var(--panel-dark);
+    padding: 10px 15px;
+    z-index: 50;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
-#quran-image {
-    height: 100%;
-    object-fit: contain;
+.top-nav { display: flex; justify-content: space-between; align-items: center; }
+.control-box label { display: block; font-size: 10px; color: #94a3b8; margin-bottom: 3px; }
+select { background: #0f172a; color: white; border: 1px solid #334155; padding: 5px; border-radius: 5px; font-size: 12px; }
+
+.quran-viewer {
+    flex: 1;
+    background: #f1f5f9; /* Sfondo chiaro per la pagina */
+    display: flex; justify-content: center; align-items: center;
+    position: relative; overflow: hidden;
 }
 
-/* Sovrapposizione versetti */
-.verse-hitbox {
+#image-wrapper { position: relative; height: 100%; display: flex; align-items: center; }
+#quran-page-img { height: 100%; max-width: 100%; object-fit: contain; }
+
+.verse-area {
     position: absolute;
     cursor: pointer;
     background: rgba(56, 189, 248, 0);
-    transition: 0.2s;
+    transition: 0.3s;
 }
-.verse-hitbox:hover { background: rgba(56, 189, 248, 0.2); }
+.verse-area:hover { background: rgba(56, 189, 248, 0.15); border: 1px solid var(--accent); }
 
-.modal {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.8);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100;
+.bottom-nav { display: flex; flex-direction: column; gap: 10px; }
+.audio-panel { display: flex; justify-content: center; align-items: center; gap: 30px; }
+.main-play-btn { background: none; border: none; color: var(--accent); font-size: 45px; cursor: pointer; }
+.page-panel { display: flex; justify-content: space-between; align-items: center; }
+.nav-btn { background: #334155; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+
+/* Modali */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
 }
 .hidden { display: none; }
-
-.modal-content {
-    background: var(--panel-bg);
-    width: 90%; max-width: 450px;
-    border-radius: 12px; padding: 15px;
-}
-
-.modal-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
-.modal-body { max-height: 300px; overflow-y: auto; color: #cbd5e1; line-height: 1.5; }
+.modal-window { background: var(--panel-dark); width: 90%; max-width: 500px; border-radius: 15px; padding: 20px; }
+.modal-header { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+.modal-body { max-height: 350px; overflow-y: auto; line-height: 1.6; color: #cbd5e1; }
 .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
-
-.action-btn {
-    flex: 1; background: var(--accent); border: none;
-    padding: 10px; border-radius: 6px; font-weight: bold;
-}
-
-.selector-group label { font-size: 10px; display: block; color: #94a3b8; }
-select { background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px; }
-.icon-btn { background: none; border: none; color: white; font-size: 20px; }
-.play-btn { color: var(--accent); font-size: 30px; }
+.footer-action { flex: 1; padding: 12px; border: none; border-radius: 8px; background: var(--accent); font-weight: bold; cursor: pointer; }
+.close-btn, .icon-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
