@@ -1,25 +1,66 @@
-:root { --bg: #0f172a; --panel: #1e293b; --accent: #38bdf8; --text: #f8fafc; }
-body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; overflow: hidden; }
-.top-nav, .bottom-nav { background: var(--panel); padding: 10px; z-index: 10; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-.top-nav { display: flex; justify-content: space-between; align-items: center; }
-.sel-box small { display: block; font-size: 9px; color: #94a3b8; }
-select { background: #0f172a; color: white; border: 1px solid #334155; font-size: 11px; border-radius: 4px; }
-.viewer { flex: 1; display: flex; justify-content: center; background: #cbd5e1; position: relative; overflow: hidden; }
-#page-container { height: 100%; position: relative; }
-#quran-img { height: 100%; width: auto; display: block; }
-#verse-overlay { position: absolute; inset: 0; }
-.v-zone { position: absolute; cursor: pointer; background: rgba(56,189,248,0); }
-.v-zone:hover { background: rgba(56,189,248,0.1); border: 1px solid var(--accent); }
-.bottom-nav { display: flex; flex-direction: column; gap: 8px; }
-.audio-ctrl { display: flex; justify-content: center; align-items: center; gap: 25px; }
-.play-trigger { background: none; border: none; color: var(--accent); font-size: 40px; cursor: pointer; }
-.page-ctrl { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
-.nav-btn { background: #334155; color: white; border: none; padding: 6px 12px; border-radius: 4px; }
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.hidden { display: none; }
-.m-content { background: var(--panel); width: 85%; max-width: 400px; border-radius: 12px; padding: 15px; }
-.m-head { display: flex; justify-content: space-between; border-bottom: 1px solid #334155; margin-bottom: 10px; }
-.m-text { max-height: 250px; overflow-y: auto; font-size: 14px; line-height: 1.5; color: #cbd5e1; }
-.m-foot { display: flex; gap: 10px; margin-top: 15px; }
-.btn-act { flex: 1; padding: 10px; border: none; border-radius: 6px; background: var(--accent); font-weight: bold; }
-.icon-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; }
+:root {
+    --app-dark: rgba(15, 23, 42, 0.9);
+    --accent: #38bdf8;
+}
+
+body, html {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: #000; font-family: sans-serif; overflow: hidden;
+}
+
+/* Header Flottante */
+.floating-header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 50px; background: var(--app-dark);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 15px; z-index: 100; color: white;
+}
+
+.header-right { display: flex; gap: 15px; align-items: center; }
+.hd-badge { border: 1px solid white; font-size: 10px; padding: 2px 4px; border-radius: 3px; }
+
+/* Mushaf */
+.mushaf-container {
+    height: 100vh; width: 100vw;
+    display: flex; justify-content: center; align-items: center;
+    background: #f4f4f4; position: relative;
+}
+
+#page-wrapper { height: 100%; position: relative; display: flex; align-items: center; }
+#quran-page { height: 100%; width: auto; max-width: 100vw; object-fit: contain; }
+
+/* Frecce di Navigazione Flottanti */
+.nav-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.3); border: none; color: white;
+    width: 40px; height: 60px; border-radius: 5px; cursor: pointer; z-index: 10;
+}
+.nav-arrow.left { left: 10px; }
+.nav-arrow.right { right: 10px; }
+
+/* Footer Flottante */
+.floating-footer {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 40px; background: var(--app-dark);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 15px; color: white; z-index: 100;
+}
+
+.surah-info { font-weight: bold; font-size: 14px; }
+
+/* Menu Laterale Animato */
+.side-panel {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 200; display: flex; justify-content: center; align-items: center;
+}
+.panel-content {
+    background: #1e293b; width: 80%; border-radius: 10px;
+    padding: 10px; display: flex; flex-direction: column;
+}
+.menu-item {
+    padding: 15px; color: white; border-bottom: 1px solid #334155;
+    display: flex; align-items: center; gap: 15px; direction: rtl;
+}
+
+.hidden { display: none !important; }
+.icon-btn { background: none; border: none; color: white; font-size: 18px; }
