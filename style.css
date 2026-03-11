@@ -3,42 +3,35 @@ body, html {
     background: #000; overflow: hidden; font-family: sans-serif;
 }
 
-/* Pagina Corano a tutto schermo */
-.mushaf-full {
+/* Pagina intera */
+.mushaf-container {
     height: 100vh; width: 100vw;
     display: flex; justify-content: center; align-items: center;
     cursor: pointer;
 }
 
-#quran-img {
-    height: 100%; width: auto; max-width: 100%;
-    object-fit: contain;
-}
+#quran-img { height: 100%; width: auto; max-width: 100%; object-fit: contain; }
 
-/* Menu superiore e inferiore */
-.app-bar, .bottom-bar {
+/* Controlli a comparsa */
+.app-header, .app-footer {
     position: fixed; left: 0; right: 0;
-    background: rgba(15, 23, 42, 0.95);
-    color: white; padding: 15px; display: flex;
-    justify-content: space-between; align-items: center;
-    transition: 0.3s; z-index: 100;
+    background: rgba(15, 23, 42, 0.9);
+    color: white; padding: 12px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: 0.3s opacity; z-index: 100;
 }
-.app-bar { top: 0; }
-.bottom-bar { bottom: 0; font-size: 14px; }
+.app-header { top: 0; }
+.app-footer { bottom: 0; font-size: 14px; }
+.hidden-ui { opacity: 0; pointer-events: none; }
 
-.ui-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-/* Menu Laterale (stile 1000090828.jpg) */
-.side-panel {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+/* Menu stili */
+.modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
     z-index: 200; display: flex; justify-content: center; align-items: center;
 }
-.menu-list {
-    background: #1e293b; width: 85%; border-radius: 10px;
-    padding: 10px; color: white; text-align: right;
-}
-.menu-row { padding: 15px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; }
-.menu-grid { display: flex; border-bottom: 1px solid #334155; }
-.menu-grid div { flex: 1; padding: 15px; text-align: center; border-left: 1px solid #334155; }
-
+.menu-content { background: #1e293b; width: 85%; border-radius: 12px; overflow: hidden; color: white; }
+.menu-item { padding: 15px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 12px; }
+.menu-split { display: flex; border-bottom: 1px solid #334155; }
+.split-box { flex: 1; padding: 15px; text-align: center; border-left: 1px solid #334155; }
 .hidden { display: none; }
+.hd-badge { border: 1px solid white; font-size: 10px; padding: 2px 4px; border-radius: 3px; }
