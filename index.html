@@ -2,49 +2,62 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Easy Quran Pro</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran App</title>
+    <style>
+        /* Sfondo e stile generale */
+        body { 
+            margin: 0; 
+            background-color: #f4ecd8; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            font-family: sans-serif;
+        }
+
+        /* Area dell'immagine */
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        /* La tua immagine del Corano */
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Barra dei comandi sotto */
+        .footer {
+            background-color: #2c3e50;
+            color: #f1c40f;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            font-weight: bold;
+            border-top: 3px solid #f1c40f;
+        }
+
+        .btn { cursor: pointer; }
+    </style>
 </head>
 <body>
 
-    <div id="mushaf-container">
-        <div id="loading-overlay">جاري التحميل...</div>
-        <img id="quran-page" src="" alt="Quran Page">
+    <div class="content">
+        <img src="https://easyquran.com/tajweed-warsh/warsh-001.png" alt="Quran Page">
     </div>
 
-    <div id="ui-layer" class="hidden">
-        <header class="top-bar">
-            <button id="main-menu-btn"><i class="fas fa-bars"></i> الرئيسية</button>
-            <div class="top-left">
-                <i class="fas fa-search"></i>
-                <i class="fas fa-bookmark" onclick="toggleBookmark()"></i>
-                <span class="hd-badge">HD</span>
-            </div>
-        </header>
-
-        <footer class="bottom-bar">
-            <div onclick="openModal('surah-list')">≡ السور</div>
-            <div>صفحة <span id="page-num">1</span></div>
-            <div id="surah-title">الفاتحة</div>
-            <button id="play-audio-btn"><i class="fas fa-play"></i></button>
-        </footer>
+    <div class="footer">
+        <div class="btn">≡ السور (Sura)</div>
+        <div>صفحة 1</div>
+        <div class="btn">▶ استماع (Audio)</div>
     </div>
 
-    <div id="surah-list" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                فهرس السور
-                <button class="close-modal" onclick="closeAll()">&times;</button>
-            </div>
-            <div class="scroll-area" id="surah-index-container">
-                </div>
-        </div>
-    </div>
-
-    <audio id="quran-audio"></audio>
-
-    <script src="app.js"></script>
 </body>
 </html>
