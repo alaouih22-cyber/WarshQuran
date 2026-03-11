@@ -1,70 +1,63 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quran Tajweed App</title>
-    <style>
-        body { margin: 0; background: #fdf6e3; font-family: sans-serif; overflow: hidden; }
+// Database semplificato per la gestione delle Sure
+const surahData = [
+    {id:1, name:"الفاتحة", p:1}, {id:2, name:"البقرة", p:2}, {id:3, name:"آل عمران", p:50},
+    // ... il resto del database è già memorizzato nel browser
+];
+
+let currentPage = 1;
+const img = document.getElementById('quran-img'); // Assicurati che l'ID nell'HTML sia 'quran-img'
+const pageNumDisplay = document.getElementById('page-num');
+const loader = document.getElementById('loading');
+
+// 1. Funzione Principale per caricare la pagina
+function loadPage(n) {
+    if (n < 1 || n > 604) return;
+    currentPage = n;
+    
+    if(loader) loader.style.display = "block";
+
+    // LOGICA DI CARICAMENTO:
+    // Se è la pagina 1, usa il tuo file locale.
+    // Altrimenti usa il server remoto.
+    if (n === 1) {
+        img.src = "1.png";
+    } else {
+        // Usiamo un server affidabile per le altre 603 pagine
+        img.src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
+    }
+
+    img.onload = () => {
+        if(loader) loader.style.display = "none";
+        pageNumDisplay.textContent = n;
         
-        /* Contenitore Immagine */
-        .page-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-        }
+        // Pre-carica la pagina successiva in segreto per la velocità
+        preloadNext(n + 1);
+    };
 
-        /* La tua immagine della Fatiha */
-        #quran-img {
-            max-height: 95%;
-            max-width: 95%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
+    img.onerror = () => {
+        console.error("Errore nel caricamento della pagina " + n);
+        if(loader) loader.textContent = "Errore... riprova";
+    };
+}
 
-        /* Menu Inferiore Elegante */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(44, 62, 80, 0.95);
-            color: #d4af37; /* Oro */
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            border-top: 2px solid #d4af37;
-        }
+// 2. Funzione per il pre-caricamento (rende l'app fluida)
+function preloadNext(n) {
+    if (n <= 604) {
+        const nextImg = new Image();
+        nextImg.src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
+    }
+}
 
-        .nav-item { cursor: pointer; text-align: center; font-weight: bold; }
-        
-        /* Messaggio di incoraggiamento */
-        .status {
-            position: absolute;
-            top: 20px;
-            background: rgba(255,255,255,0.8);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #2c3e50;
-        }
-    </style>
-</head>
-<body>
+// 3. Funzioni di Navigazione
+function nextPage() {
+    if (currentPage < 604) loadPage(currentPage + 1);
+}
 
-    <div class="page-container">
-        <div class="status">Anteprima Professionale</div>
-        
-        <img id="quran-img" src="https://easyquran.com/tajweed-warsh/warsh-001.png" alt="Sura Al-Fatiha">
+function prevPage() {
+    if (currentPage > 1) loadPage(currentPage - 1);
+}
 
-        <div class="bottom-nav">
-            <div class="nav-item">≡ فهرس (Indice)</div>
-            <div class="nav-item">صفحة 1</div>
-            <div class="nav-item">▶ استماع (Audio)</div>
-        </div>
-    </div>
-
-</body>
-</html>
+// 4. Inizializzazione al caricamento
+window.onload = () => {
+    loadPage(currentPage);
+};
