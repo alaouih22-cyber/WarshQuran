@@ -1,40 +1,40 @@
-let currentPage = 392;
-let uiVisible = false;
+let currentPage = 392; 
+let isUiVisible = false;
 
-const mushafArea = document.getElementById('mushaf-area');
-const uiOverlay = document.getElementById('ui-overlay');
+const mushaf = document.getElementById('mushaf-area');
+const ui = document.getElementById('ui-controls');
 const sideMenu = document.getElementById('side-menu');
 
-// Mostra/Nasconde i menu al click sulla pagina
-mushafArea.onclick = (e) => {
-    // Se clicchi al centro mostra i menu
+// Clicca per interagire
+mushaf.onclick = (e) => {
     const x = e.clientX;
-    const width = window.innerWidth;
-    
-    if (x > width * 0.2 && x < width * 0.8) {
-        uiVisible = !uiVisible;
-        uiOverlay.classList.toggle('ui-hidden', !uiVisible);
-    } else if (x <= width * 0.2) {
-        // Clicca a sinistra (Avanti pagina)
-        changePage(currentPage + 1);
+    const w = window.innerWidth;
+
+    if (x > w * 0.2 && x < w * 0.8) {
+        // Clic al centro: mostra/nascondi menu
+        isUiVisible = !isUiVisible;
+        ui.classList.toggle('hidden-ui', !isUiVisible);
+    } else if (x <= w * 0.2) {
+        // Clic sinistra: Pagina successiva
+        updatePage(currentPage + 1);
     } else {
-        // Clicca a destra (Indietro pagina)
-        changePage(currentPage - 1);
+        // Clic destra: Pagina precedente
+        updatePage(currentPage - 1);
     }
 };
 
-function changePage(n) {
+function updatePage(n) {
     if (n < 1 || n > 604) return;
     currentPage = n;
+    // Carica immagine reale Tajweed da internet
     document.getElementById('quran-img').src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
     document.getElementById('page-num').textContent = n;
 }
 
-// Apri il menu laterale
-document.getElementById('menu-trigger').onclick = (e) => {
+// Apri Menu
+document.getElementById('btn-main-menu').onclick = (e) => {
     e.stopPropagation();
     sideMenu.classList.remove('hidden');
 };
 
-// Chiudi menu cliccando fuori
 sideMenu.onclick = () => sideMenu.classList.add('hidden');
