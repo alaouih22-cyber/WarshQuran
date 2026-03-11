@@ -1,4 +1,4 @@
-// Database Completo delle 114 Sure (Nome in arabo e Pagina d'inizio reale nel Mushaf di Medina)
+// Database Completo delle 114 Sure
 const surahData = [
     {id:1, name:"الفاتحة", p:1}, {id:2, name:"البقرة", p:2}, {id:3, name:"آل عمران", p:50},
     {id:4, name:"النساء", p:77}, {id:5, name:"المائدة", p:106}, {id:6, name:"الأنعام", p:128},
@@ -40,22 +40,24 @@ const surahData = [
     {id:112, name:"الإخلاص", p:604}, {id:113, name:"الفلق", p:604}, {id:114, name:"الناس", p:604}
 ];
 
-// Pagina iniziale (impostata a 392 come richiesto)
 let currentPage = 392; 
 const img = document.getElementById('quran-page');
 const audio = document.getElementById('quran-audio');
 const loader = document.getElementById('loading-overlay');
 
-// 1. Funzione Principale: Carica la Pagina del Corano (Mushaf Tajweed)
+// 1. Funzione Carica Pagina (Aggiornata con link EasyQuran PNG)
 function loadPage(n) {
-    if (n < 1 || n > 604) return; // Limite pagine Corano Medina
+    if (n < 1 || n > 604) return;
     currentPage = n;
     
     loader.style.display = "block";
     img.style.display = "none";
     
-    // Sorgente immagini HD Tajweed (non si bloccano)
-    img.src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
+    // Formattiamo il numero della pagina a 3 cifre (es: 1 -> 001, 10 -> 010)
+    let pageNumFormatted = n.toString().padStart(3, '0');
+    
+    // Link diretto alle immagini PNG dal sito EasyQuran (Versione Tajweed Warsh)
+    img.src = `https://easyquran.com/tajweed-warsh/warsh-${pageNumFormatted}.png`;
     
     img.onload = () => {
         loader.style.display = "none";
@@ -65,11 +67,13 @@ function loadPage(n) {
     };
     
     img.onerror = () => {
-        loader.textContent = "Errore caricamento. Riprova.";
+        // Backup: se EasyQuran non risponde, usa il server alternativo
+        img.src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
+        console.log("Errore: Caricamento immagine di backup.");
     };
 }
 
-// 2. Aggiorna il Nome della Sura nella Barra Inferiore basandosi sulla pagina
+// 2. Aggiorna il Nome della Sura
 function updateSurahName(p) {
     let currentS = surahData[0].name;
     for(let s of surahData) {
@@ -79,7 +83,7 @@ function updateSurahName(p) {
     document.getElementById('surah-title').textContent = currentS;
 }
 
-// 3. Genera Dinamicamente l'Indice delle Sure nel Menu Laterale
+// 3. Genera Indice Menu
 function buildSurahIndex() {
     const container = document.getElementById('surah-index-container');
     let html = "";
@@ -98,11 +102,10 @@ function goToSurah(p) {
     closeAll();
 }
 
-// 4. Gestione Audio Player (Esempio: Alafasy)
+// 4. Audio Player
 let isPlaying = false;
 document.getElementById('play-audio-btn').onclick = () => {
     if(!isPlaying) {
-        // Esempio: riproduce la Sura 1 (Al-Fatiha)
         audio.src = `https://download.quranicaudio.com/quran/mishari_rashid_al-afasy/001.mp3`;
         audio.play();
         document.getElementById('play-audio-btn').innerHTML = '<i class="fas fa-pause"></i>';
@@ -113,34 +116,31 @@ document.getElementById('play-audio-btn').onclick = () => {
     isPlaying = !isPlaying;
 };
 
-// 5. Gestione Navigazione Touch (Sinistra: Avanti, Destra: Indietro, Centro: Menu)
+// 5. Navigazione Touch (Sinistra avanti, Destra indietro)
 document.getElementById('mushaf-container').onclick = (e) => {
     const x = e.clientX;
     const w = window.innerWidth;
     const uiLayer = document.getElementById('ui-layer');
 
     if (x > w * 0.3 && x < w * 0.7) {
-        // Tocco centrale: mostra/nascondi barre UI
         uiLayer.classList.toggle('hidden');
     } else if (x <= w * 0.3) {
-        // Tocco a sinistra: pagina precedente (nel Corano si va avanti a sinistra)
         loadPage(currentPage + 1);
     } else {
-        // Tocco a destra: pagina successiva
         loadPage(currentPage - 1);
     }
 };
 
-// 6. Gestione Modali (Menu)
+// 6. Gestione Menu
 function openModal(id) {
     document.getElementById(id).classList.remove('hidden');
 }
 
 function closeAll() {
     document.getElementById('surah-list').classList.add('hidden');
-    document.getElementById('ui-layer').classList.add('hidden'); // Nasconde anche le barre
+    document.getElementById('ui-layer').classList.add('hidden');
 }
 
-// Inizializzazione App
+// Inizializzazione
 buildSurahIndex();
 loadPage(currentPage);
