@@ -3,38 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran Warsh Pro</title>
+    <title>Quran Warsh Professional</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <!-- Area Pagina Corano (Tutto schermo) -->
-    <div id="quranPageContainer" onclick="toggleMenu()">
-        <img id="quranImage" src="https://easyquran.com" alt="Quran Page">
+    <!-- Visualizzazione Mushaf (Pagine) -->
+    <div id="mushafContainer" onclick="ui.toggleMenu()">
+        <img id="pageImg" src="https://easyquran.com" alt="Pagina Corano">
+        <div id="loadingOverlay" class="hidden">جاري التحميل...</div>
     </div>
 
-    <!-- Menu Overlay (Si vede al click) -->
-    <div id="menuOverlay" class="hidden">
-        <div class="menu-content">
-            <h3>Impostazioni</h3>
-            <label>Sura:</label>
-            <select id="surahSelect"></select>
+    <!-- Pannello Controllo (Slide-up) -->
+    <div id="mainMenu" class="hidden">
+        <div class="header-menu">
+            <h2>إعدادات المصحف</h2>
+            <button onclick="ui.toggleMenu()">✕</button>
+        </div>
+        
+        <div class="control-grid">
+            <section>
+                <label>السورة</label>
+                <select id="surahSelect"></select>
+            </section>
             
-            <label>Recitatore (Warsh):</label>
-            <select id="reciterSelect"></select>
-
-            <label>Tafsir:</label>
-            <select id="tafsirSelect"></select>
-
-            <div id="tafsirDisplay">Seleziona un Tafsir per leggere...</div>
+            <section>
+                <label>القارئ (ورش)</label>
+                <select id="reciterSelect"></select>
+            </section>
             
-            <button onclick="toggleMenu()">Chiudi</button>
+            <section>
+                <label>التفسير</label>
+                <select id="tafsirSelect"></select>
+            </section>
+        </div>
+
+        <div id="tafsirContent">
+            <h3>التفسير الكامل للمختارة</h3>
+            <div id="tafsirList">اختر سورة لتحميل التفسير...</div>
         </div>
     </div>
 
     <!-- Player Audio Fisso -->
-    <footer id="audioControls">
-        <audio id="audioPlayer" controls></audio>
+    <footer id="playerBar">
+        <audio id="mainAudio" controls></audio>
     </footer>
 
     <script src="app.js"></script>
