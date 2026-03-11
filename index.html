@@ -1,46 +1,54 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran Tajweed Pro</title>
+    <title>Quran App</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <header class="app-header">
-        <button class="icon-btn" id="main-menu"><i class="fas fa-bars"></i></button>
-        <div class="header-center">
-            <span id="surah-title">سُورَةُ القَصَصِ</span>
-        </div>
-        <div class="header-right">
-            <button class="icon-btn"><i class="fas fa-search"></i></button>
-            <button class="icon-btn"><i class="fas fa-bookmark"></i></button>
-            <span class="hd-tag">HD</span>
-        </div>
-    </header>
-
-    <main class="mushaf-viewer">
-        <div id="page-container">
-            <img id="quran-img" src="https://www.searchtruth.org/quran/images2/392.png" alt="Caricamento Corano...">
-            
-            <button class="nav-arrow prev" id="btn-prev"><i class="fas fa-chevron-left"></i></button>
-            <button class="nav-arrow next" id="btn-next"><i class="fas fa-chevron-right"></i></button>
-        </div>
+    <main class="mushaf-full" id="mushaf-area">
+        <img id="quran-img" src="https://pwanew.mohib.me/tajweed_png/392.png" alt="Quran">
     </main>
 
-    <footer class="app-footer">
-        <div class="footer-content">
-            <button class="footer-btn">القائمة الثانوية ≡</button>
-            <div class="page-indicator">
-                <span id="page-num">صفحة ٣٩٢</span>
+    <div id="ui-overlay" class="ui-hidden">
+        <header class="app-bar">
+            <button class="icon-btn" id="menu-trigger"><i class="fas fa-bars"></i> الرئيسية</button>
+            <div class="header-right">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-bookmark"></i>
+                <i class="fas fa-headphones"></i>
+                <span class="hd-badge">HD</span>
             </div>
-            <div class="audio-mini-player">
-                <button id="play-pause"><i class="fas fa-play"></i></button>
+        </header>
+
+        <footer class="bottom-bar">
+            <div class="footer-right">≡ القائمة الثانوية</div>
+            <div class="footer-center">صفحة <span id="page-num">392</span></div>
+            <div class="footer-left">سُورَةُ القَصَصِ</div>
+        </footer>
+    </div>
+
+    <div id="side-menu" class="side-panel hidden">
+        <div class="menu-list">
+            <div class="menu-row"><i class="fab fa-paypal"></i> تبرع</div>
+            <div class="menu-row"><i class="fas fa-book-open"></i> التفسير</div>
+            <div class="menu-grid">
+                <div>السور</div>
+                <div>الصفحات</div>
             </div>
+            <div class="menu-grid">
+                <div>الأحزاب</div>
+                <div>الأجزاء</div>
+            </div>
+            <div class="menu-row"><i class="fas fa-bookmark"></i> حفظ علامة | إنتقل للعلامة</div>
+            <div class="menu-row"><i class="fas fa-redo"></i> إسمع وكرّر</div>
+            <div class="menu-row"><i class="fas fa-hand-holding-heart"></i> دعاء الختم</div>
+            <div class="menu-row"><i class="fas fa-cog"></i> إعدادات الشاشة</div>
         </div>
-    </footer>
+    </div>
 
     <script src="app.js"></script>
 </body>
