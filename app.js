@@ -1,32 +1,40 @@
-let currentPage = 392; // Partiamo dalla pagina dello screenshot
+let currentPage = 392;
+let uiVisible = false;
 
-const qImg = document.getElementById('quran-img');
-const pLabel = document.getElementById('page-num');
+const mushafArea = document.getElementById('mushaf-area');
+const uiOverlay = document.getElementById('ui-overlay');
+const sideMenu = document.getElementById('side-menu');
 
-function loadQuranPage(n) {
-    if (n < 1 || n > 604) return;
-    currentPage = n;
-
-    // Usiamo un server affidabile per le immagini Tajweed
-    // Nota: il numero deve essere formattato correttamente
-    qImg.src = `https://www.searchtruth.org/quran/images2/${n}.png`;
+// Mostra/Nasconde i menu al click sulla pagina
+mushafArea.onclick = (e) => {
+    // Se clicchi al centro mostra i menu
+    const x = e.clientX;
+    const width = window.innerWidth;
     
-    pLabel.textContent = `صفحة ${n}`;
-    
-    // Scroll automatico in alto quando cambi pagina
-    window.scrollTo(0,0);
-}
-
-// Bottoni Avanti/Indietro
-document.getElementById('btn-next').onclick = () => loadQuranPage(currentPage - 1); // Nel Corano si legge da destra a sinistra
-document.getElementById('btn-prev').onclick = () => loadQuranPage(currentPage + 1);
-
-// Gestione Play Audio (Esempio)
-let isPlaying = false;
-document.getElementById('play-pause').onclick = function() {
-    isPlaying = !isPlaying;
-    this.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+    if (x > width * 0.2 && x < width * 0.8) {
+        uiVisible = !uiVisible;
+        uiOverlay.classList.toggle('ui-hidden', !uiVisible);
+    } else if (x <= width * 0.2) {
+        // Clicca a sinistra (Avanti pagina)
+        changePage(currentPage + 1);
+    } else {
+        // Clicca a destra (Indietro pagina)
+        changePage(currentPage - 1);
+    }
 };
 
-// Inizializza l'app
-loadQuranPage(currentPage);
+function changePage(n) {
+    if (n < 1 || n > 604) return;
+    currentPage = n;
+    document.getElementById('quran-img').src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
+    document.getElementById('page-num').textContent = n;
+}
+
+// Apri il menu laterale
+document.getElementById('menu-trigger').onclick = (e) => {
+    e.stopPropagation();
+    sideMenu.classList.remove('hidden');
+};
+
+// Chiudi menu cliccando fuori
+sideMenu.onclick = () => sideMenu.classList.add('hidden');
