@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran Pro App</title>
+    <title>Quran App Pro</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <link rel="stylesheet" href="style.css">
@@ -11,77 +11,67 @@
 </head>
 <body>
     <header class="top-nav">
-        <div class="control-box">
-            <label>Recitatore</label>
-            <select id="reciter-select">
+        <div class="sel-box">
+            <small>Recitatore</small>
+            <select id="reciter-sel">
                 <option value="ar.alafasy">Mishary Alafasy</option>
                 <option value="ar.abdulsamad">AbdulBaset</option>
-                <option value="ar.as-sudais">Abdur-Rahman as-Sudais</option>
-                <option value="ar.minshawi">Al-Minshawi</option>
+                <option value="ar.as-sudais">As-Sudais</option>
             </select>
         </div>
-        <div class="control-box">
-            <label>Tafsir</label>
-            <select id="tafsir-select">
+        <div class="sel-box">
+            <small>Tafsir</small>
+            <select id="tafsir-sel">
                 <option value="it-asmari">Italiano (Asmari)</option>
-                <option value="ar-tafsir-ibn-kathir">Ibn Kathir (Arabo)</option>
-                <option value="ar-jalalayn">Al-Jalalayn (Arabo)</option>
+                <option value="ar-jalalayn">Al-Jalalayn</option>
+                <option value="ar-saadi">Al-Saadi</option>
             </select>
         </div>
-        <button id="open-bookmarks" class="icon-btn"><i class="fas fa-bookmark"></i></button>
+        <button id="btn-bookmarks" class="icon-btn"><i class="fas fa-bookmark"></i></button>
     </header>
 
-    <main class="quran-viewer">
-        <div id="image-wrapper">
-            <img id="quran-page-img" src="https://raw.githubusercontent.com/mustafa0x/quran-images/main/png-640/1.png" alt="Pagina Corano">
-            <div id="verse-map"></div>
+    <main class="viewer">
+        <div id="page-container">
+            <img id="quran-img" src="" alt="Caricamento pagina..." onerror="this.src='https://via.placeholder.com/400x600?text=Errore+Caricamento+Pagina'">
+            <div id="verse-overlay"></div>
         </div>
     </main>
 
     <footer class="bottom-nav">
-        <div class="audio-panel">
-            <button id="prev-ayah" class="icon-btn"><i class="fas fa-step-backward"></i></button>
-            <button id="play-btn" class="main-play-btn"><i class="fas fa-play-circle"></i></button>
-            <button id="next-ayah" class="icon-btn"><i class="fas fa-step-forward"></i></button>
+        <div class="audio-ctrl">
+            <button id="a-prev" class="icon-btn"><i class="fas fa-step-backward"></i></button>
+            <button id="a-play" class="play-trigger"><i class="fas fa-play-circle"></i></button>
+            <button id="a-next" class="icon-btn"><i class="fas fa-step-forward"></i></button>
         </div>
-        <div class="page-panel">
-            <button id="prev-page-btn" class="nav-btn">Indietro</button>
-            <div class="page-info">
-                <span id="page-number-display">Pagina 1</span>
-            </div>
-            <button id="next-page-btn" class="nav-btn">Avanti</button>
+        <div class="page-ctrl">
+            <button id="p-prev" class="nav-btn">Indietro</button>
+            <b id="p-num">Pagina 1</b>
+            <button id="p-next" class="nav-btn">Avanti</button>
         </div>
     </footer>
 
-    <div id="tafsir-modal" class="modal-overlay hidden">
-        <div class="modal-window">
-            <div class="modal-header">
-                <h3 id="modal-title">Dettagli Versetto</h3>
-                <button id="close-modal" class="close-btn"><i class="fas fa-times"></i></button>
+    <div id="modal-tafsir" class="modal hidden">
+        <div class="m-content">
+            <div class="m-head">
+                <h3 id="m-title">Versetto</h3>
+                <button id="m-close" class="icon-btn"><i class="fas fa-times"></i></button>
             </div>
-            <div id="modal-content" class="modal-body">
-                <p>Caricamento del Tafsir selezionato...</p>
-            </div>
-            <div class="modal-footer">
-                <button id="save-bookmark-btn" class="footer-action"><i class="fas fa-save"></i> Salva Segnalibro</button>
-                <button id="listen-verse-btn" class="footer-action"><i class="fas fa-volume-up"></i> Ascolta</button>
+            <div id="m-body" class="m-text">Caricamento spiegazione...</div>
+            <div class="m-foot">
+                <button id="m-save" class="btn-act"><i class="fas fa-save"></i> Segnalibro</button>
+                <button id="m-audio" class="btn-act"><i class="fas fa-volume-up"></i> Audio</button>
             </div>
         </div>
     </div>
 
-    <div id="bookmarks-modal" class="modal-overlay hidden">
-        <div class="modal-window">
-            <div class="modal-header">
-                <h3>Segnalibri Salvati</h3>
-                <button id="close-bookmarks" class="close-btn"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <ul id="bookmarks-list"></ul>
-            </div>
+    <div id="modal-bmarks" class="modal hidden">
+        <div class="m-content">
+            <div class="m-head"><h3>I tuoi Segnalibri</h3><button id="b-close" class="icon-btn"><i class="fas fa-times"></i></button></div>
+            <div class="m-body"><ul id="b-list"></ul></div>
         </div>
     </div>
 
-    <audio id="audio-engine"></audio>
+    <audio id="player"></audio>
     <script src="app.js"></script>
 </body>
 </html>
