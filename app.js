@@ -1,4 +1,4 @@
-// Database Completo delle 114 Sure
+// Database Completo delle 114 Sure (Medina Mushaf)
 const surahData = [
     {id:1, name:"الفاتحة", p:1}, {id:2, name:"البقرة", p:2}, {id:3, name:"آل عمران", p:50},
     {id:4, name:"النساء", p:77}, {id:5, name:"المائدة", p:106}, {id:6, name:"الأنعام", p:128},
@@ -42,38 +42,53 @@ const surahData = [
 
 let currentPage = 392; 
 const img = document.getElementById('quran-page');
-const audio = document.getElementById('quran-audio');
 const loader = document.getElementById('loading-overlay');
 
-// 1. Funzione Carica Pagina (Aggiornata con link EasyQuran PNG)
+// 1. Funzione Carica Pagina (Usa EasyQuran PNG)
 function loadPage(n) {
     if (n < 1 || n > 604) return;
     currentPage = n;
     
     loader.style.display = "block";
-    img.style.display = "none";
     
-    // Formattiamo il numero della pagina a 3 cifre (es: 1 -> 001, 10 -> 010)
-    let pageNumFormatted = n.toString().padStart(3, '0');
-    
-    // Link diretto alle immagini PNG dal sito EasyQuran (Versione Tajweed Warsh)
-    img.src = `https://easyquran.com/tajweed-warsh/warsh-${pageNumFormatted}.png`;
+    // Formattazione numero a 3 cifre per il sito
+    let pNum = n.toString().padStart(3, '0');
+    let url = `https://easyquran.com/tajweed-warsh/warsh-${pNum}.png`;
+
+    img.src = url;
     
     img.onload = () => {
         loader.style.display = "none";
-        img.style.display = "block";
         document.getElementById('page-num').textContent = n;
         updateSurahName(n);
+        preloadNext(n + 1); // Carica segretamente la prossima pagina
     };
     
     img.onerror = () => {
-        // Backup: se EasyQuran non risponde, usa il server alternativo
+        // Fallback se il server ha problemi
         img.src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
-        console.log("Errore: Caricamento immagine di backup.");
     };
 }
 
-// 2. Aggiorna il Nome della Sura
+// 2. Funzione Pre-caricamento (Rende l'app veloce)
+function preloadNext(n) {
+    if (n <= 604) {
+        let pNum = n.toString().padStart(3, '0');
+        const nextImg = new Image();
+        nextImg.src = `https://easyquran.com/tajweed-warsh/warsh-${pNum}.png`;
+    }
+}
+
+// 3. Funzione Download PNG (Per salvare la pagina sul telefono)
+function downloadPage() {
+    let pNum = currentPage.toString().padStart(3, '0');
+    const link = document.createElement('a');
+    link.href = img.src;
+    link.download = `Warsh_Page_${pNum}.png`;
+    link.click();
+}
+
+// 4. Aggiorna Nome Sura
 function updateSurahName(p) {
     let currentS = surahData[0].name;
     for(let s of surahData) {
@@ -83,7 +98,7 @@ function updateSurahName(p) {
     document.getElementById('surah-title').textContent = currentS;
 }
 
-// 3. Genera Indice Menu
+// 5. Costruisci Indice
 function buildSurahIndex() {
     const container = document.getElementById('surah-index-container');
     let html = "";
@@ -102,21 +117,7 @@ function goToSurah(p) {
     closeAll();
 }
 
-// 4. Audio Player
-let isPlaying = false;
-document.getElementById('play-audio-btn').onclick = () => {
-    if(!isPlaying) {
-        audio.src = `https://download.quranicaudio.com/quran/mishari_rashid_al-afasy/001.mp3`;
-        audio.play();
-        document.getElementById('play-audio-btn').innerHTML = '<i class="fas fa-pause"></i>';
-    } else {
-        audio.pause();
-        document.getElementById('play-audio-btn').innerHTML = '<i class="fas fa-play"></i>';
-    }
-    isPlaying = !isPlaying;
-};
-
-// 5. Navigazione Touch (Sinistra avanti, Destra indietro)
+// 6. Navigazione Touch
 document.getElementById('mushaf-container').onclick = (e) => {
     const x = e.clientX;
     const w = window.innerWidth;
@@ -125,22 +126,18 @@ document.getElementById('mushaf-container').onclick = (e) => {
     if (x > w * 0.3 && x < w * 0.7) {
         uiLayer.classList.toggle('hidden');
     } else if (x <= w * 0.3) {
-        loadPage(currentPage + 1);
+        loadPage(currentPage + 1); // Avanti a sinistra
     } else {
-        loadPage(currentPage - 1);
+        loadPage(currentPage - 1); // Indietro a destra
     }
 };
 
-// 6. Gestione Menu
-function openModal(id) {
-    document.getElementById(id).classList.remove('hidden');
-}
-
-function closeAll() {
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeAll() { 
     document.getElementById('surah-list').classList.add('hidden');
     document.getElementById('ui-layer').classList.add('hidden');
 }
 
-// Inizializzazione
+// Inizio
 buildSurahIndex();
 loadPage(currentPage);
