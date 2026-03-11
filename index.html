@@ -3,111 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Easy Quran</title>
-    <style>
-        /* Stile elegante e scuro per far risaltare il Corano */
-        body { 
-            margin: 0; 
-            background-color: #0f172a; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            overflow: hidden;
-        }
-
-        /* Area della pagina */
-        .content {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        img {
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            background: white; /* Per vedere bene la pagina bianca */
-        }
-
-        /* Barra dei comandi */
-        .footer {
-            background-color: #1e293b;
-            color: #fbbf24;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 15px;
-            border-top: 2px solid #fbbf24;
-            font-size: 1.1rem;
-        }
-
-        .btn { 
-            background: #334155; 
-            padding: 8px 15px; 
-            border-radius: 8px; 
-            cursor: pointer;
-            border: 1px solid #475569;
-        }
-
-        .btn:active { background: #475569; }
-
-        #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-        }
-    </style>
+    <title>Easy Quran Warsh</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="content" onclick="nextPage()">
-        <div id="loading">... جاري التحميل</div>
-        <img id="quran-img" src="1.png" alt="Quran Page">
+    <div id="loading-overlay">... جاري التحميل</div>
+
+    <div class="mushaf-container" onclick="handleTap(event)">
+        <img id="quran-page" src="1.png" alt="Quran Page">
     </div>
 
-    <div class="footer">
-        <div class="btn" onclick="prevPage()">السابق</div>
-        <div>صفحة <span id="page-num">1</span></div>
-        <div class="btn" onclick="nextPage()">التالي</div>
+    <div class="bottom-bar">
+        <button class="nav-btn" onclick="prevPage()">السابق</button>
+        <div class="page-info">
+            <span id="surah-title">الفاتحة</span>
+            <br>
+            <small>صفحة <span id="page-num">1</span></small>
+        </div>
+        <button class="nav-btn" onclick="nextPage()">التالي</button>
     </div>
 
-    <script>
-        let currentPage = 1;
-        const imgElement = document.getElementById('quran-img');
-        const pageText = document.getElementById('page-num');
-
-        function updatePage() {
-            // Se è la pagina 1, usa il tuo file locale 1.png
-            if (currentPage === 1) {
-                imgElement.src = "1.png";
-            } else {
-                // Per le altre pagine, usa il server di backup così non devi caricarle tutte a mano
-                imgElement.src = `https://pwanew.mohib.me/tajweed_png/${currentPage}.png`;
-            }
-            pageText.innerText = currentPage;
-        }
-
-        function nextPage() {
-            if (currentPage < 604) {
-                currentPage++;
-                updatePage();
-            }
-        }
-
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                updatePage();
-            }
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
