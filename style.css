@@ -1,66 +1,29 @@
-:root {
-    --app-dark: rgba(15, 23, 42, 0.9);
-    --accent: #38bdf8;
+let currentPage = 392; // Pagina di esempio come nei tuoi screenshot
+
+function updatePage(n) {
+    if (n < 1 || n > 604) return;
+    currentPage = n;
+    
+    // Formattazione 001, 002...
+    const pStr = n.toString().padStart(3, '0');
+    const imgUrl = `https://everyayah.com/data/quran_pages_png/${pStr}.png`;
+    
+    document.getElementById('quran-page').src = imgUrl;
+    document.getElementById('page-label').textContent = `صفحة ${n}`;
+    
+    // Salva l'ultima pagina letta
+    localStorage.setItem('last_page', n);
 }
 
-body, html {
-    margin: 0; padding: 0; height: 100%; width: 100%;
-    background: #000; font-family: sans-serif; overflow: hidden;
-}
+// Navigazione
+document.getElementById('p-next').onclick = () => updatePage(currentPage + 1);
+document.getElementById('p-prev').onclick = () => updatePage(currentPage - 1);
 
-/* Header Flottante */
-.floating-header {
-    position: fixed; top: 0; left: 0; right: 0;
-    height: 50px; background: var(--app-dark);
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 15px; z-index: 100; color: white;
-}
+// Gestione Menu
+const sideMenu = document.getElementById('side-menu');
+document.getElementById('menu-main').onclick = () => sideMenu.classList.toggle('hidden');
+sideMenu.onclick = (e) => { if(e.target === sideMenu) sideMenu.classList.add('hidden'); };
 
-.header-right { display: flex; gap: 15px; align-items: center; }
-.hd-badge { border: 1px solid white; font-size: 10px; padding: 2px 4px; border-radius: 3px; }
-
-/* Mushaf */
-.mushaf-container {
-    height: 100vh; width: 100vw;
-    display: flex; justify-content: center; align-items: center;
-    background: #f4f4f4; position: relative;
-}
-
-#page-wrapper { height: 100%; position: relative; display: flex; align-items: center; }
-#quran-page { height: 100%; width: auto; max-width: 100vw; object-fit: contain; }
-
-/* Frecce di Navigazione Flottanti */
-.nav-arrow {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    background: rgba(0,0,0,0.3); border: none; color: white;
-    width: 40px; height: 60px; border-radius: 5px; cursor: pointer; z-index: 10;
-}
-.nav-arrow.left { left: 10px; }
-.nav-arrow.right { right: 10px; }
-
-/* Footer Flottante */
-.floating-footer {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    height: 40px; background: var(--app-dark);
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 15px; color: white; z-index: 100;
-}
-
-.surah-info { font-weight: bold; font-size: 14px; }
-
-/* Menu Laterale Animato */
-.side-panel {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    z-index: 200; display: flex; justify-content: center; align-items: center;
-}
-.panel-content {
-    background: #1e293b; width: 80%; border-radius: 10px;
-    padding: 10px; display: flex; flex-direction: column;
-}
-.menu-item {
-    padding: 15px; color: white; border-bottom: 1px solid #334155;
-    display: flex; align-items: center; gap: 15px; direction: rtl;
-}
-
-.hidden { display: none !important; }
-.icon-btn { background: none; border: none; color: white; font-size: 18px; }
+// Inizializzazione
+const saved = localStorage.getItem('last_page');
+updatePage(saved ? parseInt(saved) : 392);
