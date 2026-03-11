@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran Warsh Professional</title>
+    <title>Quran Warsh Professional - Mushaf Tajweed</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <!-- Visualizzazione Mushaf (Pagine) -->
     <div id="mushafContainer" onclick="ui.toggleMenu()">
-        <img id="pageImg" src="https://easyquran.com" alt="Pagina Corano">
+        <img id="pageImg" src="https://easyquran.com/warsh-tajweed-colored/1.png" alt="المصحف الملون برواية ورش - تجويد">
         <div id="loadingOverlay" class="hidden">جاري التحميل...</div>
+        
+        <div id="tajweedLegend" class="hidden">
+            <span style="color: #ff0000;">مد</span>
+            <span style="color: #008000;">غنة</span>
+            <span style="color: #0000ff;">قلقلة</span>
+        </div>
     </div>
 
-    <!-- Pannello Controllo (Slide-up) -->
     <div id="mainMenu" class="hidden">
         <div class="header-menu">
-            <h2>إعدادات المصحف</h2>
+            <h2>إعدادات المصحف برواية ورش</h2>
             <button onclick="ui.toggleMenu()">✕</button>
         </div>
         
@@ -29,7 +33,10 @@
             
             <section>
                 <label>القارئ (ورش)</label>
-                <select id="reciterSelect"></select>
+                <select id="reciterSelect">
+                    <option value="yassin_al_jazairi">ياسين الجزائري</option>
+                    <option value="kushite">محمود خليل الحصري (ورش)</option>
+                </select>
             </section>
             
             <section>
@@ -38,14 +45,26 @@
             </section>
         </div>
 
+        <div class="ramadan-features">
+            <div class="status-box">
+                <span id="mosqueStatus">Stato della Moschea (Live News)</span>
+            </div>
+            <div class="timers">
+                <p>Imsak: <span id="imsakTime">05:20</span> (Fine Suhoor)</p>
+                <p>Iftar: <span id="iftarTime">17:45</span></p>
+                <p>Tarawih: <span id="tarawihTime">20:30</span></p>
+            </div>
+            <button id="notteSerenaBtn">Attiva Modalità Notte Serena</button>
+        </div>
+
         <div id="tafsirContent">
             <h3>التفسير الكامل للمختارة</h3>
             <div id="tafsirList">اختر سورة لتحميل التفسير...</div>
         </div>
     </div>
 
-    <!-- Player Audio Fisso -->
     <footer id="playerBar">
+        <div class="audio-info">جاري الاستماع برواية ورش عن نافع</div>
         <audio id="mainAudio" controls></audio>
     </footer>
 
