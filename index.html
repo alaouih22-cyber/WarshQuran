@@ -1,146 +1,42 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Quran Warsh</title>
 
-<style>
-
-body{
-font-family:Amiri;
-background:#f4f4f4;
-margin:0;
-}
-
-header{
-background:#0b6b50;
-color:white;
-padding:15px;
-text-align:center;
-font-size:22px;
-}
-
-#quran{
-padding:20px;
-line-height:2.2;
-font-size:24px;
-}
-
-.ayah{
-cursor:pointer;
-padding:5px;
-}
-
-.ayah:hover{
-background:#e8e8e8;
-}
-
-#tafsir{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-background:white;
-padding:20px;
-max-height:50%;
-overflow:auto;
-display:none;
-border-top:4px solid #0b6b50;
-}
-
-button{
-padding:8px 12px;
-margin:5px;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
 
 </head>
 
 <body>
 
 <header>
-📖 القرآن الكريم
+📖 المصحف برواية ورش
 </header>
 
-<div style="text-align:center">
+<div class="toolbar">
 
 <select id="surah"></select>
 
-<button onclick="loadSurah()">Apri Sura</button>
+<button onclick="openPage()">Apri</button>
+
+<input id="search" placeholder="🔎 Cerca ayah">
 
 </div>
 
-<div id="quran"></div>
+<div id="mushaf"></div>
 
-<div id="tafsir">
+<div id="tafsirBox">
 <button onclick="closeTafsir()">Chiudi</button>
 <div id="tafsirText"></div>
 </div>
 
-<script>
-
-const surahSelect=document.getElementById("surah")
-
-for(let i=1;i<=114;i++){
-
-let o=document.createElement("option")
-o.value=i
-o.text="Sura "+i
-surahSelect.appendChild(o)
-
-}
-
-async function loadSurah(){
-
-let s=surahSelect.value
-
-let res=await fetch("https://api.alquran.cloud/v1/surah/"+s+"/ar")
-
-let data=await res.json()
-
-let q=document.getElementById("quran")
-
-q.innerHTML=""
-
-data.data.ayahs.forEach(a=>{
-
-let div=document.createElement("div")
-
-div.className="ayah"
-
-div.innerHTML=a.text+" ("+a.numberInSurah+")"
-
-div.onclick=()=>playAudio(a.number)
-
-q.appendChild(div)
-
-})
-
-}
-
-function playAudio(n){
-
-let num=String(n).padStart(6,"0")
-
-let url="https://everyayah.com/data/Husary_Warsh_64kbps/"+num+".mp3"
-
-let audio=new Audio(url)
-
-audio.play()
-
-}
-
-function closeTafsir(){
-
-document.getElementById("tafsir").style.display="none"
-
-}
-
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
