@@ -1,20 +1,13 @@
 {
-  "name": "Quran Reader App",
-  "short_name": "Quran",
-  "description": "App per la lettura del Corano a tutto schermo con Tafsir e Audio",
+  "name": "Quran Reader Pro",
+  "short_name": "QuranPro",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#1a1a2e",
-  "orientation": "portrait",
+  "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Icon_of_Quran.svg/192px-Icon_of_Quran.svg.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Icon_of_Quran.svg/512px-Icon_of_Quran.svg.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/2807/2807575.png",
       "sizes": "512x512",
       "type": "image/png"
     }
