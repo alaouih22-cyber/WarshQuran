@@ -1,42 +1,33 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>Quran Warsh</title>
-
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Quran Clone - Warsh</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
 </head>
-
 <body>
+    <header>
+        <h1>القرآن الكريم (رواية ورش)</h1>
+        <select id="surahSelect"><option>جاري التحميل...</option></select>
+    </header>
 
-<header>
-📖 المصحف برواية ورش
-</header>
+    <main id="quranContainer">
+        <div id="ayahText" class="quran-text">اختر سورة للبدء</div>
+        <div id="tafsirText" class="tafsir-text"></div>
+    </main>
 
-<div class="toolbar">
+    <footer class="player">
+        <audio id="audioPlayer" controls></audio>
+    </footer >
 
-<select id="surah"></select>
-
-<button onclick="openPage()">Apri</button>
-
-<input id="search" placeholder="🔎 Cerca ayah">
-
-</div>
-
-<div id="mushaf"></div>
-
-<div id="tafsirBox">
-<button onclick="closeTafsir()">Chiudi</button>
-<div id="tafsirText"></div>
-</div>
-
-<script src="app.js"></script>
-
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
