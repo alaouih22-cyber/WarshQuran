@@ -5,60 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Quran Warsh Professional</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <div id="mushafContainer" onclick="ui.toggleMenu()">
-        <img id="pageImg" src="https://easyquran.com/path-to-warsh-tajweed/1.png" alt="المصحف الملون برواية ورش - تجويد">
+    <div id="mushafContainer">
+        <img id="pageImg" src="https://www.searchtruth.org/quran/images2/tajweed/1.jpg" alt="Pagina Corano">
         <div id="loadingOverlay" class="hidden">جاري التحميل...</div>
     </div>
 
-    <div id="mainMenu" class="hidden">
+    <div id="mainMenu">
         <div class="header-menu">
             <h2>إعدادات المصحف</h2>
-            <button onclick="ui.toggleMenu()">✕</button>
         </div>
         
         <div class="control-grid">
             <section>
                 <label>السورة (Sura)</label>
-                <select id="surahSelect"></select>
+                <select id="surahSelect">
+                    <option>جاري تحميل السور...</option>
+                </select>
             </section>
             
             <section>
                 <label>رقم الصفحة (Pagina)</label>
                 <input type="number" id="pageInput" min="1" max="604" value="1">
             </section>
-
-            <section>
-                <label>القارئ (ورش - Recitante)</label>
-                <select id="reciterSelect"></select>
-            </section>
-            
-            <section>
-                <label>التفسير (Tafsir)</label>
-                <select id="tafsirSelect"></select>
-            </section>
         </div>
 
         <div id="tajweedLegend">
-            <h3>دليل ألوان التجويد (Legenda Tajweed)</h3>
-            <div class="legend-grid">
-                <span style="color: #FF0000;">● المدود (Allungamenti)</span>
-                <span style="color: #008000;">● الغنة (Ghunna)</span>
-                <span style="color: #0000FF;">● القلقلة (Qalqala)</span>
-                <span style="color: #FFA500;">● التفخيم (Enfatizzazione)</span>
+            <h3>دليل ألوان التجويد</h3>
+            <div class="legend-grid" style="display: flex; gap: 10px; font-size: 0.8em; justify-content: center; margin-top: 10px;">
+                <span style="color: #FF0000;">● مد</span>
+                <span style="color: #008000;">● غنة</span>
+                <span style="color: #0000FF;">● قلقلة</span>
             </div>
-        </div>
-
-        <div id="tafsirContent">
-            <h3>التفسير الكامل للمختارة</h3>
-            <div id="tafsirList">اخter سورة لتحميل التفسير...</div>
         </div>
     </div>
 
     <footer id="playerBar">
-        <audio id="mainAudio" controls></audio>
+        <audio id="mainAudio" controls style="width: 100%;"></audio>
     </footer>
 
     <script src="app.js"></script>
