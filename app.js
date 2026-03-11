@@ -1,30 +1,44 @@
-const surahSelect = document.getElementById('surahSelect');
-const ayahText = document.getElementById('ayahText');
-const tafsirText = document.getElementById('tafsirText');
-const audioPlayer = document.getElementById('audioPlayer');
+const recitersWarsh = [
+    { id: 'ar.yassin_al_jazaery', name: 'Yassin Al Jazaery' },
+    { id: 'ar.ibrahimaldosari', name: 'Ibrahim Al Dosari' },
+    { id: 'ar.laayoun_el_kouchi', name: 'Laayoun El Kouchi' }
+];
 
-// Carica l'elenco delle Sure
-fetch('https://api.alquran.cloud')
-    .then(res => res.json())
-    .then(data => {
-        surahSelect.innerHTML = data.data.map(s => `<option value="${s.number}">${s.name}</option>`).join('');
-    });
+const tafsirs = [
+    { id: 'ar.jalalayn', name: 'Tafsir Al-Jalalayn' },
+    { id: 'ar.muyassar', name: 'Tafsir Al-Muyassar' }
+];
 
-surahSelect.addEventListener('change', (e) => {
-    const id = e.target.value;
+function toggleMenu() {
+    document.getElementById('menuOverlay').classList.toggle('hidden');
+}
+
+// Popola Menu
+window.onload = () => {
+    const rs = document.getElementById('reciterSelect');
+    rs.innerHTML = recitersWarsh.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+
+    const ts = document.getElementById('tafsirSelect');
+    ts.innerHTML = tafsirs.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
+    // Carica lista Sure
+    fetch('https://api.alquran.cloud')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('surahSelect').innerHTML = data.data.map(s => 
+                `<option value="${s.number}">${s.name}</option>`).join('');
+        });
+};
+
+// Cambio Sura/Pagina
+document.getElementById('surahSelect').addEventListener('change', (e) => {
+    const surahId = e.target.value;
+    const reciter = document.getElementById('reciterSelect').value;
     
-    // Testo in Warsh (Edizione: quran-wordbyword)
-    fetch(`https://api.alquran.cloud/${id}/ar.ebrahim_walk`)
-        .then(res => res.json())
-        .then(data => {
-            ayahText.innerText = data.data.ayahs.map(a => a.text).join(' ۝ ');
-            audioPlayer.src = `https://cdn.islamic.network{id}.mp3`;
-        });
-
-    // Esempio Tafsir (Jalalayn)
-    fetch(`https://api.alquran.cloud/${id}/ar.jalalayn`)
-        .then(res => res.json())
-        .then(data => {
-            tafsirText.innerText = data.data.ayahs[0].text + "... (Tafsir)";
-        });
+    // Audio
+    document.getElementById('audioPlayer').src = `https://cdn.islamic.network{reciter}/${surahId}.mp3`;
+    
+    // Nota: Per le immagini esatte di EasyQuran serve il loro server o QuranHub
+    // Esempio generico di immagine pagina (da adattare al numero pagina della sura)
+    document.getElementById('quranImage').src = `https://easyquran.com{surahId}.png`; 
 });
