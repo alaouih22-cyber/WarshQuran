@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran Reader App</title>
+    <title>Quran Reader</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a2e">
     <link rel="stylesheet" href="style.css">
@@ -12,87 +12,59 @@
 <body>
     <header class="top-bar">
         <div class="selector-group">
-            <label for="reciter-select">Recitatore:</label>
+            <label>Recitatore</label>
             <select id="reciter-select">
-                <option value="mishary">Mishary Rashid Alafasy</option>
-                <option value="abdulbasit">AbdulBaset AbdulSamad</option>
-                <option value="sudais">Abdur-Rahman as-Sudais</option>
+                <option value="ar.alafasy">Mishary Alafasy</option>
+                <option value="ar.abdulsamad">AbdulBaset</option>
+                <option value="ar.as-sudais">As-Sudais</option>
             </select>
         </div>
         <div class="selector-group">
-            <label for="tafsir-select">Tafsir:</label>
+            <label>Tafsir</label>
             <select id="tafsir-select">
-                <option value="ibn-kathir">Tafsir Ibn Kathir</option>
-                <option value="jalalayn">Tafsir Al-Jalalayn</option>
-                <option value="saadi">Tafsir Al-Saadi</option>
+                <option value="it-asmari">Italiano (Asmari)</option>
+                <option value="ar-tafsir-ibn-kathir">Ibn Kathir</option>
+                <option value="ar-jalalayn">Al-Jalalayn</option>
             </select>
         </div>
-        <button id="bookmarks-btn" class="icon-btn" aria-label="Segnalibri">
-            <i class="fas fa-bookmark"></i>
-        </button>
+        <button id="bookmarks-btn" class="icon-btn"><i class="fas fa-bookmark"></i></button>
     </header>
 
     <main class="reader-container">
-        <div class="quran-page-image" id="quran-page" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Quran_page_example.jpg/800px-Quran_page_example.jpg');">
-            
-            <div class="verse-clickable-area" data-verse="1" data-surah="1" style="top: 15%; left: 10%; width: 80%; height: 10%;"></div>
-            <div class="verse-clickable-area" data-verse="2" data-surah="1" style="top: 26%; left: 10%; width: 80%; height: 10%;"></div>
-            <div class="verse-clickable-area" data-verse="3" data-surah="1" style="top: 37%; left: 10%; width: 80%; height: 10%;"></div>
-            <div class="verse-clickable-area" data-verse="4" data-surah="1" style="top: 48%; left: 10%; width: 80%; height: 10%;"></div>
+        <div id="quran-container">
+            <img id="quran-image" src="https://pro.quran.com/images/quran/muhammad_v2/1.png" alt="Pagina Corano">
+            <div id="verse-overlays"></div>
         </div>
     </main>
 
     <footer class="bottom-bar">
         <div class="audio-controls">
-            <button id="prev-ayah-btn" class="icon-btn" aria-label="Verso precedente">
-                <i class="fas fa-step-backward"></i>
-            </button>
-            <button id="play-pause-btn" class="icon-btn play-btn" aria-label="Riproduci/Pausa">
-                <i class="fas fa-play"></i>
-            </button>
-            <button id="next-ayah-btn" class="icon-btn" aria-label="Verso successivo">
-                <i class="fas fa-step-forward"></i>
-            </button>
+            <button id="prev-btn" class="icon-btn"><i class="fas fa-step-backward"></i></button>
+            <button id="play-pause-btn" class="icon-btn play-btn"><i class="fas fa-play"></i></button>
+            <button id="next-btn" class="icon-btn"><i class="fas fa-step-forward"></i></button>
         </div>
-        <div class="page-navigation">
-            <button id="prev-page" class="text-btn">Pagina Prec.</button>
-            <span id="current-page-display">Pagina 1</span>
-            <button id="next-page" class="text-btn">Pagina Succ.</button>
+        <div class="page-nav">
+            <button id="prev-page">Indietro</button>
+            <span id="page-num">Pagina 1</span>
+            <button id="next-page">Avanti</button>
         </div>
     </footer>
 
     <div id="tafsir-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="tafsir-title">Tafsir - Sura 1, Verso 1</h2>
-                <button id="close-tafsir" class="icon-btn"><i class="fas fa-times"></i></button>
+                <h3 id="modal-title">Tafsir</h3>
+                <button id="close-modal" class="icon-btn"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body">
-                <p id="tafsir-text">Il testo del Tafsir selezionato apparirà qui. Cliccando su un'area del versetto, questo spazio si popolerà dinamicamente.</p>
-            </div>
+            <div class="modal-body" id="modal-body">Caricamento...</div>
             <div class="modal-footer">
-                <button id="add-bookmark-verse" class="action-btn"><i class="fas fa-bookmark"></i> Aggiungi ai Segnalibri</button>
-                <button id="play-verse-audio" class="action-btn"><i class="fas fa-volume-up"></i> Ascolta Versetto</button>
+                <button id="add-bm-btn" class="action-btn"><i class="fas fa-plus"></i> Segnalibro</button>
+                <button id="play-v-btn" class="action-btn"><i class="fas fa-volume-up"></i> Audio</button>
             </div>
         </div>
     </div>
 
-    <div id="bookmarks-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>I Miei Segnalibri</h2>
-                <button id="close-bookmarks" class="icon-btn"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <ul id="bookmarks-list" class="bookmarks-list">
-                    <li class="empty-state">Nessun segnalibro salvato.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <audio id="quran-audio-player" src=""></audio>
-
+    <audio id="main-audio"></audio>
     <script src="app.js"></script>
 </body>
 </html>
