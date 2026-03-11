@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran App</title>
+    <title>Quran App Professional</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <main class="mushaf-full" id="mushaf-area">
-        <img id="quran-img" src="https://pwanew.mohib.me/tajweed_png/392.png" alt="Quran">
+    <main class="mushaf-container" id="mushaf-area">
+        <img id="quran-img" src="https://pwanew.mohib.me/tajweed_png/392.png" alt="Quran Page">
     </main>
 
-    <div id="ui-overlay" class="ui-hidden">
-        <header class="app-bar">
-            <button class="icon-btn" id="menu-trigger"><i class="fas fa-bars"></i> الرئيسية</button>
-            <div class="header-right">
+    <div id="ui-controls" class="hidden-ui">
+        <header class="app-header">
+            <button id="btn-main-menu"><i class="fas fa-bars"></i> الرئيسية</button>
+            <div class="header-icons">
                 <i class="fas fa-search"></i>
                 <i class="fas fa-bookmark"></i>
                 <i class="fas fa-headphones"></i>
@@ -24,29 +24,29 @@
             </div>
         </header>
 
-        <footer class="bottom-bar">
-            <div class="footer-right">≡ القائمة الثانوية</div>
+        <footer class="app-footer">
+            <div class="footer-right" id="btn-sub-menu">≡ القائمة الثانوية</div>
             <div class="footer-center">صفحة <span id="page-num">392</span></div>
             <div class="footer-left">سُورَةُ القَصَصِ</div>
         </footer>
     </div>
 
-    <div id="side-menu" class="side-panel hidden">
-        <div class="menu-list">
-            <div class="menu-row"><i class="fab fa-paypal"></i> تبرع</div>
-            <div class="menu-row"><i class="fas fa-book-open"></i> التفسير</div>
-            <div class="menu-grid">
-                <div>السور</div>
-                <div>الصفحات</div>
+    <div id="side-menu" class="modal hidden">
+        <div class="menu-content">
+            <div class="menu-item"><i class="fab fa-paypal"></i> تبرع</div>
+            <div class="menu-item"><i class="fas fa-book-open"></i> التفسير</div>
+            <div class="menu-split">
+                <div class="split-box">السور</div>
+                <div class="split-box">الصفحات</div>
             </div>
-            <div class="menu-grid">
-                <div>الأحزاب</div>
-                <div>الأجزاء</div>
+            <div class="menu-split">
+                <div class="split-box">الأحزاب</div>
+                <div class="split-box">الأجزاء</div>
             </div>
-            <div class="menu-row"><i class="fas fa-bookmark"></i> حفظ علامة | إنتقل للعلامة</div>
-            <div class="menu-row"><i class="fas fa-redo"></i> إسمع وكرّر</div>
-            <div class="menu-row"><i class="fas fa-hand-holding-heart"></i> دعاء الختم</div>
-            <div class="menu-row"><i class="fas fa-cog"></i> إعدادات الشاشة</div>
+            <div class="menu-item"><i class="fas fa-bookmark"></i> حفظ علامة | إنتقل للعلامة</div>
+            <div class="menu-item"><i class="fas fa-redo"></i> إسمع وكرّر</div>
+            <div class="menu-item"><i class="fas fa-hand-holding-heart"></i> دعاء الختم</div>
+            <div class="menu-item"><i class="fas fa-cog"></i> إعدادات الشاشة</div>
         </div>
     </div>
 
