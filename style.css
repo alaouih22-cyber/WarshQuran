@@ -1,210 +1,80 @@
 :root {
-    --bg-color: #0f172a;
+    --dark-bg: #0f172a;
     --panel-bg: #1e293b;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --accent-color: #38bdf8;
-    --accent-hover: #0284c7;
-    --overlay-color: rgba(56, 189, 248, 0.2);
+    --accent: #38bdf8;
+    --white: #ffffff;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-body {
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+body, html {
+    margin: 0; padding: 0;
+    height: 100%; width: 100%;
+    background: var(--dark-bg);
+    color: white;
+    font-family: sans-serif;
     overflow: hidden;
+    display: flex; flex-direction: column;
 }
 
-/* Header & Footer */
 .top-bar, .bottom-bar {
-    background-color: var(--panel-bg);
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-    z-index: 10;
-}
-
-.bottom-bar {
-    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.5);
-}
-
-.selector-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.selector-group label {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin-bottom: 2px;
-}
-
-select {
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    border: 1px solid #334155;
-    padding: 5px;
-    border-radius: 4px;
-    outline: none;
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    font-size: 1.2rem;
-    cursor: pointer;
+    background: var(--panel-bg);
     padding: 10px;
-    transition: color 0.3s;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 20;
 }
 
-.icon-btn:hover {
-    color: var(--accent-color);
-}
-
-.play-btn {
-    font-size: 1.8rem;
-    color: var(--accent-color);
-}
-
-.text-btn {
-    background: none;
-    border: none;
-    color: var(--accent-color);
-    font-weight: bold;
-    cursor: pointer;
-    padding: 5px 10px;
-}
-
-/* Area di lettura */
 .reader-container {
     flex: 1;
+    display: flex; justify-content: center; align-items: center;
+    background: #e2e8f0; /* Grigio chiaro per non essere "tutto scuro" */
     position: relative;
     overflow: hidden;
-    background-color: #000;
 }
 
-.quran-page-image {
-    width: 100%;
-    height: 100%;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+#quran-container {
     position: relative;
+    height: 100%;
+    max-width: 100%;
+    display: flex; justify-content: center;
 }
 
-/* Aree cliccabili sovrapposte ai versetti */
-.verse-clickable-area {
+#quran-image {
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Sovrapposizione versetti */
+.verse-hitbox {
     position: absolute;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    background: rgba(56, 189, 248, 0);
+    transition: 0.2s;
 }
+.verse-hitbox:hover { background: rgba(56, 189, 248, 0.2); }
 
-.verse-clickable-area:hover, .verse-clickable-area.active {
-    background-color: var(--overlay-color);
-    border: 1px solid var(--accent-color);
-}
-
-/* Modali */
 .modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
     z-index: 100;
 }
-
-.modal.hidden {
-    display: none;
-}
+.hidden { display: none; }
 
 .modal-content {
-    background-color: var(--panel-bg);
-    width: 90%;
-    max-width: 500px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    background: var(--panel-bg);
+    width: 90%; max-width: 450px;
+    border-radius: 12px; padding: 15px;
 }
 
-.modal-header {
-    padding: 15px;
-    border-bottom: 1px solid #334155;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-body {
-    padding: 20px;
-    max-height: 60vh;
-    overflow-y: auto;
-    line-height: 1.6;
-}
-
-.modal-footer {
-    padding: 15px;
-    border-top: 1px solid #334155;
-    display: flex;
-    gap: 10px;
-}
+.modal-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+.modal-body { max-height: 300px; overflow-y: auto; color: #cbd5e1; line-height: 1.5; }
+.modal-footer { display: flex; gap: 10px; margin-top: 20px; }
 
 .action-btn {
-    flex: 1;
-    background-color: var(--accent-color);
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.3s;
+    flex: 1; background: var(--accent); border: none;
+    padding: 10px; border-radius: 6px; font-weight: bold;
 }
 
-.action-btn:hover {
-    background-color: var(--accent-hover);
-}
-
-/* Segnalibri List */
-.bookmarks-list {
-    list-style: none;
-}
-
-.bookmarks-list li {
-    padding: 10px;
-    border-bottom: 1px solid #334155;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.bookmarks-list li:last-child {
-    border-bottom: none;
-}
-
-.bookmark-go-btn {
-    background-color: var(--bg-color);
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
+.selector-group label { font-size: 10px; display: block; color: #94a3b8; }
+select { background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px; }
+.icon-btn { background: none; border: none; color: white; font-size: 20px; }
+.play-btn { color: var(--accent); font-size: 30px; }
