@@ -2,32 +2,41 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Quran Clone - Warsh</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quran Warsh Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2c3e50">
 </head>
 <body>
-    <header>
-        <h1>القرآن الكريم (رواية ورش)</h1>
-        <select id="surahSelect"><option>جاري التحميل...</option></select>
-    </header>
+    <!-- Area Pagina Corano (Tutto schermo) -->
+    <div id="quranPageContainer" onclick="toggleMenu()">
+        <img id="quranImage" src="https://easyquran.com" alt="Quran Page">
+    </div>
 
-    <main id="quranContainer">
-        <div id="ayahText" class="quran-text">اختر سورة للبدء</div>
-        <div id="tafsirText" class="tafsir-text"></div>
-    </main>
+    <!-- Menu Overlay (Si vede al click) -->
+    <div id="menuOverlay" class="hidden">
+        <div class="menu-content">
+            <h3>Impostazioni</h3>
+            <label>Sura:</label>
+            <select id="surahSelect"></select>
+            
+            <label>Recitatore (Warsh):</label>
+            <select id="reciterSelect"></select>
 
-    <footer class="player">
+            <label>Tafsir:</label>
+            <select id="tafsirSelect"></select>
+
+            <div id="tafsirDisplay">Seleziona un Tafsir per leggere...</div>
+            
+            <button onclick="toggleMenu()">Chiudi</button>
+        </div>
+    </div>
+
+    <!-- Player Audio Fisso -->
+    <footer id="audioControls">
         <audio id="audioPlayer" controls></audio>
-    </footer >
+    </footer>
 
     <script src="app.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-    </script>
 </body>
 </html>
