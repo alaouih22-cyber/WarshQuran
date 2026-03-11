@@ -1,57 +1,44 @@
 body, html {
     margin: 0; padding: 0; height: 100%; width: 100%;
-    background: #000; font-family: 'Arial', sans-serif; overflow: hidden;
+    background: #000; overflow: hidden; font-family: sans-serif;
 }
 
-/* Header stile App */
-.app-header {
-    position: fixed; top: 0; width: 100%; height: 60px;
-    background: rgba(20, 30, 45, 0.95); display: flex;
-    justify-content: space-between; align-items: center; padding: 0 15px;
-    z-index: 100; color: white; box-sizing: border-box;
-}
-
-/* Contenitore Pagina */
-.mushaf-viewer {
-    height: 100vh; display: flex; justify-content: center; align-items: center;
-    background: #111; padding-top: 60px; padding-bottom: 50px; box-sizing: border-box;
-}
-
-#page-container {
-    position: relative; height: 100%; display: flex; align-items: center;
+/* Pagina Corano a tutto schermo */
+.mushaf-full {
+    height: 100vh; width: 100vw;
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer;
 }
 
 #quran-img {
-    height: 100%; width: auto; max-width: 100vw;
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
-    background: white; /* Per vedere la pagina mentre carica */
+    height: 100%; width: auto; max-width: 100%;
+    object-fit: contain;
 }
 
-/* Frecce trasparenti sopra l'immagine */
-.nav-arrow {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    background: rgba(0,0,0,0.2); border: none; color: #fff;
-    width: 50px; height: 80px; font-size: 24px; cursor: pointer;
-    transition: 0.3s;
+/* Menu superiore e inferiore */
+.app-bar, .bottom-bar {
+    position: fixed; left: 0; right: 0;
+    background: rgba(15, 23, 42, 0.95);
+    color: white; padding: 15px; display: flex;
+    justify-content: space-between; align-items: center;
+    transition: 0.3s; z-index: 100;
 }
-.nav-arrow:hover { background: rgba(0,0,0,0.5); }
-.prev { left: 0; border-radius: 0 10px 10px 0; }
-.next { right: 0; border-radius: 10px 0 0 10px; }
+.app-bar { top: 0; }
+.bottom-bar { bottom: 0; font-size: 14px; }
 
-/* Footer */
-.app-footer {
-    position: fixed; bottom: 0; width: 100%; height: 50px;
-    background: rgba(20, 30, 45, 0.95); color: white;
-    display: flex; align-items: center; z-index: 100;
+.ui-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* Menu Laterale (stile 1000090828.jpg) */
+.side-panel {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    z-index: 200; display: flex; justify-content: center; align-items: center;
 }
-
-.footer-content {
-    display: flex; justify-content: space-between; width: 100%;
-    padding: 0 20px; align-items: center;
+.menu-list {
+    background: #1e293b; width: 85%; border-radius: 10px;
+    padding: 10px; color: white; text-align: right;
 }
+.menu-row { padding: 15px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 10px; flex-direction: row-reverse; }
+.menu-grid { display: flex; border-bottom: 1px solid #334155; }
+.menu-grid div { flex: 1; padding: 15px; text-align: center; border-left: 1px solid #334155; }
 
-.hd-tag {
-    border: 1px solid #fff; font-size: 10px; padding: 2px 5px; border-radius: 3px;
-}
-
-.icon-btn { background: none; border: none; color: white; font-size: 20px; }
+.hidden { display: none; }
