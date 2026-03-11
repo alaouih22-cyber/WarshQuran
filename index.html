@@ -1,49 +1,97 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran Warsh Professional</title>
+    <title>Quran Reader App</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div id="mushafContainer">
-        <img id="pageImg" src="https://www.searchtruth.org/quran/images2/tajweed/1.jpg" alt="Pagina Corano">
-        <div id="loadingOverlay" class="hidden">جاري التحميل...</div>
-    </div>
-
-    <div id="mainMenu">
-        <div class="header-menu">
-            <h2>إعدادات المصحف</h2>
+    <header class="top-bar">
+        <div class="selector-group">
+            <label for="reciter-select">Recitatore:</label>
+            <select id="reciter-select">
+                <option value="mishary">Mishary Rashid Alafasy</option>
+                <option value="abdulbasit">AbdulBaset AbdulSamad</option>
+                <option value="sudais">Abdur-Rahman as-Sudais</option>
+            </select>
         </div>
-        
-        <div class="control-grid">
-            <section>
-                <label>السورة (Sura)</label>
-                <select id="surahSelect">
-                    <option>جاري تحميل السور...</option>
-                </select>
-            </section>
+        <div class="selector-group">
+            <label for="tafsir-select">Tafsir:</label>
+            <select id="tafsir-select">
+                <option value="ibn-kathir">Tafsir Ibn Kathir</option>
+                <option value="jalalayn">Tafsir Al-Jalalayn</option>
+                <option value="saadi">Tafsir Al-Saadi</option>
+            </select>
+        </div>
+        <button id="bookmarks-btn" class="icon-btn" aria-label="Segnalibri">
+            <i class="fas fa-bookmark"></i>
+        </button>
+    </header>
+
+    <main class="reader-container">
+        <div class="quran-page-image" id="quran-page" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Quran_page_example.jpg/800px-Quran_page_example.jpg');">
             
-            <section>
-                <label>رقم الصفحة (Pagina)</label>
-                <input type="number" id="pageInput" min="1" max="604" value="1">
-            </section>
+            <div class="verse-clickable-area" data-verse="1" data-surah="1" style="top: 15%; left: 10%; width: 80%; height: 10%;"></div>
+            <div class="verse-clickable-area" data-verse="2" data-surah="1" style="top: 26%; left: 10%; width: 80%; height: 10%;"></div>
+            <div class="verse-clickable-area" data-verse="3" data-surah="1" style="top: 37%; left: 10%; width: 80%; height: 10%;"></div>
+            <div class="verse-clickable-area" data-verse="4" data-surah="1" style="top: 48%; left: 10%; width: 80%; height: 10%;"></div>
         </div>
+    </main>
 
-        <div id="tajweedLegend">
-            <h3>دليل ألوان التجويد</h3>
-            <div class="legend-grid" style="display: flex; gap: 10px; font-size: 0.8em; justify-content: center; margin-top: 10px;">
-                <span style="color: #FF0000;">● مد</span>
-                <span style="color: #008000;">● غنة</span>
-                <span style="color: #0000FF;">● قلقلة</span>
+    <footer class="bottom-bar">
+        <div class="audio-controls">
+            <button id="prev-ayah-btn" class="icon-btn" aria-label="Verso precedente">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button id="play-pause-btn" class="icon-btn play-btn" aria-label="Riproduci/Pausa">
+                <i class="fas fa-play"></i>
+            </button>
+            <button id="next-ayah-btn" class="icon-btn" aria-label="Verso successivo">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+        <div class="page-navigation">
+            <button id="prev-page" class="text-btn">Pagina Prec.</button>
+            <span id="current-page-display">Pagina 1</span>
+            <button id="next-page" class="text-btn">Pagina Succ.</button>
+        </div>
+    </footer>
+
+    <div id="tafsir-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="tafsir-title">Tafsir - Sura 1, Verso 1</h2>
+                <button id="close-tafsir" class="icon-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="tafsir-text">Il testo del Tafsir selezionato apparirà qui. Cliccando su un'area del versetto, questo spazio si popolerà dinamicamente.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="add-bookmark-verse" class="action-btn"><i class="fas fa-bookmark"></i> Aggiungi ai Segnalibri</button>
+                <button id="play-verse-audio" class="action-btn"><i class="fas fa-volume-up"></i> Ascolta Versetto</button>
             </div>
         </div>
     </div>
 
-    <footer id="playerBar">
-        <audio id="mainAudio" controls style="width: 100%;"></audio>
-    </footer>
+    <div id="bookmarks-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>I Miei Segnalibri</h2>
+                <button id="close-bookmarks" class="icon-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <ul id="bookmarks-list" class="bookmarks-list">
+                    <li class="empty-state">Nessun segnalibro salvato.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <audio id="quran-audio-player" src=""></audio>
 
     <script src="app.js"></script>
 </body>
