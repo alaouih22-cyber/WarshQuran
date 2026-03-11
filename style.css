@@ -1,22 +1,210 @@
-:root { --primary: #1a252f; --accent: #27ae60; --text: #ecf0f1; }
-body { margin: 0; background: #000; font-family: sans-serif; overflow: hidden; color: var(--text); }
-
-#mushafContainer { height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; position: relative; }
-#pageImg { max-height: 100%; max-width: 100%; transition: opacity 0.3s; }
-
-#mainMenu {
-    position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh;
-    background: var(--primary); z-index: 1000; border-radius: 25px 25px 0 0;
-    padding: 20px; box-sizing: border-box; overflow-y: auto;
+:root {
+    --bg-color: #0f172a;
+    --panel-bg: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-color: #38bdf8;
+    --accent-hover: #0284c7;
+    --overlay-color: rgba(56, 189, 248, 0.2);
 }
 
-.control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-select { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 8px; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
 
-#tafsirContent { background: #f8f9fa; color: #333; padding: 20px; border-radius: 12px; line-height: 1.8; text-align: right; }
-.ayah-tafsir { margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-.ayah-num { color: var(--accent); font-weight: bold; }
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
 
-#playerBar { position: fixed; bottom: 15px; width: 90%; left: 5%; z-index: 500; }
-audio { width: 100%; filter: invert(1); }
-.hidden { display: none !important; }
+/* Header & Footer */
+.top-bar, .bottom-bar {
+    background-color: var(--panel-bg);
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.bottom-bar {
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+.selector-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.selector-group label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+select {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    border: 1px solid #334155;
+    padding: 5px;
+    border-radius: 4px;
+    outline: none;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
+.icon-btn:hover {
+    color: var(--accent-color);
+}
+
+.play-btn {
+    font-size: 1.8rem;
+    color: var(--accent-color);
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+/* Area di lettura */
+.reader-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.quran-page-image {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* Aree cliccabili sovrapposte ai versetti */
+.verse-clickable-area {
+    position: absolute;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.verse-clickable-area:hover, .verse-clickable-area.active {
+    background-color: var(--overlay-color);
+    border: 1px solid var(--accent-color);
+}
+
+/* Modali */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: var(--panel-bg);
+    width: 90%;
+    max-width: 500px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    padding: 15px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    padding: 15px;
+    border-top: 1px solid #334155;
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    flex: 1;
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.action-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Segnalibri List */
+.bookmarks-list {
+    list-style: none;
+}
+
+.bookmarks-list li {
+    padding: 10px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bookmarks-list li:last-child {
+    border-bottom: none;
+}
+
+.bookmark-go-btn {
+    background-color: var(--bg-color);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
