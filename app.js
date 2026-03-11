@@ -1,44 +1,66 @@
-const recitersWarsh = [
-    { id: 'ar.yassin_al_jazaery', name: 'Yassin Al Jazaery' },
-    { id: 'ar.ibrahimaldosari', name: 'Ibrahim Al Dosari' },
-    { id: 'ar.laayoun_el_kouchi', name: 'Laayoun El Kouchi' }
-];
-
-const tafsirs = [
-    { id: 'ar.jalalayn', name: 'Tafsir Al-Jalalayn' },
-    { id: 'ar.muyassar', name: 'Tafsir Al-Muyassar' }
-];
-
-function toggleMenu() {
-    document.getElementById('menuOverlay').classList.toggle('hidden');
-}
-
-// Popola Menu
-window.onload = () => {
-    const rs = document.getElementById('reciterSelect');
-    rs.innerHTML = recitersWarsh.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-
-    const ts = document.getElementById('tafsirSelect');
-    ts.innerHTML = tafsirs.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-
-    // Carica lista Sure
-    fetch('https://api.alquran.cloud')
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('surahSelect').innerHTML = data.data.map(s => 
-                `<option value="${s.number}">${s.name}</option>`).join('');
-        });
+const CONFIG = {
+    reciters: [
+        { id: 'ar.yassin_al_jazaery', name: 'ياسين الجزائري (ورش)' },
+        { id: 'ar.ibrahimaldosari', name: 'إبراهيم الدوسري (ورش)' },
+        { id: 'ar.laayoun_el_kouchi', name: 'العيون الكوشي (ورش)' }
+    ],
+    tafsirs: [
+        { id: 'ar.jalalayn', name: 'تفسير الجلالين' },
+        { id: 'ar.muyassar', name: 'تفسير الميسر' },
+        { id: 'ar.qortobi', name: 'تفسير القرطبي' }
+    ]
 };
 
-// Cambio Sura/Pagina
-document.getElementById('surahSelect').addEventListener('change', (e) => {
-    const surahId = e.target.value;
+const ui = {
+    toggleMenu: () => document.getElementById('mainMenu').classList.toggle('hidden'),
+    showLoading: (show) => document.getElementById('loadingOverlay').classList.toggle('hidden', !show)
+};
+
+async function loadSurahData() {
+    const id = document.getElementById('surahSelect').value;
     const reciter = document.getElementById('reciterSelect').value;
-    
-    // Audio
-    document.getElementById('audioPlayer').src = `https://cdn.islamic.network{reciter}/${surahId}.mp3`;
-    
-    // Nota: Per le immagini esatte di EasyQuran serve il loro server o QuranHub
-    // Esempio generico di immagine pagina (da adattare al numero pagina della sura)
-    document.getElementById('quranImage').src = `https://easyquran.com{surahId}.png`; 
-});
+    const tafsirId = document.getElementById('tafsirSelect').value;
+
+    ui.showLoading(true);
+
+    try {
+        // 1. Aggiorna Immagine (Warsh)
+        document.getElementById('pageImg').src = `https://easyquran.com{id}.png`;
+
+        // 2. Aggiorna Audio
+        document.getElementById('mainAudio').src = `https://cdn.islamic.network{reciter}/${id}.mp3`;
+
+        // 3. Carica Tafsir Completo (Tutti i versetti)
+        const response = await fetch(`https://api.alquran.cloud{id}/${tafsirId}`);
+        const data = await response.json();
+        
+        let html = '';
+        data.data.ayahs.forEach(ayah => {
+            html += `<div class="ayah-tafsir">
+                        <span class="ayah-num">[آية ${ayah.numberInSurah}]</span><br>
+                        ${ayah.text}
+                     </div>`;
+        });
+        document.getElementById('tafsirList').innerHTML = html;
+
+    } catch (err) {
+        console.error("Errore nel caricamento:", err);
+    } finally {
+        ui.showLoading(false);
+    }
+}
+
+// Inizializzazione
+window.onload = async () => {
+    // Popola select
+    document.getElementById('reciterSelect').innerHTML = CONFIG.reciters.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+    document.getElementById('tafsirSelect').innerHTML = CONFIG.tafsirs.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
+    const res = await fetch('https://api.alquran.cloud');
+    const data = await res.json();
+    document.getElementById('surahSelect').innerHTML = data.data.map(s => `<option value="${s.number}">${s.name}</option>`).join('');
+
+    document.getElementById('surahSelect').onchange = loadSurahData;
+    document.getElementById('reciterSelect').onchange = loadSurahData;
+    document.getElementById('tafsirSelect').onchange = loadSurahData;
+};
