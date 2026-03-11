@@ -1,77 +1,53 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran App Pro</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <title>Quran Pro App</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <header class="top-nav">
-        <div class="sel-box">
-            <small>Recitatore</small>
-            <select id="reciter-sel">
-                <option value="ar.alafasy">Mishary Alafasy</option>
-                <option value="ar.abdulsamad">AbdulBaset</option>
-                <option value="ar.as-sudais">As-Sudais</option>
-            </select>
+
+    <header class="floating-header">
+        <button class="icon-btn" id="menu-main"><i class="fas fa-bars"></i></button>
+        <div class="header-right">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+            <button class="icon-btn" id="btn-bookmarks"><i class="fas fa-bookmark"></i></button>
+            <button class="icon-btn"><i class="fas fa-headphones"></i></button>
+            <span class="hd-badge">HD</span>
         </div>
-        <div class="sel-box">
-            <small>Tafsir</small>
-            <select id="tafsir-sel">
-                <option value="it-asmari">Italiano (Asmari)</option>
-                <option value="ar-jalalayn">Al-Jalalayn</option>
-                <option value="ar-saadi">Al-Saadi</option>
-            </select>
-        </div>
-        <button id="btn-bookmarks" class="icon-btn"><i class="fas fa-bookmark"></i></button>
     </header>
 
-    <main class="viewer">
-        <div id="page-container">
-            <img id="quran-img" src="" alt="Caricamento pagina..." onerror="this.src='https://via.placeholder.com/400x600?text=Errore+Caricamento+Pagina'">
-            <div id="verse-overlay"></div>
+    <main class="mushaf-container">
+        <button class="nav-arrow left" id="p-prev"><i class="fas fa-chevron-left"></i></button>
+        
+        <div id="page-wrapper">
+            <img id="quran-page" src="" alt="Mushaf">
+            <div id="click-layer"></div>
         </div>
+
+        <button class="nav-arrow right" id="p-next"><i class="fas fa-chevron-right"></i></button>
     </main>
 
-    <footer class="bottom-nav">
-        <div class="audio-ctrl">
-            <button id="a-prev" class="icon-btn"><i class="fas fa-step-backward"></i></button>
-            <button id="a-play" class="play-trigger"><i class="fas fa-play-circle"></i></button>
-            <button id="a-next" class="icon-btn"><i class="fas fa-step-forward"></i></button>
+    <footer class="floating-footer">
+        <div class="surah-info">
+            <span id="surah-name">القصص</span>
+            <span id="page-label">صفحة ١</span>
         </div>
-        <div class="page-ctrl">
-            <button id="p-prev" class="nav-btn">Indietro</button>
-            <b id="p-num">Pagina 1</b>
-            <button id="p-next" class="nav-btn">Avanti</button>
-        </div>
+        <button class="menu-trigger" id="open-sub-menu">القائمة الثانوية ≡</button>
     </footer>
 
-    <div id="modal-tafsir" class="modal hidden">
-        <div class="m-content">
-            <div class="m-head">
-                <h3 id="m-title">Versetto</h3>
-                <button id="m-close" class="icon-btn"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="m-body" class="m-text">Caricamento spiegazione...</div>
-            <div class="m-foot">
-                <button id="m-save" class="btn-act"><i class="fas fa-save"></i> Segnalibro</button>
-                <button id="m-audio" class="btn-act"><i class="fas fa-volume-up"></i> Audio</button>
-            </div>
+    <div id="side-menu" class="side-panel hidden">
+        <div class="panel-content">
+            <div class="menu-item"><i class="fas fa-book-open"></i> التفسير</div>
+            <div class="menu-item"><i class="fas fa-list"></i> السور</div>
+            <div class="menu-item"><i class="fas fa-th-large"></i> الأجزاء</div>
+            <div class="menu-item"><i class="fas fa-cog"></i> إعدادات الشاشة</div>
         </div>
     </div>
 
-    <div id="modal-bmarks" class="modal hidden">
-        <div class="m-content">
-            <div class="m-head"><h3>I tuoi Segnalibri</h3><button id="b-close" class="icon-btn"><i class="fas fa-times"></i></button></div>
-            <div class="m-body"><ul id="b-list"></ul></div>
-        </div>
-    </div>
-
-    <audio id="player"></audio>
+    <audio id="audio-engine"></audio>
     <script src="app.js"></script>
 </body>
 </html>
