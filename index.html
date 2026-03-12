@@ -3,59 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran Pro Italiano</title>
+    <title>Quran Tajweed Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #eab308; --dark: #0f172a; --bg: #020617; }
-        body { margin: 0; background-color: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        :root { --gold: #eab308; --dark: #0f172a; --bg: #fdf6e3; } /* Sfondo crema come la carta del Corano */
+        body { margin: 0; background-color: #020617; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
         
-        /* Area Mushaf */
-        .mushaf-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px; position: relative; cursor: pointer; background: radial-gradient(circle, #1e293b 0%, #020617 100%); }
-        #quran-img { max-width: 100%; max-height: 85vh; border-radius: 5px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); background: white; }
+        /* Contenitore Pagina Corano */
+        .mushaf-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 5px; position: relative; background: #020617; cursor: pointer; }
+        #quran-img { max-width: 100%; max-height: 95vh; border-radius: 2px; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
 
         /* Menu Centrale (L'Anima) */
-        .overlay-menu { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 23, 42, 0.95); border: 2px solid var(--gold); border-radius: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; z-index: 100; transition: 0.3s; opacity: 0; pointer-events: none; }
+        .overlay-menu { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 23, 42, 0.98); border: 2px solid var(--gold); border-radius: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 25px; z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s; box-shadow: 0 0 30px var(--gold); }
         .overlay-menu.show { opacity: 1; pointer-events: auto; }
-        .menu-item { text-align: center; color: var(--gold); cursor: pointer; font-size: 14px; text-decoration: none; }
-        .menu-item i { display: block; font-size: 28px; margin-bottom: 8px; }
+        .menu-item { text-align: center; color: var(--gold); cursor: pointer; text-decoration: none; }
+        .menu-item i { display: block; font-size: 32px; margin-bottom: 10px; }
 
-        /* Pannello Scorrevole Traduzione/Tafsir */
-        .info-panel { height: 35vh; background: var(--dark); border-top: 3px solid var(--gold); padding: 20px; overflow-y: auto; display: none; }
-        .info-panel.active { display: block; }
-        .text-content { font-size: 1.1rem; line-height: 1.7; color: #f1f5f9; text-align: right; dir: rtl; }
-        .text-it { text-align: left; dir: ltr; color: #fbbf24; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        /* Pannello Info (Traduzione/Tafsir) */
+        .info-panel { height: 35vh; background: var(--dark); border-top: 4px solid var(--gold); padding: 20px; overflow-y: auto; display: none; border-radius: 20px 20px 0 0; }
+        .info-panel.active { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .text-it { text-align: left; color: #f1f5f9; font-size: 1.1rem; line-height: 1.8; margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
 
-        /* Footer */
+        /* Footer Navigazione */
         .footer { background: var(--dark); padding: 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
-        .btn-nav { background: var(--gold); color: black; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-nav { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         
-        #loading { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--gold); color: black; padding: 5px 15px; border-radius: 20px; display: none; z-index: 1000; }
+        #loading { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--gold); color: black; padding: 8px 20px; border-radius: 30px; display: none; z-index: 1000; font-weight: bold; box-shadow: 0 0 15px rgba(234, 179, 8, 0.5); }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div id="loading">Caricamento...</div>
+    <div id="loading">Caricamento Pagina Tajweed...</div>
 
     <div class="mushaf-container" onclick="toggleMenu()">
-        <img id="quran-img" src="1.png" onerror="this.src='https://pwanew.mohib.me/tajweed_png/1.png'">
+        <img id="quran-img" src="1.png" onerror="this.src='https://www.searchtruth.org/quran/images2/1.png'">
         
         <div id="main-menu" class="overlay-menu">
-            <div class="menu-item" onclick="showContent('audio')"><i class="fas fa-play"></i>Ascolta</div>
+            <div class="menu-item" onclick="showContent('audio')"><i class="fas fa-play-circle"></i>Ascolta</div>
             <div class="menu-item" onclick="showContent('trans')"><i class="fas fa-language"></i>Traduzione</div>
             <div class="menu-item" onclick="showContent('tafsir')"><i class="fas fa-book-open"></i>Tafsir</div>
-            <div class="menu-item" onclick="window.open('https://sufi.it/wp-content/uploads/il-corano-in-italiano.pdf')"><i class="fas fa-file-pdf"></i>PDF Originale</div>
+            <div class="menu-item" onclick="window.open('https://sufi.it/wp-content/uploads/il-corano-in-italiano.pdf')"><i class="fas fa-file-pdf"></i>Leggi PDF</div>
         </div>
     </div>
 
     <div id="info-panel" class="info-panel">
-        <div id="panel-content" class="text-content"></div>
+        <div id="panel-content"></div>
     </div>
 
     <div class="footer">
         <button class="btn-nav" onclick="changePage(-1)">← Prec</button>
         <div style="text-align:center">
-            <b id="surah-label">Caricamento...</b><br>
-            <small>Pagina <span id="page-num">1</span></small>
+            <b id="surah-title" style="color:var(--gold); font-size: 1.2rem;">Al-Fatiha</b><br>
+            <small>Pagina <span id="page-num">1</span> / 604</small>
         </div>
         <button class="btn-nav" onclick="changePage(1)">Succ →</button>
     </div>
@@ -67,47 +67,54 @@
         const panel = document.getElementById('info-panel');
         const content = document.getElementById('panel-content');
 
+        function toggleMenu() { document.getElementById('main-menu').classList.toggle('show'); }
+
         async function fetchTranslation(page) {
-            content.innerHTML = "Recupero traduzione italiana...";
+            content.innerHTML = "<p style='text-align:center'>Recupero traduzione italiana ufficiale...</p>";
             try {
-                // Chiamata all'API per ottenere la traduzione italiana di quella pagina
                 const res = await fetch(`https://api.alquran.cloud/v1/page/${page}/it.piccardo`);
                 const data = await res.json();
-                let html = "";
+                let html = `<h2 style='color:var(--gold); text-align:center;'>${data.data.ayahs[0].surah.englishName}</h2>`;
                 data.data.ayahs.forEach(ayah => {
-                    html += `<div class="text-it"><b>(${ayah.numberInSurah})</b> ${ayah.text}</div>`;
+                    html += `<div class="text-it"><b>${ayah.numberInSurah}.</b> ${ayah.text}</div>`;
                 });
                 content.innerHTML = html;
-                document.getElementById('surah-label').innerText = data.data.ayahs[0].surah.englishName;
-            } catch (e) {
-                content.innerHTML = "Errore nel caricamento della traduzione.";
-            }
+                document.getElementById('surah-title').innerText = data.data.ayahs[0].surah.englishName;
+            } catch (e) { content.innerHTML = "Errore di connessione alla traduzione."; }
         }
-
-        function toggleMenu() { document.getElementById('main-menu').classList.toggle('show'); }
 
         function showContent(type) {
             panel.classList.add('active');
             if(type === 'trans') fetchTranslation(currentPage);
             if(type === 'audio') {
-                content.innerHTML = `<h3>Ascolta Recitazione</h3><audio controls autoplay style="width:100%"><source src="https://www.searchtruth.org/quran/audio/page/${currentPage}.mp3"></audio>`;
+                content.innerHTML = `<h3 style='color:var(--gold); text-align:center;'>Recitazione Pagina ${currentPage}</h3>
+                <audio controls autoplay style="width:100%; margin-top:20px;">
+                    <source src="https://www.searchtruth.org/quran/audio/page/${currentPage}.mp3">
+                </audio>`;
             }
-            if(type === 'tafsir') content.innerHTML = `<h3>Tafsir</h3><p>Il Tafsir dettagliato per la pagina ${currentPage} è in fase di aggiornamento.</p>`;
+            if(type === 'tafsir') content.innerHTML = `<h3 style='color:var(--gold); text-align:center;'>Tafsir (Esegesi)</h3><p style='text-align:center'>Approfondimento della pagina ${currentPage} in caricamento...</p>`;
             document.getElementById('main-menu').classList.remove('show');
         }
 
         function changePage(delta) {
-            currentPage += delta;
-            if(currentPage < 1) currentPage = 1;
-            if(currentPage > 604) currentPage = 604;
+            let next = currentPage + delta;
+            if(next < 1 || next > 604) return;
+            currentPage = next;
             
             loader.style.display = 'block';
-            img.src = (currentPage === 1) ? "1.png" : `https://pwanew.mohib.me/tajweed_png/${currentPage}.png`;
+            // Fonte Tajweed Warsh/Hafs HD
+            const tajweedUrl = `https://www.searchtruth.org/quran/images2/${currentPage}.png`;
+            
+            img.src = (currentPage === 1) ? "1.png" : tajweedUrl;
             
             img.onload = () => {
                 loader.style.display = 'none';
                 document.getElementById('page-num').innerText = currentPage;
                 if(panel.classList.contains('active')) fetchTranslation(currentPage);
+            };
+            
+            img.onerror = () => {
+                img.src = `https://pwanew.mohib.me/tajweed_png/${currentPage}.png`;
             };
         }
 
