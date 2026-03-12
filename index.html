@@ -1,132 +1,157 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="it" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quran App Tajweed</title>
+    <title>Quran Tajweed & Traduzione</title>
     <style>
-        /* TUTTO LO STILE QUI DENTRO */
         body { 
             margin: 0; 
             background-color: #020617; 
             display: flex; 
             flex-direction: column; 
             height: 100vh; 
-            font-family: sans-serif;
-            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
             color: white;
+            overflow: hidden;
         }
+
+        /* Area del Mushaf (Immagine) */
         .mushaf-container {
-            flex: 1;
+            flex: 2; /* Prende più spazio */
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 10px;
             background: radial-gradient(circle, #1e293b 0%, #020617 100%);
-            cursor: pointer;
         }
+
         #quran-page {
             max-width: 100%;
             max-height: 100%;
             border-radius: 5px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             background: white;
         }
+
+        /* Area Traduzione Italiana */
+        .translation-container {
+            flex: 1; /* Spazio per il testo */
+            background-color: #111827;
+            padding: 15px;
+            overflow-y: auto;
+            border-top: 2px solid #eab308;
+            text-align: center;
+        }
+
+        .translation-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #f1f5f9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .translation-title {
+            color: #eab308;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Barra di navigazione */
         .bottom-bar {
             background-color: #0f172a;
-            border-top: 2px solid #eab308;
             padding: 15px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            text-align: center;
         }
+
         .nav-btn {
             background: #eab308;
             color: #020617;
             border: none;
-            padding: 12px 25px;
+            padding: 12px 20px;
             border-radius: 10px;
             font-weight: bold;
-            font-size: 1rem;
             cursor: pointer;
         }
-        .nav-btn:active { transform: scale(0.95); }
-        .page-info { font-weight: bold; line-height: 1.2; }
+
         #loading {
             position: fixed;
             top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: rgba(0,0,0,0.8);
             padding: 8px 20px;
             border-radius: 30px;
-            z-index: 100;
             display: none;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
 
-    <div id="loading">... جاري التحميل</div>
+    <div id="loading">Caricamento...</div>
 
-    <div class="mushaf-container" onclick="handleTap(event)">
-        <img id="quran-page" src="1.png" alt="Quran Page">
+    <div class="mushaf-container">
+        <img id="quran-page" src="1.png" alt="Pagina Corano">
+    </div>
+
+    <div class="translation-container">
+        <span class="translation-title">Traduzione in Italiano</span>
+        <div id="translation-box" class="translation-text">
+            Caricamento traduzione...
+        </div>
     </div>
 
     <div class="bottom-bar">
-        <button class="nav-btn" onclick="prevPage()">السابق</button>
-        <div class="page-info">
-            <span id="surah-name">الفاتحة</span><br>
-            <small>صفحة <span id="page-num">1</span></small>
+        <button class="nav-btn" onclick="changePage(-1)">Indietro</button>
+        <div style="text-align:center">
+            <b id="page-num">1</b><br><small>Pagina</small>
         </div>
-        <button class="nav-btn" onclick="nextPage()">التالي</button>
+        <button class="nav-btn" onclick="changePage(1)">Avanti</button>
     </div>
 
     <script>
-        /* TUTTA LA LOGICA QUI DENTRO */
         let currentPage = 1;
-        const img = document.getElementById('quran-page');
-        const pageDisplay = document.getElementById('page-num');
-        const loader = document.getElementById('loading');
 
-        function loadPage(n) {
-            if (n < 1 || n > 604) return;
-            currentPage = n;
+        // Esempio di database traduzioni (qui metteremo i testi del PDF)
+        const translations = {
+            1: "Nel nome di Allah, il Compassionevole, il Misericordioso. La lode appartiene ad Allah, Signore dei mondi, il Compassionevole, il Misericordioso, Re del Giorno del Giudizio. Te solo adoriamo e a Te solo chiediamo aiuto. Guidaci sulla retta via, la via di coloro che hai colmato di grazia, non di coloro che sono incorsi nella Tua ira, né degli sviati.",
+            2: "Alif, Lâm, Mîm. Questo è il Libro su cui non vi è dubbio, una guida per i timorati di Allah, coloro che credono nell'Invisibile, assolvono all'orazione e spendono di ciò di cui li abbiamo provvisti...",
+            // Aggiungeremo le altre man mano
+        };
+
+        function updateUI() {
+            const img = document.getElementById('quran-page');
+            const loader = document.getElementById('loading');
+            const transBox = document.getElementById('translation-box');
             
-            if(loader) loader.style.display = "block";
-
-            // Se è pagina 1 usa il tuo file, altrimenti server esterno
-            if (n === 1) {
-                img.src = "1.png";
-            } else {
-                img.src = `https://pwanew.mohib.me/tajweed_png/${n}.png`;
-            }
+            loader.style.display = "block";
+            
+            // Gestione Immagine (la tua 1.png o server)
+            img.src = (currentPage === 1) ? "1.png" : `https://pwanew.mohib.me/tajweed_png/${currentPage}.png`;
 
             img.onload = () => {
-                if(loader) loader.style.display = "none";
-                pageDisplay.textContent = n;
-                // Aggiorna nome Sura (semplificato)
-                document.getElementById('surah-name').textContent = n === 1 ? "الفاتحة" : "القرآن الكريم";
-            };
-
-            img.onerror = () => {
-                if(loader) loader.style.display = "none";
-                // Fallback se il primo server fallisce
-                img.src = `https://www.searchtruth.org/quran/images2/${n}.png`;
+                loader.style.display = "none";
+                document.getElementById('page-num').innerText = currentPage;
+                
+                // Aggiorna Traduzione
+                transBox.innerText = translations[currentPage] || "Traduzione in fase di inserimento per questa pagina...";
             };
         }
 
-        function nextPage() { loadPage(currentPage + 1); }
-        function prevPage() { loadPage(currentPage - 1); }
-
-        // Tocco schermo: sinistra avanti, destra indietro
-        function handleTap(e) {
-            const x = e.clientX;
-            const w = window.innerWidth;
-            if (x < w / 2) { nextPage(); } else { prevPage(); }
+        function changePage(delta) {
+            let next = currentPage + delta;
+            if (next >= 1 && next <= 604) {
+                currentPage = next;
+                updateUI();
+            }
         }
 
-        // Avvio istantaneo
-        window.onload = () => loadPage(1);
+        window.onload = updateUI;
     </script>
 </body>
 </html>
