@@ -4,132 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Al-Qur'an Warsh Pro</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#064e3b">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-512.png">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
         :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-        .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: fixed; }
-        .header { background: var(--emerald); color: var(--gold); padding: 10px 5px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .nav-bar { display: flex; gap: 8px; padding: 8px; background: rgba(0,0,0,0.2); align-items: center; justify-content: center; }
-        select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-weight: bold; color: var(--emerald); }
-        .btn-toggle { padding: 10px 15px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; min-width: 105px; justify-content: center; }
-        .main-content { flex: 1; overflow-y: auto; background-color: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); position: relative; }
-        #text-view { padding: 15px; display: block; }
-        .ayah-card { margin-bottom: 12px; padding: 15px; border-radius: 10px; background: #fff; border-left: 5px solid var(--emerald); line-height: 1.6; font-size: 1.1rem; cursor: pointer; }
-        .ayah-card.active { border-left-color: var(--gold); background: #fef3c7; }
-        #reality-view { display: none; width: 100%; }
-        #quran-page { width: 100%; height: auto; display: block; }
-        .footer { background: var(--emerald); padding: 12px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; }
-        .info-box { color: var(--gold); text-align: center; font-size: 0.9rem; }
+        body, html { height: 100%; width: 100%; background: var(--emerald); overflow: hidden; font-family: sans-serif; }
+        .app { display: flex; flex-direction: column; height: 100vh; }
+        .header { background: var(--emerald); color: var(--gold); padding: 10px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .nav { display: flex; gap: 8px; padding: 10px; background: rgba(0,0,0,0.2); }
+        select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-weight: bold; }
+        .btn-t { padding: 10px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; min-width: 100px; }
+        .view { flex: 1; overflow-y: auto; background: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); }
+        #txt { padding: 15px; }
+        .card { margin-bottom: 12px; padding: 15px; background: #fff; border-left: 5px solid var(--emerald); border-radius: 8px; cursor: pointer; line-height: 1.5; }
+        .card.active { background: #fef3c7; border-left-color: var(--gold); }
+        #real { display: none; width: 100%; }
+        #qimg { width: 100%; height: auto; display: block; }
+        .foot { background: var(--emerald); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
+        .btn-n { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-
-<div class="app-container">
+<div class="app">
     <div class="header">
-        <b><i class="fas fa-quran"></i> AL-QUR'AN WARSH PRO</b>
-        <div class="nav-bar">
-            <select id="surahSelect" onchange="loadSurah(this.value)"></select>
-            <button class="btn-toggle" onclick="toggleMode()">
-                <i id="mode-icon" class="fas fa-eye"></i> <span id="mode-text">Reality</span>
-            </button>
+        <b>AL-QUR'AN WARSH PRO</b>
+        <div class="nav">
+            <select id="sSel" onchange="loadS(this.value)"></select>
+            <button class="btn-t" onclick="tog()">Reality</button>
         </div>
     </div>
-
-    <div class="main-content" id="scroll-box">
-        <div id="text-view"></div>
-        <div id="reality-view"><img id="quran-page" src=""></div>
+    <div class="view" id="vBox">
+        <div id="txt"></div>
+        <div id="real"><img id="qimg" src=""></div>
     </div>
-
-    <audio id="audioPlayer" preload="auto"></audio>
-
-    <div class="footer">
-        <button class="btn-nav" onclick="navigate(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="info-box"><b id="sName">Sura 1</b><br><span id="pNum">Pagina 1</span></div>
-        <button class="btn-nav" onclick="navigate(1)"><i class="fas fa-chevron-right"></i></button>
+    <audio id="aud"></audio>
+    <div class="foot">
+        <button class="btn-n" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div style="color:var(--gold);text-align:center;"><b id="sL">Sura 1</b><br><small id="pL">Pagina 1</small></div>
+        <button class="btn-n" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
-
 <script>
-    let currentSura = 1, currentPage = 1, realityMode = false;
-    const player = document.getElementById('audioPlayer');
+    let curS = 1, curP = 1, isR = false;
+    const aud = document.getElementById('aud');
 
-    async function init() {
-        const res = await fetch('https://api.alquran.cloud/v1/surah');
-        const d = await res.json();
-        const select = document.getElementById('surahSelect');
+    async function start() {
+        const r = await fetch('https://api.alquran.cloud/v1/surah');
+        const d = await r.json();
         d.data.forEach(s => {
-            let opt = document.createElement('option');
-            opt.value = s.number;
-            opt.textContent = `${s.number}. ${s.englishName}`;
-            select.appendChild(opt);
+            let o = document.createElement('option'); o.value = s.number; o.textContent = s.number + '. ' + s.englishName;
+            document.getElementById('sSel').appendChild(o);
         });
-        loadSurah(1);
+        loadS(1);
     }
 
-    async function loadSurah(num) {
-        currentSura = parseInt(num);
-        document.getElementById('surahSelect').value = num;
-        document.getElementById('sName').innerText = `Sura ${num}`;
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/it.piccardo`);
-        const d = await res.json();
-        let html = "";
+    async function loadS(n) {
+        curS = parseInt(n);
+        document.getElementById('sSel').value = n;
+        document.getElementById('sL').innerText = 'Sura ' + n;
+        const r = await fetch(`https://api.alquran.cloud/v1/surah/${n}/it.piccardo`);
+        const d = await r.json();
+        let h = "";
         d.data.ayahs.forEach(v => {
-            html += `<div class="ayah-card" onclick="playVoice(${num}, ${v.numberInSurah}, this)"><b>${v.numberInSurah}.</b> ${v.text}</div>`;
+            h += `<div class="card" onclick="pAud(${n},${v.numberInSurah},this)"><b>${v.numberInSurah}.</b> ${v.text}</div>`;
         });
-        document.getElementById('text-view').innerHTML = html;
-        currentPage = d.data.ayahs[0].page;
-        updateMushaf();
+        document.getElementById('txt').innerHTML = h;
+        curP = d.data.ayahs[0].page;
+        uImg();
     }
 
-    function playVoice(s, a, el) {
-        document.querySelectorAll('.ayah-card').forEach(c => c.classList.remove('active'));
+    function pAud(s, a, el) {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        // Audio Husary Warsh ad alta qualità (HTTPS forzato)
-        player.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`;
-        player.play().catch(err => console.error("Errore audio:", err));
+        aud.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${String(s).padStart(3,'0')}${String(a).padStart(3,'0')}.mp3`;
+        aud.play();
     }
 
-    function updateMushaf() {
-        document.getElementById('quran-page').src = `https://www.searchtruth.org/quran/images2/warsh/page${String(currentPage).padStart(3, '0')}.png`;
-        document.getElementById('pNum').innerText = `Pagina ${currentPage}`;
+    function uImg() {
+        document.getElementById('qimg').src = `https://www.searchtruth.org/quran/images2/warsh/page${String(curP).padStart(3,'0')}.png`;
+        document.getElementById('pL').innerText = 'Pagina ' + curP;
     }
 
-    function toggleMode() {
-        realityMode = !realityMode;
-        document.getElementById('text-view').style.display = realityMode ? "none" : "block";
-        document.getElementById('reality-view').style.display = realityMode ? "block" : "none";
-        document.getElementById('mode-text').innerText = realityMode ? "Testo" : "Reality";
-        document.getElementById('mode-icon').className = realityMode ? "fas fa-file-alt" : "fas fa-eye";
+    function tog() {
+        isR = !isR;
+        document.getElementById('txt').style.display = isR ? 'none' : 'block';
+        document.getElementById('real').style.display = isR ? 'block' : 'none';
+        document.querySelector('.btn-t').innerText = isR ? 'Testo' : 'Reality';
     }
 
-    function navigate(step) {
-        if (realityMode) {
-            currentPage += step;
-            if (currentPage < 1) currentPage = 1; if (currentPage > 604) currentPage = 604;
-            updateMushaf();
-        } else {
-            let n = currentSura + step;
-            if (n >= 1 && n <= 114) loadSurah(n);
-        }
+    function nav(x) {
+        if(isR) { curP += x; if(curP<1)curP=1; uImg(); }
+        else { let n = curS + x; if(n>0 && n<115) loadS(n); }
     }
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
-            console.log("Service Worker Armonizzato!");
-        });
-    }
-    window.onload = init;
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+    window.onload = start;
 </script>
 </body>
 </html>
