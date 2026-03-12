@@ -16,18 +16,19 @@
             font-family: 'Georgia', serif; 
         }
 
-        /* Contenitore App a tutto schermo */
-        .app-wrapper {
-            display: flex; flex-direction: column; height: 100vh;
-            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; }
+
+        .header { background: var(--emerald); color: var(--gold); padding: 10px; text-align: center; border-bottom: 2px solid var(--gold); }
+        
+        /* Controlli di Ricerca */
+        .controls-row { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(0,0,0,0.2); }
+        .select-wrapper { display: flex; gap: 5px; }
+        
+        select, input { 
+            flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--gold); 
+            background: var(--paper); font-size: 15px; outline: none; color: var(--emerald); font-weight: bold;
         }
 
-        /* Header Professionale */
-        .header { background: var(--emerald); color: var(--gold); padding: 10px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .search-row { display: flex; gap: 5px; padding: 5px 10px; background: rgba(0,0,0,0.2); }
-        .search-row input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-size: 14px; outline: none; }
-
-        /* Area Lettura con bordo Mushaf Tajweed */
         .reader-container {
             flex: 1; overflow-y: auto; background-color: var(--paper);
             margin: 10px; border-radius: 15px; border: 4px double var(--gold);
@@ -37,19 +38,16 @@
         .surah-title-box { text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 25px; padding-bottom: 15px; }
         .surah-name-ar { font-size: 2.2rem; color: var(--emerald); margin: 0; }
         
-        /* Grafica Versetti */
         .ayah-card {
             margin-bottom: 15px; padding: 15px; border-radius: 12px;
             background: rgba(255,255,255,0.7); border-left: 5px solid var(--emerald);
-            line-height: 1.8; font-size: 1.2rem; color: var(--text);
-            transition: 0.2s; cursor: pointer;
+            line-height: 1.8; font-size: 1.2rem; color: var(--text); transition: 0.2s;
         }
         .ayah-card.active { background: #fef3c7; border-left-color: var(--gold); transform: scale(1.01); }
         .ayah-num { color: var(--emerald); font-weight: bold; margin-right: 10px; font-size: 0.9rem; }
 
-        /* Navigazione Bottom */
         .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -57,15 +55,18 @@
 <div class="app-wrapper">
     <div class="header">
         <b style="letter-spacing: 2px;"><i class="fas fa-moon"></i> AL-QUR'AN PRO</b>
-        <div class="search-row">
-            <input type="number" id="sIn" placeholder="Sura (1-114)">
-            <input type="number" id="aIn" placeholder="Versetto">
-            <button onclick="go()" class="btn-nav" style="padding: 10px;"><i class="fas fa-search"></i></button>
+        <div class="controls-row">
+            <div class="select-wrapper">
+                <select id="surahSelect" onchange="load(this.value)">
+                    <option value="">Scegli Sura...</option>
+                </select>
+                <input type="number" id="ayahIn" placeholder="Vers." style="flex: 0 0 80px;">
+                <button onclick="goToAyah()" class="btn-nav" style="padding: 10px;"><i class="fas fa-search"></i></button>
+            </div>
         </div>
     </div>
 
     <div class="reader-container" id="reader"></div>
-
     <audio id="player"></audio>
 
     <div class="footer">
@@ -81,14 +82,31 @@
     let curS = 1;
     const reader = document.getElementById('reader');
     const player = document.getElementById('player');
+    const surahSelect = document.getElementById('surahSelect');
+
+    // Popola il selettore delle 114 Sure
+    async function populateSurahs() {
+        try {
+            const res = await fetch('https://api.alquran.cloud/v1/surah');
+            const d = await res.json();
+            d.data.forEach(s => {
+                let opt = document.createElement('option');
+                opt.value = s.number;
+                opt.textContent = `${s.number}. ${s.englishName} (${s.name})`;
+                surahSelect.appendChild(opt);
+            });
+        } catch(e) { console.error("Errore caricamento lista."); }
+    }
 
     async function load(s, a = null) {
+        if(!s) return;
         reader.innerHTML = "<p style='text-align:center'>Caricamento...</p>";
         try {
             const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
             const d = await res.json();
             const surah = d.data;
-            curS = s;
+            curS = parseInt(s);
+            surahSelect.value = curS;
             document.getElementById('label').innerText = `Sura ${s}`;
 
             let html = `<div class="surah-title-box"><h1 class="surah-name-ar">${surah.name}</h1><p>${surah.englishNameTranslation}</p></div>`;
@@ -114,9 +132,9 @@
     }
 
     function nav(d) { let n = curS + d; if(n >= 1 && n <= 114) load(n); }
-    function go() { const s = document.getElementById('sIn').value; const a = document.getElementById('aIn').value; if(s >= 1 && s <= 114) load(s, a); }
+    function goToAyah() { const a = document.getElementById('ayahIn').value; if(a) load(curS, a); }
 
-    window.onload = () => load(1);
+    window.onload = () => { populateSurahs(); load(1); };
 </script>
 </body>
 </html>
