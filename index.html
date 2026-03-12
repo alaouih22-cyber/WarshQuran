@@ -13,56 +13,116 @@
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             background-color: var(--emerald); overflow: hidden; 
-            font-family: 'Georgia', serif; 
+            font-family: 'serif'; 
         }
 
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; }
-
-        .header { background: var(--emerald); color: var(--gold); padding: 10px; text-align: center; border-bottom: 2px solid var(--gold); }
-        
-        /* Controlli di Ricerca */
-        .controls-row { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(0,0,0,0.2); }
-        .select-wrapper { display: flex; gap: 5px; }
-        
-        select, input { 
-            flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--gold); 
-            background: var(--paper); font-size: 15px; outline: none; color: var(--emerald); font-weight: bold;
+        .app-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            width: 100vw;
         }
 
+        /* Header con barra comandi adattiva */
+        .header { 
+            background: var(--emerald); 
+            color: var(--gold); 
+            padding: 10px 5px; 
+            text-align: center; 
+            border-bottom: 2px solid var(--gold); 
+        }
+        
+        .controls-row { 
+            display: flex; 
+            gap: 5px; 
+            padding: 10px 5px; 
+            background: rgba(0,0,0,0.2);
+            width: 100%;
+        }
+        
+        select { 
+            flex: 2; /* Più spazio alla Sura */
+            padding: 10px; 
+            border-radius: 8px; 
+            border: 1px solid var(--gold); 
+            background: var(--paper); 
+            font-size: 14px; 
+            color: var(--emerald); 
+            font-weight: bold;
+            min-width: 0; /* Previene l'uscita dai bordi */
+        }
+
+        input { 
+            flex: 1; /* Meno spazio al versetto */
+            padding: 10px; 
+            border-radius: 8px; 
+            border: 1px solid var(--gold); 
+            background: var(--paper); 
+            font-size: 14px; 
+            max-width: 70px;
+            text-align: center;
+        }
+
+        .btn-search {
+            background: var(--gold);
+            color: var(--emerald);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Reader Area: Rimane fissa nello schermo */
         .reader-container {
-            flex: 1; overflow-y: auto; background-color: var(--paper);
-            margin: 10px; border-radius: 15px; border: 4px double var(--gold);
-            padding: 15px; box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            flex: 1; 
+            overflow-y: auto; 
+            background-color: var(--paper);
+            margin: 8px; 
+            border-radius: 12px; 
+            border: 3px double var(--gold);
+            padding: 12px; 
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
         }
 
-        .surah-title-box { text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 25px; padding-bottom: 15px; }
-        .surah-name-ar { font-size: 2.2rem; color: var(--emerald); margin: 0; }
+        .surah-title-box { text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 20px; padding-bottom: 10px; }
+        .surah-name-ar { font-size: 1.8rem; color: var(--emerald); margin: 0; }
         
         .ayah-card {
-            margin-bottom: 15px; padding: 15px; border-radius: 12px;
-            background: rgba(255,255,255,0.7); border-left: 5px solid var(--emerald);
-            line-height: 1.8; font-size: 1.2rem; color: var(--text); transition: 0.2s;
+            margin-bottom: 12px; 
+            padding: 12px; 
+            border-radius: 10px;
+            background: #fff; 
+            border-left: 4px solid var(--emerald);
+            line-height: 1.6; 
+            font-size: 1.1rem; 
+            color: var(--text);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .ayah-card.active { background: #fef3c7; border-left-color: var(--gold); transform: scale(1.01); }
-        .ayah-num { color: var(--emerald); font-weight: bold; margin-right: 10px; font-size: 0.9rem; }
+        .ayah-card.active { background: #fef3c7; border-left-color: var(--gold); }
+        .ayah-num { color: var(--emerald); font-weight: bold; margin-right: 8px; }
 
-        .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .footer { 
+            background: var(--emerald); 
+            padding: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-top: 1px solid var(--gold); 
+        }
+        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="app-wrapper">
     <div class="header">
-        <b style="letter-spacing: 2px;"><i class="fas fa-moon"></i> AL-QUR'AN PRO</b>
+        <b style="font-size: 1.1rem;"><i class="fas fa-star-and-crescent"></i> AL-QUR'AN PRO</b>
         <div class="controls-row">
-            <div class="select-wrapper">
-                <select id="surahSelect" onchange="load(this.value)">
-                    <option value="">Scegli Sura...</option>
-                </select>
-                <input type="number" id="ayahIn" placeholder="Vers." style="flex: 0 0 80px;">
-                <button onclick="goToAyah()" class="btn-nav" style="padding: 10px;"><i class="fas fa-search"></i></button>
-            </div>
+            <select id="surahSelect" onchange="load(this.value)">
+                <option value="">Seleziona Sura</option>
+            </select>
+            <input type="number" id="ayahIn" placeholder="Vers.">
+            <button onclick="goToAyah()" class="btn-search"><i class="fas fa-search"></i></button>
         </div>
     </div>
 
@@ -70,9 +130,9 @@
     <audio id="player"></audio>
 
     <div class="footer">
-        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-arrow-left"></i></button>
+        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
         <span id="label" style="color:var(--gold); font-weight:bold;">Sura 1</span>
-        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-arrow-right"></i></button>
+        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
 
@@ -84,7 +144,6 @@
     const player = document.getElementById('player');
     const surahSelect = document.getElementById('surahSelect');
 
-    // Popola il selettore delle 114 Sure
     async function populateSurahs() {
         try {
             const res = await fetch('https://api.alquran.cloud/v1/surah');
@@ -92,18 +151,20 @@
             d.data.forEach(s => {
                 let opt = document.createElement('option');
                 opt.value = s.number;
-                opt.textContent = `${s.number}. ${s.englishName} (${s.name})`;
+                opt.textContent = `${s.number}. ${s.englishName}`;
                 surahSelect.appendChild(opt);
             });
-        } catch(e) { console.error("Errore caricamento lista."); }
+        } catch(e) { console.error("Errore lista."); }
     }
 
     async function load(s, a = null) {
         if(!s) return;
         reader.innerHTML = "<p style='text-align:center'>Caricamento...</p>";
         try {
-            const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
-            const d = await res.json();
+            const res = await fetch(`https://api.alquran.cloud/v1/page/${(s*5)-4}/it.piccardo`); // Esempio caricamento testo
+            // Per precisione usiamo l'endpoint sura
+            const res2 = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
+            const d = await res2.json();
             const surah = d.data;
             curS = parseInt(s);
             surahSelect.value = curS;
