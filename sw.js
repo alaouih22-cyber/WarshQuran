@@ -1,10 +1,10 @@
-const CACHE_NAME = 'quran-warsh-final-v1';
+const CACHE_NAME = 'quran-warsh-final';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(['./', './index.html', './manifest.json', './icon-512.png']);
+      return cache.addAll(['./index.html', './manifest.json', './icon-512.png']);
     })
   );
 });
@@ -12,7 +12,7 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
-      return Promise.all(keys.map((key) => caches.delete(key)));
+      return Promise.all(keys.map((k) => caches.delete(k)));
     }).then(() => self.clients.claim())
   );
 });
