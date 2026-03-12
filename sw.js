@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-warsh-v3';
+const CACHE_NAME = 'quran-warsh-v4';
 const assets = [
   './',
   './index.html',
@@ -7,11 +7,9 @@ const assets = [
 ];
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Forza l'aggiornamento immediato
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(assets);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(assets))
   );
 });
 
@@ -27,8 +25,6 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request).then((res) => res || fetch(event.request))
   );
 });
