@@ -1,7 +1,8 @@
 {
   "name": "Al-Qur'an Warsh Pro",
   "short_name": "QuranWarsh",
-  "start_url": "index.html",
+  "description": "Corano con narrazione Warsh e regole Tajweed",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#064e3b",
   "theme_color": "#064e3b",
@@ -9,7 +10,8 @@
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
