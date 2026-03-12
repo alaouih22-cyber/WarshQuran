@@ -3,55 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Al-Qur'an Reality Warsh</title>
+    <title>Al-Qur'an Warsh Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Segoe UI', sans-serif; }
 
         .app-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: fixed; }
 
-        /* Header */
         .header { background: var(--emerald); color: var(--gold); padding: 10px 5px; text-align: center; border-bottom: 2px solid var(--gold); }
         .controls-row { display: flex; gap: 8px; padding: 8px; background: rgba(0,0,0,0.2); align-items: center; justify-content: center; }
         
         select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-size: 14px; font-weight: bold; color: var(--emerald); }
-        .btn-mode { padding: 10px 15px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        
+        /* IL BOTTONE SWITCH */
+        .btn-toggle { padding: 10px 15px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; min-width: 100px; justify-content: center; }
 
-        /* Area Principale */
-        .main-view { flex: 1; overflow-y: auto; background-color: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); position: relative; display: flex; justify-content: center; }
+        .main-view { flex: 1; overflow-y: auto; background-color: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); position: relative; }
 
-        /* Vista Testo Italiano */
-        #text-view { width: 100%; padding: 15px; display: block; }
+        /* VISTA TESTO */
+        #text-view { padding: 15px; display: block; }
         .ayah-card { margin-bottom: 12px; padding: 15px; border-radius: 10px; background: #fff; border-left: 5px solid var(--emerald); line-height: 1.6; font-size: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* Vista Reality (Mushaf Marocchino) */
-        #reality-view { display: none; width: 100%; height: 100%; overflow-y: auto; }
+        /* VISTA REALITY (MUSHAF) */
+        #reality-view { display: none; width: 100%; height: 100%; }
         #quran-page { width: 100%; height: auto; display: block; }
 
-        /* Footer */
         .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
         .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; }
-        .info-label { color: var(--gold); text-align: center; line-height: 1.2; }
+        .info-label { color: var(--gold); text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="app-wrapper">
     <div class="header">
-        <b style="font-size: 1rem;"><i class="fas fa-quran"></i> AL-QUR'AN WARSH PRO</b>
+        <b style="font-size: 1.1rem;"><i class="fas fa-star-and-crescent"></i> AL-QUR'AN WARSH</b>
         <div class="controls-row">
             <select id="surahSelect" onchange="loadSurah(this.value)"></select>
-            <button class="btn-mode" onclick="toggleMode()">
-                <i class="fas fa-eye"></i> <span id="mode-text">Reality</span>
+            <button class="btn-toggle" onclick="toggleView()">
+                <i id="mode-icon" class="fas fa-eye"></i> <span id="mode-text">Reality</span>
             </button>
         </div>
     </div>
 
-    <div class="main-view">
+    <div class="main-view" id="scroll-container">
         <div id="text-view"></div>
-        
         <div id="reality-view">
             <img id="quran-page" src="" alt="Mushaf Warsh">
         </div>
@@ -72,11 +70,6 @@
     let curP = 1;
     let isReality = false;
 
-    const textView = document.getElementById('text-view');
-    const realityView = document.getElementById('reality-view');
-    const qImg = document.getElementById('quran-page');
-    const surahSelect = document.getElementById('surahSelect');
-
     async function init() {
         const res = await fetch('https://api.alquran.cloud/v1/surah');
         const d = await res.json();
@@ -84,54 +77,64 @@
             let opt = document.createElement('option');
             opt.value = s.number;
             opt.textContent = `${s.number}. ${s.englishName}`;
-            surahSelect.appendChild(opt);
+            document.getElementById('surahSelect').appendChild(opt);
         });
         loadSurah(1);
     }
 
     async function loadSurah(s) {
         curS = parseInt(s);
-        surahSelect.value = s;
+        document.getElementById('surahSelect').value = s;
         document.getElementById('surahLabel').innerText = `Sura ${s}`;
 
-        // Carica testo italiano
-        textView.innerHTML = "<p style='text-align:center'>Caricamento testo...</p>";
+        // Carica Traduzione
         const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
         const d = await res.json();
-        
         let html = "";
         d.data.ayahs.forEach(v => {
             html += `<div class="ayah-card"><b>${v.numberInSurah}.</b> ${v.text}</div>`;
         });
-        textView.innerHTML = html;
+        document.getElementById('text-view').innerHTML = html;
 
-        // Imposta pagina per Reality Mode
+        // Imposta Pagina Reality
         curP = d.data.ayahs[0].page;
-        updateImage();
+        updateRealityImage();
+        document.getElementById('scroll-container').scrollTop = 0;
     }
 
-    function updateImage() {
-        // Fonte Mushaf Warsh
-        qImg.src = `https://www.searchtruth.org/quran/images2/warsh/page${String(curP).padStart(3, '0')}.png`;
+    function updateRealityImage() {
+        document.getElementById('quran-page').src = `https://www.searchtruth.org/quran/images2/warsh/page${String(curP).padStart(3, '0')}.png`;
         document.getElementById('pageLabel').innerText = `Pagina ${curP}`;
     }
 
-    function toggleMode() {
+    function toggleView() {
         isReality = !isReality;
-        textView.style.display = isReality ? 'none' : 'block';
-        realityView.style.display = isReality ? 'block' : 'none';
-        document.getElementById('mode-text').innerText = isReality ? 'Testo' : 'Reality';
+        const textView = document.getElementById('text-view');
+        const realityView = document.getElementById('reality-view');
+        const modeText = document.getElementById('mode-text');
+        const modeIcon = document.getElementById('mode-icon');
+
+        if (isReality) {
+            textView.style.display = "none";
+            realityView.style.display = "block";
+            modeText.innerText = "Testo";
+            modeIcon.className = "fas fa-file-alt";
+        } else {
+            textView.style.display = "block";
+            realityView.style.display = "none";
+            modeText.innerText = "Reality";
+            modeIcon.className = "fas fa-eye";
+        }
     }
 
     function nav(d) {
         if (isReality) {
             curP += d;
-            if(curP < 1) curP = 1;
-            if(curP > 604) curP = 604;
-            updateImage();
+            if(curP < 1) curP = 1; if(curP > 604) curP = 604;
+            updateRealityImage();
         } else {
-            let next = curS + d;
-            if(next >= 1 && next <= 114) loadSurah(next);
+            let n = curS + d;
+            if(n >= 1 && n <= 114) loadSurah(n);
         }
     }
 
