@@ -4,156 +4,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Al-Qur'an Warsh Pro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#064e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-512.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        
+        body, html { 
+            height: 100%; width: 100%; 
+            background-color: var(--emerald); 
+            overflow: hidden; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+        }
 
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: fixed; }
+        .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: fixed; }
 
+        /* Header */
         .header { background: var(--emerald); color: var(--gold); padding: 10px 5px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .controls-row { display: flex; gap: 8px; padding: 8px; background: rgba(0,0,0,0.2); align-items: center; justify-content: center; }
+        .nav-bar { display: flex; gap: 8px; padding: 8px; background: rgba(0,0,0,0.2); align-items: center; justify-content: center; }
         
         select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-size: 14px; font-weight: bold; color: var(--emerald); }
         
-        .btn-toggle { padding: 10px 15px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; min-width: 100px; justify-content: center; }
+        .btn-toggle { 
+            padding: 10px 15px; border-radius: 8px; border: none; 
+            background: var(--gold); color: var(--emerald); 
+            font-weight: bold; cursor: pointer; display: flex; 
+            align-items: center; gap: 5px; min-width: 105px; justify-content: center; 
+        }
 
-        .main-view { flex: 1; overflow-y: auto; background-color: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); position: relative; }
+        /* Area Lettura */
+        .main-content { 
+            flex: 1; overflow-y: auto; background-color: var(--paper); 
+            margin: 8px; border-radius: 12px; border: 4px double var(--gold); 
+            position: relative; -webkit-overflow-scrolling: touch;
+        }
 
         #text-view { padding: 15px; display: block; }
-        .ayah-card { margin-bottom: 12px; padding: 15px; border-radius: 10px; background: #fff; border-left: 5px solid var(--emerald); line-height: 1.6; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
-        .ayah-card:active { background: #fef3c7; }
+        .ayah-card { 
+            margin-bottom: 12px; padding: 15px; border-radius: 10px; 
+            background: #fff; border-left: 5px solid var(--emerald); 
+            line-height: 1.6; font-size: 1.1rem; cursor: pointer; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
         .ayah-card.active { border-left-color: var(--gold); background: #fef3c7; }
 
-        #reality-view { display: none; width: 100%; height: 100%; }
+        #reality-view { display: none; width: 100%; height: auto; }
         #quran-page { width: 100%; height: auto; display: block; }
 
-        .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; }
-        .info-label { color: var(--gold); text-align: center; }
+        /* Footer */
+        .footer { background: var(--emerald); padding: 12px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
+        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 22px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; }
+        .info-box { color: var(--gold); text-align: center; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div class="app-wrapper">
+<div class="app-container">
     <div class="header">
         <b style="font-size: 1.1rem;"><i class="fas fa-star-and-crescent"></i> AL-QUR'AN WARSH</b>
-        <div class="controls-row">
+        <div class="nav-bar">
             <select id="surahSelect" onchange="loadSurah(this.value)"></select>
-            <button class="btn-toggle" onclick="toggleView()">
+            <button class="btn-toggle" onclick="toggleMode()">
                 <i id="mode-icon" class="fas fa-eye"></i> <span id="mode-text">Reality</span>
             </button>
         </div>
     </div>
 
-    <div class="main-view" id="scroll-container">
+    <div class="main-content" id="scroll-box">
         <div id="text-view"></div>
+        
         <div id="reality-view">
-            <img id="quran-page" src="" alt="Mushaf Warsh">
+            <img id="quran-page" src="" alt="Mushaf Warsh Tajweed">
         </div>
     </div>
 
-    <audio id="audioPlayer"></audio>
+    <audio id="quranAudio"></audio>
 
     <div class="footer">
-        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="info-label">
-            <b id="surahLabel">Sura 1</b><br>
-            <small id="pageLabel">Pagina 1</small>
+        <button class="btn-nav" onclick="navigate(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div class="info-box">
+            <b id="sName">Sura 1</b><br>
+            <span id="pNum">Pagina 1</span>
         </div>
-        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
+        <button class="btn-nav" onclick="navigate(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
 
 <script>
-    let curS = 1;
-    let curP = 1;
-    let isReality = false;
-    const player = document.getElementById('audioPlayer');
+    let currentSura = 1;
+    let currentPage = 1;
+    let realityMode = false;
+    const audio = document.getElementById('quranAudio');
 
-    async function init() {
-        const res = await fetch('https://api.alquran.cloud/v1/surah');
-        const d = await res.json();
-        d.data.forEach(s => {
-            let opt = document.createElement('option');
-            opt.value = s.number;
-            opt.textContent = `${s.number}. ${s.englishName}`;
-            document.getElementById('surahSelect').appendChild(opt);
-        });
-        loadSurah(1);
+    // Inizializza l'app
+    async function start() {
+        try {
+            const res = await fetch('https://api.alquran.cloud/v1/surah');
+            const d = await res.json();
+            const select = document.getElementById('surahSelect');
+            d.data.forEach(s => {
+                let opt = document.createElement('option');
+                opt.value = s.number;
+                opt.textContent = `${s.number}. ${s.englishName}`;
+                select.appendChild(opt);
+            });
+            loadSurah(1);
+        } catch (e) { console.error("Errore caricamento lista sure"); }
     }
 
-    async function loadSurah(s) {
-        curS = parseInt(s);
-        document.getElementById('surahSelect').value = s;
-        document.getElementById('surahLabel').innerText = `Sura ${s}`;
+    // Carica contenuto Sura
+    async function loadSurah(num) {
+        currentSura = parseInt(num);
+        document.getElementById('surahSelect').value = num;
+        document.getElementById('sName').innerText = `Sura ${num}`;
 
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
-        const d = await res.json();
-        let html = "";
-        d.data.ayahs.forEach(v => {
-            // Cliccando sulla card parte l'audio di Al-Husary (Warsh)
-            html += `<div class="ayah-card" onclick="playAyah(${s}, ${v.numberInSurah}, this)">
-                        <b>${v.numberInSurah}.</b> ${v.text}
-                     </div>`;
-        });
-        document.getElementById('text-view').innerHTML = html;
-
-        curP = d.data.ayahs[0].page;
-        updateRealityImage();
-        document.getElementById('scroll-container').scrollTop = 0;
+        try {
+            const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/it.piccardo`);
+            const d = await res.json();
+            let html = "";
+            d.data.ayahs.forEach(v => {
+                html += `<div class="ayah-card" onclick="playVoice(${num}, ${v.numberInSurah}, this)">
+                            <b>${v.numberInSurah}.</b> ${v.text}
+                         </div>`;
+            });
+            document.getElementById('text-view').innerHTML = html;
+            
+            // Imposta pagina per Reality
+            currentPage = d.data.ayahs[0].page;
+            updateMushaf();
+            document.getElementById('scroll-box').scrollTop = 0;
+        } catch (e) { console.error("Errore caricamento sura"); }
     }
 
-    function playAyah(s, a, el) {
-        // Rimuove evidenziazione precedente
+    // Riproduce voce Al-Husary (Warsh)
+    function playVoice(s, a, el) {
         document.querySelectorAll('.ayah-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
 
-        // URL Audio Al-Husary (Warsh)
-        const surahTag = String(s).padStart(3, '0');
-        const ayahTag = String(a).padStart(3, '0');
-        player.src = `https://www.everyayah.com/data/Husary_Warsh_64kbps/${surahTag}${ayahTag}.mp3`;
-        player.play();
+        const sID = String(s).padStart(3, '0');
+        const aID = String(a).padStart(3, '0');
+        audio.src = `https://www.everyayah.com/data/Husary_Warsh_64kbps/${sID}${aID}.mp3`;
+        audio.play();
     }
 
-    function updateRealityImage() {
-        document.getElementById('quran-page').src = `https://www.searchtruth.org/quran/images2/warsh/page${String(curP).padStart(3, '0')}.png`;
-        document.getElementById('pageLabel').innerText = `Pagina ${curP}`;
+    // Aggiorna immagine Mushaf Marocchino
+    function updateMushaf() {
+        document.getElementById('quran-page').src = `https://www.searchtruth.org/quran/images2/warsh/page${String(currentPage).padStart(3, '0')}.png`;
+        document.getElementById('pNum').innerText = `Pagina ${currentPage}`;
     }
 
-    function toggleView() {
-        isReality = !isReality;
-        const textView = document.getElementById('text-view');
-        const realityView = document.getElementById('reality-view');
-        const modeText = document.getElementById('mode-text');
-        const modeIcon = document.getElementById('mode-icon');
+    // Switch tra Testo e Reality
+    function toggleMode() {
+        realityMode = !realityMode;
+        const txt = document.getElementById('text-view');
+        const real = document.getElementById('reality-view');
+        const btnT = document.getElementById('mode-text');
+        const btnI = document.getElementById('mode-icon');
 
-        if (isReality) {
-            textView.style.display = "none";
-            realityView.style.display = "block";
-            modeText.innerText = "Testo";
-            modeIcon.className = "fas fa-file-alt";
+        if (realityMode) {
+            txt.style.display = "none";
+            real.style.display = "block";
+            btnT.innerText = "Testo";
+            btnI.className = "fas fa-file-alt";
         } else {
-            textView.style.display = "block";
-            realityView.style.display = "none";
-            modeText.innerText = "Reality";
-            modeIcon.className = "fas fa-eye";
+            txt.style.display = "block";
+            real.style.display = "none";
+            btnT.innerText = "Reality";
+            btnI.className = "fas fa-eye";
         }
     }
 
-    function nav(d) {
-        if (isReality) {
-            curP += d;
-            if(curP < 1) curP = 1; if(curP > 604) curP = 604;
-            updateRealityImage();
+    // Navigazione
+    function navigate(step) {
+        if (realityMode) {
+            currentPage += step;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > 604) currentPage = 604;
+            updateMushaf();
         } else {
-            let n = curS + d;
-            if(n >= 1 && n <= 114) loadSurah(n);
+            let nextS = currentSura + step;
+            if (nextS >= 1 && nextS <= 114) loadSurah(nextS);
         }
     }
 
-    window.onload = init;
+    window.onload = start;
 </script>
 </body>
 </html>
