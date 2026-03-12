@@ -9,7 +9,6 @@
     <meta name="theme-color" content="#064e3b">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon-512.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,20 +24,15 @@
         .btn-t { padding: 10px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; min-width: 100px; }
         .view { flex: 1; overflow-y: auto; background: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); }
         #txt { padding: 15px; }
-        .card { margin-bottom: 12px; padding: 15px; background: #fff; border-left: 5px solid var(--emerald); border-radius: 8px; cursor: pointer; line-height: 1.5; }
+        .card { margin-bottom: 12px; padding: 15px; background: #fff; border-left: 5px solid var(--emerald); border-radius: 8px; cursor: pointer; }
         .card.active { background: #fef3c7; border-left-color: var(--gold); }
         #real { display: none; width: 100%; }
         #qimg { width: 100%; height: auto; display: block; }
         .foot { background: var(--emerald); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
         .btn-n { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; }
-        
-        /* Bottone Installazione Nascosto (Appare se serve) */
-        #installBtn { display: none; position: fixed; top: 10px; right: 10px; z-index: 999; padding: 5px 10px; background: var(--gold); color: var(--emerald); border-radius: 5px; font-size: 12px; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
-
-<button id="installBtn">INSTALLA APP</button>
 
 <div class="app">
     <div class="header">
@@ -52,45 +46,29 @@
         <div id="txt"></div>
         <div id="real"><img id="qimg" src=""></div>
     </div>
-    <audio id="aud" crossorigin="anonymous"></audio>
+    <audio id="aud"></audio>
     <div class="foot">
-        <button class="btn-n" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="btn-nav btn-n" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
         <div style="color:var(--gold);text-align:center;"><b id="sL">Sura 1</b><br><small id="pL">Pagina 1</small></div>
-        <button class="btn-n" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
+        <button class="btn-nav btn-n" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
 
 <script>
     let curS = 1, curP = 1, isR = false;
-    let deferredPrompt;
     const aud = document.getElementById('aud');
 
-    // GESTIONE INSTALLAZIONE
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('installBtn').style.display = 'block';
-    });
-
-    document.getElementById('installBtn').addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('installBtn').style.display = 'none';
-            }
-            deferredPrompt = null;
-        }
-    });
-
     async function start() {
-        const r = await fetch('https://api.alquran.cloud/v1/surah');
-        const d = await r.json();
-        d.data.forEach(s => {
-            let o = document.createElement('option'); o.value = s.number; o.textContent = s.number + '. ' + s.englishName;
-            document.getElementById('sSel').appendChild(o);
-        });
-        loadS(1);
+        try {
+            const r = await fetch('https://api.alquran.cloud/v1/surah');
+            const d = await r.json();
+            const sel = document.getElementById('sSel');
+            d.data.forEach(s => {
+                let o = document.createElement('option'); o.value = s.number; o.textContent = s.number + '. ' + s.englishName;
+                sel.appendChild(o);
+            });
+            loadS(1);
+        } catch(e) {}
     }
 
     async function loadS(n) {
@@ -111,15 +89,8 @@
     function pAud(s, a, el) {
         document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        const sID = String(s).padStart(3,'0');
-        const aID = String(a).padStart(3,'0');
-        // Audio con fallback HTTPS
-        aud.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${sID}${aID}.mp3`;
-        aud.play().catch(e => {
-            // Se fallisce, prova il server mirror
-            aud.src = `https://mirrors.quranicaudio.com/everyayah/Husary_Warsh_64kbps/${sID}${aID}.mp3`;
-            aud.play();
-        });
+        aud.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${String(s).padStart(3,'0')}${String(a).padStart(3,'0')}.mp3`;
+        aud.play();
     }
 
     function uImg() {
@@ -141,9 +112,7 @@
 
     // Registrazione Service Worker
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js');
-        });
+        navigator.serviceWorker.register('./sw.js').then(() => console.log("OK"));
     }
     window.onload = start;
 </script>
