@@ -6,6 +6,8 @@
     <title>Al-Qur'an Pro</title>
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Font Arabo per Mushaf -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; --text: #1a202c; }
         
@@ -15,7 +17,7 @@
             height: 100%; width: 100%; 
             background-color: var(--emerald); 
             overflow: hidden; 
-            font-family: serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         }
 
         .app-wrapper { 
@@ -23,7 +25,7 @@
             flex-direction: column; 
             height: 100vh; 
             width: 100vw;
-            position: fixed; /* Blocca tutto lo schermo */
+            position: fixed;
         }
 
         .header { 
@@ -34,7 +36,6 @@
             border-bottom: 2px solid var(--gold); 
         }
         
-        /* Barra comandi ultra-compatta */
         .controls-row { 
             display: flex; 
             gap: 5px; 
@@ -45,58 +46,71 @@
         }
         
         #surahSelect { 
-            width: 60%; /* Proporzione fissa */
+            width: 45%; 
             padding: 10px; 
             border-radius: 8px; 
             border: 1px solid var(--gold); 
             background: var(--paper); 
             font-size: 14px; 
-            color: var(--emerald); 
             font-weight: bold;
         }
 
         #ayahIn { 
-            width: 20%; 
+            width: 15%; 
             padding: 10px; 
             border-radius: 8px; 
             border: 1px solid var(--gold); 
             background: var(--paper); 
-            font-size: 14px; 
             text-align: center;
         }
 
-        .btn-search {
-            width: 15%;
+        .btn-toggle {
+            width: 25%;
             background: var(--gold);
             color: var(--emerald);
             border: none;
             padding: 10px;
             border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
             cursor: pointer;
+            white-space: nowrap;
         }
 
-        /* Area Testo: Bordo Mushaf Tajweed */
         .reader-container {
             flex: 1; 
             overflow-y: auto; 
             background-color: var(--paper);
             margin: 10px; 
             border-radius: 12px; 
-            border: 4px double var(--gold); /* Richiamo Mushaf */
+            border: 4px double var(--gold); 
             padding: 15px; 
             box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
         }
 
+        /* Stile specifico per il testo Arabo Warsh */
+        .mode-warsh {
+            direction: rtl;
+            font-family: 'Amiri', serif;
+            text-align: right;
+        }
+        .mode-warsh .ayah-card {
+            font-size: 1.8rem;
+            line-height: 2.5;
+            border-left: none;
+            border-right: 4px solid var(--emerald);
+        }
+
         .surah-title-box { text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 20px; padding-bottom: 10px; }
-        .surah-name-ar { font-size: 2rem; color: var(--emerald); }
+        .surah-name-ar { font-size: 2.2rem; color: var(--emerald); font-family: 'Amiri', serif; }
         
         .ayah-card {
-            margin-bottom: 12px; padding: 12px; border-radius: 10px;
+            margin-bottom: 12px; padding: 15px; border-radius: 10px;
             background: #fff; border-left: 4px solid var(--emerald);
-            line-height: 1.6; font-size: 1.15rem; color: var(--text);
+            line-height: 1.6; font-size: 1.1rem; color: var(--text);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .ayah-card.active { background: #fef3c7; border-left-color: var(--gold); }
+        .ayah-card.active { background: #fef3c7; border-color: var(--gold); }
 
         .footer { 
             background: var(--emerald); 
@@ -113,11 +127,12 @@
 
 <div class="app-wrapper">
     <div class="header">
-        <b style="font-size: 1.1rem;"><i class="fas fa-star-and-crescent"></i> AL-QUR'AN PRO</b>
+        <b style="font-size: 1.1rem;"><i class="fas fa-book-open"></i> AL-QUR'AN PRO</b>
         <div class="controls-row">
             <select id="surahSelect" onchange="load(this.value)"></select>
             <input type="number" id="ayahIn" placeholder="V.">
-            <button onclick="goToAyah()" class="btn-search"><i class="fas fa-search"></i></button>
+            <button id="modeBtn" onclick="toggleMode()" class="btn-toggle">WARSH</button>
+            <button onclick="goToAyah()" style="background:var(--gold); border:none; padding:10px; border-radius:8px;"><i class="fas fa-search"></i></button>
         </div>
     </div>
 
@@ -132,16 +147,12 @@
 </div>
 
 <script>
-    if ('serviceWorker' in navigator) { 
-        navigator.serviceWorker.register('sw.js').then(reg => {
-            reg.onupdatefound = () => { window.location.reload(); }; // Ricarica se trova aggiornamenti
-        });
-    }
-
     let curS = 1;
+    let currentMode = 'it'; // 'it' per Italiano, 'warsh' per Arabo Warsh
     const reader = document.getElementById('reader');
     const player = document.getElementById('player');
     const surahSelect = document.getElementById('surahSelect');
+    const modeBtn = document.getElementById('modeBtn');
 
     async function populateSurahs() {
         const res = await fetch('https://api.alquran.cloud/v1/surah');
@@ -156,28 +167,57 @@
 
     async function load(s, a = null) {
         if(!s) return;
-        reader.innerHTML = "<p style='text-align:center'>Caricamento...</p>";
+        curS = parseInt(s);
+        surahSelect.value = curS;
+        reader.innerHTML = "<p style='text-align:center; padding:20px;'>Caricamento...</p>";
+        
+        // Scegli l'edizione in base alla modalità
+        const edition = (currentMode === 'it') ? 'it.piccardo' : 'ar.warsh';
+        
         try {
-            const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
+            const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/${edition}`);
             const d = await res.json();
             const surah = d.data;
-            curS = parseInt(s);
-            surahSelect.value = curS;
+            
             document.getElementById('label').innerText = `Sura ${s}`;
 
-            let html = `<div class="surah-title-box"><h1 class="surah-name-ar">${surah.name}</h1><p>${surah.englishNameTranslation}</p></div>`;
+            // Gestione classe CSS per orientamento testo
+            if(currentMode === 'warsh') {
+                reader.classList.add('mode-warsh');
+            } else {
+                reader.classList.remove('mode-warsh');
+            }
+
+            let html = `<div class="surah-title-box">
+                            <h1 class="surah-name-ar">${surah.name}</h1>
+                            <p>${surah.englishNameTranslation}</p>
+                        </div>`;
+            
             surah.ayahs.forEach(v => {
                 html += `<div class="ayah-card" id="v-${v.numberInSurah}" onclick="play(${s}, ${v.numberInSurah}, this)">
                     <span style="color:var(--emerald);font-weight:bold">${v.numberInSurah}.</span> ${v.text}</div>`;
             });
+            
             reader.innerHTML = html;
+
             if(a) { 
                 setTimeout(() => { 
                     const el = document.getElementById(`v-${a}`);
                     if(el) { el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.add('active'); }
                 }, 500);
             }
-        } catch(e) { reader.innerHTML = "Errore connessione."; }
+        } catch(e) { reader.innerHTML = "Errore connessione o dati non disponibili."; }
+    }
+
+    function toggleMode() {
+        if(currentMode === 'it') {
+            currentMode = 'warsh';
+            modeBtn.innerText = "ITALIANO";
+        } else {
+            currentMode = 'it';
+            modeBtn.innerText = "WARSH";
+        }
+        load(curS);
     }
 
     function play(s, a, el) {
