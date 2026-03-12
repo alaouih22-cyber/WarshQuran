@@ -1,37 +1,32 @@
-const CACHE_NAME = 'quran-pro-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-512.png'
-];
+const CACHE_NAME = 'quran-pro-v10'; // Cambiato nome per forzare il refresh
 
-// Installazione: scarica i file di base
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
+    self.skipWaiting();
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll([
+                './index.html',
+                './manifest.json',
+                './icon-512.png'
+            ]);
+        })
+    );
 });
 
-// Attivazione: pulisce le vecchie cache
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      );
-    }).then(() => self.clients.claim())
-  );
+    event.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) return caches.delete(key);
+                })
+            );
+        }).then(() => self.clients.claim())
+    );
 });
 
-// Fetch: serve i file dalla cache o scarica dal web
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
+    event.respondWith(
+        fetch(event.request).catch(() => caches.match(event.request))
+    );
 });
