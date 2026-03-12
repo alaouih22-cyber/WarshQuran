@@ -1,22 +1,37 @@
-const CACHE_NAME = 'quran-warsh-final';
+const CACHE_NAME = 'quran-warsh-v5';
+const assets = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-512.png'
+];
 
-self.addEventListener('install', (e) => {
+// Installazione: scarica i file necessari
+self.addEventListener('install', (event) => {
   self.skipWaiting();
-  e.waitUntil(
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(['./index.html', './manifest.json', './icon-512.png']);
+      return cache.addAll(assets);
     })
   );
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
+// Attivazione: cancella le vecchie versioni per evitare errori
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
     caches.keys().then((keys) => {
-      return Promise.all(keys.map((k) => caches.delete(k)));
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
     }).then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+// Gestione richieste: serve i file dalla cache se offline
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
 });
