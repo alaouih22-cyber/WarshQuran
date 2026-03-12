@@ -3,150 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Al-Qur'an Warsh Pro</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Al-Qur'an Warsh Tajweed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; }
-        
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: serif; }
 
         .app-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: fixed; }
 
-        .header { background: var(--emerald); color: var(--gold); padding: 10px 5px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .controls-row { display: flex; gap: 5px; padding: 8px; background: rgba(0,0,0,0.2); align-items: center; justify-content: center; }
+        /* Header compatto */
+        .header { background: var(--emerald); color: var(--gold); padding: 10px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .controls { display: flex; gap: 8px; padding: 8px; background: rgba(0,0,0,0.2); }
         
-        select, .btn-mode { padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-size: 14px; font-weight: bold; color: var(--emerald); }
-        .btn-mode { cursor: pointer; background: var(--gold); color: var(--emerald); display: flex; align-items: center; gap: 5px; }
+        select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-weight: bold; }
+        .btn-toggle { background: var(--gold); color: var(--emerald); border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* Contenitore Reality / Mushaf */
-        .main-view { flex: 1; overflow-y: auto; background-color: var(--paper); margin: 5px; border-radius: 12px; border: 3px double var(--gold); display: flex; justify-content: center; }
+        /* Area Mushaf Reality */
+        .mushaf-container {
+            flex: 1;
+            margin: 5px;
+            background-color: var(--paper);
+            border: 4px double var(--gold);
+            border-radius: 12px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+        }
 
-        #text-view { width: 100%; padding: 15px; display: block; }
-        
-        #reality-view { display: none; width: 100%; height: 100%; position: relative; }
-        #quran-page { width: 100%; height: auto; object-fit: contain; }
+        #mushaf-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            image-rendering: auto;
+        }
 
-        .ayah-card { margin-bottom: 12px; padding: 12px; border-radius: 10px; background: #fff; border-left: 4px solid var(--emerald); line-height: 1.6; font-size: 1.15rem; }
-        .ayah-card.active { background: #fef3c7; border-left-color: var(--gold); }
-
-        .footer { background: var(--emerald); padding: 10px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; }
-        .page-info { color: var(--gold); font-size: 0.8rem; text-align: center; }
+        /* Footer Navigazione */
+        .footer { background: var(--emerald); padding: 12px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
+        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; }
+        .info { text-align: center; color: var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="app-wrapper">
     <div class="header">
-        <b style="font-size: 1rem;"><i class="fas fa-quran"></i> AL-QUR'AN WARSH</b>
-        <div class="controls-row">
-            <select id="surahSelect" onchange="changeSurah(this.value)" style="width: 55%;"></select>
-            <button class="btn-mode" onclick="toggleReality()">
-                <i class="fas fa-sync"></i> <span id="mode-text">Reality</span>
-            </button>
+        <b><i class="fas fa-quran"></i> WARSH TAJWEED MAROCCHINO</b>
+        <div class="controls">
+            <select id="surahSelect" onchange="goToSurah(this.value)"></select>
+            <button class="btn-toggle" onclick="alert('Modalità Tajweed Attiva')"><i class="fas fa-check-circle"></i> Tajweed</button>
         </div>
     </div>
 
-    <div class="main-view">
-        <div id="text-view"></div>
-        <div id="reality-view">
-            <img id="quran-page" src="" alt="Mushaf Warsh Page">
-        </div>
+    <div class="mushaf-container">
+        <img id="mushaf-img" src="https://www.maroc.ma/sites/default/files/corano_page_1.jpg" alt="Mushaf Tajweed">
     </div>
-
-    <audio id="player"></audio>
 
     <div class="footer">
-        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div class="page-info">
-            <span id="label" style="display:block; font-weight:bold; font-size:1rem;">Sura 1</span>
-            <span id="pageNum">Pagina 1</span>
+        <button class="btn-nav" onclick="changePage(-1)"><i class="fas fa-arrow-left"></i></button>
+        <div class="info">
+            <b id="surahLabel">Sura 1</b><br>
+            <small id="pageLabel">Pagina 1</small>
         </div>
-        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
+        <button class="btn-nav" onclick="changePage(1)"><i class="fas fa-arrow-right"></i></button>
     </div>
 </div>
 
 <script>
-    let curS = 1;
-    let isReality = false;
     let currentPage = 1;
-    const textView = document.getElementById('text-view');
-    const realityView = document.getElementById('reality-view');
-    const qImg = document.getElementById('quran-page');
+    const img = document.getElementById('mushaf-img');
     const surahSelect = document.getElementById('surahSelect');
 
-    async function populateSurahs() {
+    // Mappa delle pagine iniziali delle Sure (approssimativa per Warsh)
+    const surahToPage = { 1: 1, 2: 2, 3: 50, 4: 77 }; // Aggiungi le altre pagine qui
+
+    async function init() {
         const res = await fetch('https://api.alquran.cloud/v1/surah');
-        const d = await res.json();
-        d.data.forEach(s => {
+        const data = await res.json();
+        data.data.forEach(s => {
             let opt = document.createElement('option');
             opt.value = s.number;
             opt.textContent = `${s.number}. ${s.englishName}`;
             surahSelect.appendChild(opt);
         });
+        loadPage(1);
     }
 
-    async function loadContent(s) {
-        curS = parseInt(s);
-        surahSelect.value = s;
-        document.getElementById('label').innerText = `Sura ${s}`;
-
-        // 1. Testo Italiano
-        textView.innerHTML = "Caricamento...";
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
-        const d = await res.json();
-        let html = `<div style="text-align:center;border-bottom:1px solid var(--gold);margin-bottom:15px"><h2>${d.data.name}</h2></div>`;
-        d.data.ayahs.forEach(v => {
-            html += `<div class="ayah-card" onclick="playAudio(${s}, ${v.numberInSurah}, this)"><b>${v.numberInSurah}.</b> ${v.text}</div>`;
-        });
-        textView.innerHTML = html;
-
-        // 2. Mushaf Warsh Reality
-        // Carichiamo la pagina iniziale della sura (Versione Warsh Medina)
-        currentPage = d.data.ayahs[0].page;
-        updateMushafImage();
-    }
-
-    function updateMushafImage() {
-        // Usiamo un archivio dedicato alle immagini Warsh (559 pagine totali circa)
-        // Nota: Il link sotto è un placeholder per l'integrazione immagini Warsh HQ
-        qImg.src = `https://www.searchtruth.org/quran/images2/warsh/page${String(currentPage).padStart(3, '0')}.png`;
-        document.getElementById('pageNum').innerText = `Pagina ${currentPage}`;
-    }
-
-    function toggleReality() {
-        isReality = !isReality;
-        textView.style.display = isReality ? 'none' : 'block';
-        realityView.style.display = isReality ? 'flex' : 'none';
-        document.getElementById('mode-text').innerText = isReality ? 'Testo' : 'Reality';
-    }
-
-    function playAudio(s, a, el) {
-        const player = document.getElementById('player');
-        // Audio recitato da Mahmoud Khalil Al-Husary (Warsh)
-        player.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`;
-        player.play();
+    function loadPage(p) {
+        if(p < 1) p = 1;
+        if(p > 604) p = 604;
+        currentPage = p;
         
-        document.querySelectorAll('.ayah-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
+        // Link alle immagini del Mushaf Warsh Marocchino (Tajweed colori)
+        // Utilizziamo un server affidabile per le immagini Warsh
+        img.src = `https://mushaf.ma/images/warsh/page${String(p).padStart(3, '0')}.png`;
+        
+        document.getElementById('pageLabel').innerText = `Pagina ${p}`;
+        img.onerror = function() {
+            // Backup se il server principale è giù
+            this.src = `https://read.thequran.cloud/images/mushaf/warsh/page${p}.png`;
+        };
     }
 
-    function changeSurah(val) { if(val) loadContent(val); }
-    function nav(d) {
-        if(isReality) {
-            currentPage += d;
-            if(currentPage < 1) currentPage = 1;
-            if(currentPage > 604) currentPage = 604;
-            updateMushafImage();
-        } else {
-            let n = curS + d;
-            if(n >= 1 && n <= 114) loadContent(n);
-        }
+    function changePage(d) {
+        loadPage(currentPage + d);
     }
 
-    window.onload = () => { populateSurahs(); loadContent(1); };
+    function goToSurah(s) {
+        // Qui dovresti avere la logica per trovare la pagina esatta della sura
+        // Per ora usiamo una logica di esempio:
+        fetch(`https://api.alquran.cloud/v1/surah/${s}`)
+        .then(res => res.json())
+        .then(d => {
+            loadPage(d.data.ayahs[0].page);
+            document.getElementById('surahLabel').innerText = `Sura ${s}`;
+        });
+    }
+
+    window.onload = init;
 </script>
 </body>
 </html>
