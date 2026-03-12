@@ -1,252 +1,208 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mushaf Tajweed Warsh Marocchino</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mushaf Tajweed Warsh 604</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Font Amiri con varianti Maghrebi -->
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --mushaf-bg: #fffcf5; 
-            --emerald-dark: #053e30;
-            --gold-border: #c5a059;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --emerald: #064e3b; --gold: #c5a059; --paper: #f4ecd8; }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body, html { 
             height: 100%; width: 100%; 
-            background-color: #0b2e26; 
+            background-color: #1a1a1a; 
             overflow: hidden; 
-            font-family: 'Amiri', serif; 
+            font-family: sans-serif; 
         }
 
-        .app-wrapper { display: flex; flex-direction: column; height: 100vh; }
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; position: fixed; width: 100%; }
 
-        /* Toolbar superiore elegante */
+        /* Header ultra-compatta */
         .header { 
-            background: var(--emerald-dark); 
+            background: var(--emerald); 
             padding: 8px; 
             display: flex; 
-            gap: 10px; 
+            gap: 8px; 
             justify-content: center; 
-            border-bottom: 2px solid var(--gold-border);
+            align-items: center;
+            border-bottom: 2px solid var(--gold); 
         }
         
-        select, .btn-action { 
-            background: #fdf6e3; border: 1px solid var(--gold-border); 
-            padding: 6px 12px; border-radius: 5px; font-weight: bold; font-size: 14px;
+        #surahSelect { 
+            background: #fff; border: 1px solid var(--gold); 
+            padding: 8px; border-radius: 6px; font-weight: bold; width: 180px; 
         }
 
-        /* AREA MUSHAF AUTENTICA */
+        /* Area Mushaf */
         .mushaf-container {
             flex: 1;
-            padding: 15px;
+            background: #222;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-        }
-
-        .mushaf-page {
-            width: 100%;
-            height: 100%;
-            max-width: 500px;
-            background-color: var(--mushaf-bg);
             position: relative;
-            /* CORNICE FLOREALE MAROCCHINA (Simulata con immagine e bordi) */
-            border: 22px solid transparent;
-            border-image-source: url('https://i.ibb.co/Y7YpDqf/moroccan-border.png'); /* Cornice stile Zellij */
-            border-image-slice: 100;
-            border-image-repeat: stretch;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            scrollbar-width: none;
-        }
-        .mushaf-page::-webkit-scrollbar { display: none; }
-
-        /* Intestazione Sura stile Marocco */
-        .surah-frame {
-            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-            background-color: #fff;
-            border: 2px solid var(--emerald-dark);
-            margin: 10px auto;
-            width: 85%;
-            padding: 8px;
-            text-align: center;
-            border-radius: 10px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-        }
-        .surah-name { 
-            font-size: 1.6rem; 
-            color: var(--emerald-dark); 
-            font-weight: bold;
+            overflow: hidden;
+            touch-action: none;
         }
 
-        .bismillah { 
-            font-size: 1.8rem; 
-            margin: 15px 0; 
-            text-align: center; 
-            color: #000;
+        #mushafImage {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: opacity 0.3s;
         }
 
-        /* Testo Warsh: Dimensioni ridotte e stile denso */
-        .quran-text-warsh {
-            padding: 0 10px 30px 10px;
-            direction: rtl;
-            text-align: justify;
-            font-size: 1.55rem; /* Ridotto come richiesto */
-            line-height: 2.2;
-            color: #1a1a1a;
-            /* Ottimizzazione per stile Maghrebi */
-            font-feature-settings: "cv08" 1, "cv05" 1; 
+        /* Bottoni invisibili per cambiare pagina (stile Kindle/eReader) */
+        .page-nav-overlay {
+            position: absolute; top: 0; height: 100%; width: 40%; z-index: 10;
         }
+        .nav-left { right: 0; } /* Per l'arabo, clicca a destra per andare avanti */
+        .nav-right { left: 0; }
 
-        /* Segno Ayah Marocchino */
-        .ayah-sign {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            margin: 0 5px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 10 L85 35 L85 65 L50 90 L15 65 L15 35 Z" fill="none" stroke="%238d6e35" stroke-width="8"/><circle cx="50" cy="50" r="15" fill="%238d6e35" opacity="0.2"/></svg>');
-            background-size: contain;
-            background-repeat: no-repeat;
-            font-size: 0.8rem;
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            color: #8d6e35;
-            vertical-align: middle;
-        }
-
-        .active-word { background: rgba(197, 160, 89, 0.25); border-radius: 4px; }
-
-        /* Footer Navigazione */
+        /* Footer */
         .footer { 
-            background: var(--emerald-dark); 
-            padding: 12px; 
+            background: var(--emerald); 
+            padding: 10px 20px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-top: 2px solid var(--gold-border);
+            border-top: 2px solid var(--gold); 
         }
-        .btn-nav { background: var(--gold-border); color: #fff; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 1rem; }
+
+        .page-indicator { color: var(--gold); font-weight: bold; font-size: 1.1rem; }
+        .btn-nav { background: var(--gold); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="app-wrapper">
     <div class="header">
-        <select id="surahSelect" onchange="loadSurah(this.value)"></select>
-        <button onclick="toggleMode()" id="modeBtn" class="btn-action">MUSHAF WARSH</button>
+        <select id="surahSelect" onchange="goToSurah(this.value)"></select>
+        <div id="loading" style="color: white; font-size: 12px; display:none;">Caricamento...</div>
     </div>
 
     <div class="mushaf-container">
-        <div class="mushaf-page" id="mushafPage">
-            <!-- Caricamento dinamico -->
-        </div>
+        <!-- Overlay per cambio pagina al tocco -->
+        <div class="page-nav-overlay nav-right" onclick="changePage(1)"></div>
+        <div class="page-nav-overlay nav-left" onclick="changePage(-1)"></div>
+        
+        <img id="mushafImage" src="" alt="Mushaf Page">
     </div>
 
     <div class="footer">
-        <button class="btn-nav" onclick="changeSurah(-1)"><i class="fas fa-chevron-right"></i></button>
-        <span id="surahLabel" style="color:var(--gold-border); font-weight:bold; font-size:1.1rem;">Al-Fatiha</span>
-        <button class="btn-nav" onclick="changeSurah(1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="btn-nav" onclick="changePage(1)"><i class="fas fa-chevron-left"></i> Prec.</button>
+        <div class="page-indicator">Pagina <span id="pageNumber">1</span></div>
+        <button class="btn-nav" onclick="changePage(-1)">Succ. <i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
 
-<audio id="quranPlayer"></audio>
-
 <script>
-    let currentSurah = 1;
-    let isWarsh = true;
-    const page = document.getElementById('mushafPage');
-    const player = document.getElementById('quranPlayer');
+    let currentPage = 1;
+    
+    // Mappatura precisa delle pagine d'inizio delle 114 Sure (Mushaf 604 pagine standard)
+    const surahStartPages = [
+        1, 2, 50, 77, 106, 128, 151, 177, 187, 208, 221, 235, 249, 255, 262, 267, 282, 293, 305, 312, 
+        322, 332, 342, 350, 359, 367, 377, 385, 396, 404, 411, 415, 418, 428, 434, 440, 446, 453, 458, 
+        467, 477, 483, 489, 496, 499, 502, 507, 511, 515, 518, 520, 523, 526, 528, 531, 534, 537, 542, 
+        545, 549, 551, 553, 554, 556, 558, 560, 562, 564, 566, 568, 570, 572, 574, 575, 577, 578, 580, 
+        582, 583, 585, 586, 587, 587, 589, 590, 591, 591, 592, 593, 594, 595, 595, 596, 596, 597, 597, 
+        598, 598, 599, 599, 600, 600, 601, 601, 601, 602, 602, 602, 603, 603, 603, 604, 604, 604
+    ];
 
-    async function init() {
-        // Popola la lista delle sure
-        const res = await fetch('https://api.alquran.cloud/v1/surah');
-        const data = await res.json();
+    const surahNames = [
+        "Al-Fatihah", "Al-Baqarah", "Al-Imran", "An-Nisa", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
+        "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha",
+        "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
+        "Luqman", "As-Sajdah", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir",
+        "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+        "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hashr", "Al-Mumtahanah",
+        "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij",
+        "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
+        "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiyah", "Al-Fajr", "Al-Balad",
+        "Ash-Shams", "Al-Layl", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat",
+        "Al-Qari'ah", "At-Takathur", "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
+        "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+    ];
+
+    function init() {
         const select = document.getElementById('surahSelect');
-        data.data.forEach(s => {
+        surahNames.forEach((name, index) => {
             let opt = document.createElement('option');
-            opt.value = s.number;
-            opt.textContent = `${s.number}. ${s.englishName}`;
+            opt.value = surahStartPages[index];
+            opt.textContent = `${index + 1}. ${name}`;
             select.appendChild(opt);
         });
-        loadSurah(1);
+        updatePage();
     }
 
-    async function loadSurah(s) {
-        currentSurah = parseInt(s);
-        document.getElementById('surahSelect').value = s;
-        page.innerHTML = "<div style='text-align:center; padding:50px;'>جاري التحميل...</div>";
-        
-        // Edition: ar.warsh (Importante per il vero testo Warsh marocchino)
-        const edition = isWarsh ? 'ar.warsh' : 'it.piccardo';
-        
-        try {
-            const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/${edition}`);
-            const d = await res.json();
-            const surah = d.data;
+    function updatePage() {
+        const img = document.getElementById('mushafImage');
+        const loader = document.getElementById('loading');
+        loader.style.display = "block";
+        img.style.opacity = "0.5";
 
-            document.getElementById('surahLabel').innerText = surah.englishName;
-            renderMushaf(surah);
-        } catch (e) { page.innerHTML = "Errore di caricamento."; }
+        // URL del database Mushaf Tajweed Dar Al-Ma'rifah (standard 604 pagine)
+        // Utilizziamo un server CDN che ospita le scansioni ufficiali Warsh
+        const paddedPage = String(currentPage).padStart(3, '0');
+        const imgUrl = `https://raw.githubusercontent.com/QuranHub/quran-pages-images/master/warsh/604/${currentPage}.png`;
+        
+        img.src = imgUrl;
+        img.onload = () => {
+            img.style.opacity = "1";
+            loader.style.display = "none";
+        };
+        img.onerror = () => {
+            // Fallback se GitHub ha problemi
+            img.src = `https://www.easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+        };
+
+        document.getElementById('pageNumber').innerText = currentPage;
+        
+        // Aggiorna il selettore se cambiamo pagina sfogliando
+        updateSurahSelect();
     }
 
-    function renderMushaf(surah) {
-        let html = `
-            <div class="surah-frame">
-                <div class="surah-name">${surah.name}</div>
-            </div>
-        `;
-
-        if (currentSurah !== 1 && currentSurah !== 9) {
-            html += `<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`;
+    function changePage(delta) {
+        let next = currentPage + delta;
+        if (next >= 1 && next <= 604) {
+            currentPage = next;
+            updatePage();
         }
+    }
 
-        html += `<div class="quran-text-warsh">`;
-        surah.ayahs.forEach(v => {
-            let text = v.text;
-            // Pulisce Bismillah automatica se presente nel primo verso (tranne Fatiha)
-            if (v.numberInSurah === 1 && currentSurah !== 1 && currentSurah !== 9) {
-                text = text.replace("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", "");
+    function goToSurah(page) {
+        currentPage = parseInt(page);
+        updatePage();
+    }
+
+    function updateSurahSelect() {
+        // Trova la sura corrispondente alla pagina attuale
+        let currentSurahIdx = 0;
+        for (let i = 0; i < surahStartPages.length; i++) {
+            if (currentPage >= surahStartPages[i]) {
+                currentSurahIdx = i;
+            } else {
+                break;
             }
-            html += `<span id="a-${v.numberInSurah}" onclick="playAyah(${currentSurah}, ${v.numberInSurah}, this)">${text} <span class="ayah-sign">${v.numberInSurah}</span></span> `;
-        });
-        html += `</div>`;
-        
-        page.innerHTML = html;
-        page.scrollTop = 0;
+        }
+        document.getElementById('surahSelect').value = surahStartPages[currentSurahIdx];
     }
 
-    function playAyah(s, a, el) {
-        document.querySelectorAll('.quran-text-warsh span').forEach(s => s.classList.remove('active-word'));
-        el.classList.add('active-word');
-        
-        // Recitatore Al-Hussary (Warsh) per massima fedeltà
-        player.src = `https://www.everyayah.com/data/Husary_Warsh_64kbps/${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`;
-        player.play();
-    }
-
-    function toggleMode() {
-        isWarsh = !isWarsh;
-        document.getElementById('modeBtn').innerText = isWarsh ? "MUSHAF WARSH" : "TRADUZIONE ITA";
-        loadSurah(currentSurah);
-    }
-
-    function changeSurah(dir) {
-        let n = currentSurah + dir;
-        if (n >= 1 && n <= 114) loadSurah(n);
-    }
+    // Gestione swipe su mobile
+    let touchstartX = 0;
+    let touchendX = 0;
+    
+    document.addEventListener('touchstart', e => touchstartX = e.changedTouches[0].screenX);
+    document.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        if (touchendX < touchstartX - 50) changePage(-1); // Swipe Sinistra -> Avanti (Arabo)
+        if (touchendX > touchstartX + 50) changePage(1);  // Swipe Destra -> Indietro (Arabo)
+    });
 
     window.onload = init;
 </script>
-
 </body>
 </html>
