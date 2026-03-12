@@ -3,172 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corano in Italiano</title>
+    <title>Corano Italiano Ultimate</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --gold: #eab308; --dark: #0f172a; --bg: #020617; }
+        :root { 
+            --emerald: #064e3b; 
+            --gold: #fbbf24; 
+            --dark: #022c22;
+            --ivory: #f8fafc;
+        }
+        
         body { 
-            margin: 0; 
-            background-color: var(--bg); 
-            color: white; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
+            margin: 0; background-color: var(--dark); color: var(--ivory); 
+            font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; 
         }
 
-        /* Header con Titolo */
-        .header { 
-            background: var(--dark); 
-            padding: 20px; 
-            text-align: center; 
-            border-bottom: 2px solid var(--gold);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        /* Border Mushaf Style */
+        .mushaf-border {
+            border: 15px solid transparent;
+            border-image: url('https://www.transparenttextures.com/patterns/gold-albedo.png') 30 round;
+            outline: 2px solid var(--gold);
+            outline-offset: -10px;
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
         }
-        .header h1 { margin: 0; color: var(--gold); font-size: 1.5rem; }
 
-        /* Area Testo Corano */
-        .content { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 20px; 
-            line-height: 1.8;
-            scroll-behavior: smooth;
+        /* Navbar & Search */
+        .header { background: var(--emerald); padding: 10px; border-bottom: 2px solid var(--gold); }
+        .search-container { display: flex; gap: 5px; margin-top: 5px; }
+        .search-container input { 
+            flex: 1; padding: 8px; border-radius: 5px; border: none; outline: none; 
+            font-size: 0.9rem; background: var(--ivory);
         }
-        .surah-title { 
-            color: var(--gold); 
-            text-align: center; 
-            font-size: 1.8rem; 
-            margin-bottom: 30px; 
-            border-bottom: 1px solid #334155;
-            padding-bottom: 10px;
-        }
-        .verse { 
-            margin-bottom: 20px; 
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .verse:hover { background: rgba(255,255,255,0.1); }
-        .v-num { color: var(--gold); font-weight: bold; margin-right: 10px; font-size: 0.9rem; }
 
-        /* Footer Navigazione */
-        .footer { 
-            background: var(--dark); 
-            padding: 15px; 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center; 
-            border-top: 2px solid var(--gold);
+        /* Area Testo */
+        .main-content { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
+        
+        .surah-header {
+            text-align: center; margin-bottom: 25px; padding: 15px;
+            background: rgba(251, 191, 36, 0.1); border-radius: 10px; border: 1px solid var(--gold);
         }
-        .nav-btn { 
-            background: var(--gold); 
-            color: black; 
-            border: none; 
-            padding: 12px 20px; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .nav-btn:disabled { background: #475569; cursor: not-allowed; }
 
-        #loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
-            border-radius: 15px;
-            display: none;
-            z-index: 1000;
-            color: var(--gold);
+        .ayah-card {
+            background: rgba(6, 78, 59, 0.3); border-radius: 10px; padding: 15px;
+            margin-bottom: 15px; border: 1px solid transparent; transition: 0.3s; cursor: pointer;
         }
+        .ayah-card:hover { border-color: var(--gold); background: rgba(6, 78, 59, 0.6); }
+        .ayah-card.playing { border-color: var(--gold); background: rgba(251, 191, 36, 0.2); transform: scale(1.02); }
+
+        .ayah-num { 
+            color: var(--gold); font-weight: bold; border: 1px solid var(--gold);
+            padding: 2px 8px; border-radius: 50%; font-size: 0.8rem; margin-right: 10px;
+        }
+
+        /* Controls */
+        .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid var(--gold); }
+        .nav-btn { background: var(--gold); color: var(--dark); border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        #audio-player { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="loading"><i class="fas fa-spinner fa-spin"></i> Caricamento...</div>
-
+<div class="mushaf-border">
     <div class="header">
-        <h1>Il Sacro Corano</h1>
-        <small id="surah-info">Sura 1: Al-Fatiha</small>
+        <div style="text-align: center; color: var(--gold); font-weight: bold; margin-bottom: 5px;">
+            <i class="fas fa-quran"></i> CORANO ITALIANO PRO
+        </div>
+        <div class="search-container">
+            <input type="number" id="searchSurah" placeholder="Sura (1-114)" min="1" max="114">
+            <input type="number" id="searchAyah" placeholder="Vers." min="1">
+            <button onclick="performSearch()" class="nav-btn"><i class="fas fa-search"></i></button>
+        </div>
     </div>
 
-    <div class="content" id="quran-text">
+    <div class="main-content" id="content">
         </div>
+
+    <audio id="audio-player"></audio>
 
     <div class="footer">
-        <button class="nav-btn" id="prev-btn" onclick="changeSurah(-1)">
-            <i class="fas fa-chevron-left"></i> Prec
-        </button>
-        <div style="text-align: center;">
-            <span id="current-number">1</span> / 114
-        </div>
-        <button class="nav-btn" id="next-btn" onclick="changeSurah(1)">
-            Succ <i class="fas fa-chevron-right"></i>
-        </button>
+        <button class="nav-btn" onclick="move(-1)"><i class="fas fa-chevron-left"></i></button>
+        <span id="surah-info" style="font-weight: bold; color: var(--gold);">Sura 1</span>
+        <button class="nav-btn" onclick="move(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
+</div>
 
-    <script>
-        let currentSurah = 1;
-        const quranText = document.getElementById('quran-text');
-        const loader = document.getElementById('loading');
+<script>
+    let currentSurah = 1;
+    const content = document.getElementById('content');
+    const player = document.getElementById('audio-player');
 
-        async function loadSurah(num) {
-            loader.style.display = 'block';
-            quranText.innerHTML = "";
+    async function loadSurah(num, scrollToAyah = null) {
+        content.innerHTML = "<p style='text-align:center'>Caricamento...</p>";
+        try {
+            const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/it.piccardo`);
+            const data = await res.json();
+            const s = data.data;
             
-            try {
-                // Usiamo l'API ufficiale per la traduzione Piccardo (Italiano)
-                const response = await fetch(`https://api.alquran.cloud/v1/surah/${num}/it.piccardo`);
-                const data = await response.json();
-                
-                const surah = data.data;
-                document.getElementById('surah-info').innerText = `Sura ${surah.number}: ${surah.englishName}`;
-                document.getElementById('current-number').innerText = surah.number;
+            currentSurah = num;
+            document.getElementById('surah-info').innerText = `${s.number}. ${s.englishName}`;
 
-                let html = `<div class="surah-title">${surah.name} <br> <small>${surah.englishNameTranslation}</small></div>`;
-                
-                surah.ayahs.forEach(ayah => {
-                    html += `
-                        <div class="verse">
-                            <span class="v-num">${ayah.numberInSurah}.</span>
-                            <span class="v-text">${ayah.text}</span>
-                        </div>
-                    `;
-                });
+            let html = `
+                <div class="surah-header">
+                    <h2 style="color:var(--gold); margin:0;">${s.name}</h2>
+                    <p style="margin:5px 0;">${s.englishNameTranslation}</p>
+                </div>
+            `;
 
-                quranText.innerHTML = html;
-                quranText.scrollTop = 0;
+            s.ayahs.forEach(a => {
+                html += `
+                    <div class="ayah-card" id="ayah-${a.numberInSurah}" onclick="playAyah(${s.number}, ${a.numberInSurah}, this)">
+                        <span class="ayah-num">${a.numberInSurah}</span>
+                        <span class="ayah-text">${a.text}</span>
+                    </div>
+                `;
+            });
 
-            } catch (error) {
-                quranText.innerHTML = "<p style='text-align:center'>Errore nel caricamento. Controlla la connessione.</p>";
-            } finally {
-                loader.style.display = 'none';
-                updateButtons();
+            content.innerHTML = html;
+
+            if (scrollToAyah) {
+                setTimeout(() => {
+                    const el = document.getElementById(`ayah-${scrollToAyah}`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('playing');
+                    }
+                }, 500);
             }
-        }
+        } catch (e) { content.innerHTML = "Errore di connessione."; }
+    }
 
-        function changeSurah(delta) {
-            let next = currentSurah + delta;
-            if (next >= 1 && next <= 114) {
-                currentSurah = next;
-                loadSurah(currentSurah);
-            }
-        }
+    function playAyah(s, a, element) {
+        // Rimuovi classe playing dagli altri
+        document.querySelectorAll('.ayah-card').forEach(c => c.classList.remove('playing'));
+        element.classList.add('playing');
 
-        function updateButtons() {
-            document.getElementById('prev-btn').disabled = (currentSurah === 1);
-            document.getElementById('next-btn').disabled = (currentSurah === 114);
-        }
+        // Audio API (Recitatore Al-Afasy)
+        const ayahId = s + ":" + a;
+        player.src = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${(s * 1000 + a - 1000) || a}.mp3`; // Link semplificato per test
+        // Nota: Il link audio sopra è indicativo, usiamo una sorgente diretta affidabile:
+        player.src = `https://api.quran.com/api/v4/recordings/reciters/7/audio_files?ayah_key=${s}:${a}`; // Questo richiede parsing, per semplicità usiamo:
+        player.src = `https://www.everyayah.com/data/Alafasy_128kbps/${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`;
+        
+        player.play();
+    }
 
-        // Avvio dell'app
-        window.onload = () => loadSurah(1);
-    </script>
+    function move(d) {
+        let n = currentSurah + d;
+        if (n >= 1 && n <= 114) loadSurah(n);
+    }
+
+    function performSearch() {
+        const s = document.getElementById('searchSurah').value;
+        const a = document.getElementById('searchAyah').value;
+        if (s >= 1 && s <= 114) {
+            loadSurah(s, a || null);
+        }
+    }
+
+    window.onload = () => loadSurah(1);
+</script>
 </body>
 </html>
