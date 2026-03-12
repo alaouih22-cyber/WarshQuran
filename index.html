@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Al-Qur'an Warsh Pro</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#064e3b">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-512.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
@@ -25,9 +31,15 @@
         #qimg { width: 100%; height: auto; display: block; }
         .foot { background: var(--emerald); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
         .btn-n { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; }
+        
+        /* Bottone Installazione Nascosto (Appare se serve) */
+        #installBtn { display: none; position: fixed; top: 10px; right: 10px; z-index: 999; padding: 5px 10px; background: var(--gold); color: var(--emerald); border-radius: 5px; font-size: 12px; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
+
+<button id="installBtn">INSTALLA APP</button>
+
 <div class="app">
     <div class="header">
         <b>AL-QUR'AN WARSH PRO</b>
@@ -40,16 +52,36 @@
         <div id="txt"></div>
         <div id="real"><img id="qimg" src=""></div>
     </div>
-    <audio id="aud"></audio>
+    <audio id="aud" crossorigin="anonymous"></audio>
     <div class="foot">
         <button class="btn-n" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
         <div style="color:var(--gold);text-align:center;"><b id="sL">Sura 1</b><br><small id="pL">Pagina 1</small></div>
         <button class="btn-n" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
+
 <script>
     let curS = 1, curP = 1, isR = false;
+    let deferredPrompt;
     const aud = document.getElementById('aud');
+
+    // GESTIONE INSTALLAZIONE
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installBtn').style.display = 'block';
+    });
+
+    document.getElementById('installBtn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('installBtn').style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    });
 
     async function start() {
         const r = await fetch('https://api.alquran.cloud/v1/surah');
@@ -79,8 +111,15 @@
     function pAud(s, a, el) {
         document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        aud.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${String(s).padStart(3,'0')}${String(a).padStart(3,'0')}.mp3`;
-        aud.play();
+        const sID = String(s).padStart(3,'0');
+        const aID = String(a).padStart(3,'0');
+        // Audio con fallback HTTPS
+        aud.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${sID}${aID}.mp3`;
+        aud.play().catch(e => {
+            // Se fallisce, prova il server mirror
+            aud.src = `https://mirrors.quranicaudio.com/everyayah/Husary_Warsh_64kbps/${sID}${aID}.mp3`;
+            aud.play();
+        });
     }
 
     function uImg() {
@@ -100,7 +139,12 @@
         else { let n = curS + x; if(n>0 && n<115) loadS(n); }
     }
 
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+    // Registrazione Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js');
+        });
+    }
     window.onload = start;
 </script>
 </body>
