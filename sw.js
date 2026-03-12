@@ -1,32 +1,30 @@
-const CACHE_NAME = 'quran-pro-v10'; // Cambiato nome per forzare il refresh
+const CACHE_NAME = 'quran-pro-v1';
+const ASSETS = [
+  './',
+  './index.html',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
+];
 
-self.addEventListener('install', (event) => {
-    self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll([
-                './index.html',
-                './manifest.json',
-                './icon-512.png'
-            ]);
-        })
-    );
+// Installazione: salva i file base nella cache
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
 });
 
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((keys) => {
-            return Promise.all(
-                keys.map((key) => {
-                    if (key !== CACHE_NAME) return caches.delete(key);
-                })
-            );
-        }).then(() => self.clients.claim())
-    );
-});
-
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request).catch(() => caches.match(event.request))
-    );
+// Strategia di fetch: prova la rete, se fallisce usa la cache
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((res) => {
+      return res || fetch(e.request).then((fetchRes) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          // Salva in cache le sura caricate per leggerle offline dopo
+          if (e.request.url.includes('api.alquran.cloud')) {
+            cache.put(e.request.url, fetchRes.clone());
+          }
+          return fetchRes;
+        });
+      });
+    })
+  );
 });
