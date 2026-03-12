@@ -3,245 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Corano Pro Italiano</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    
+    <title>Al-Qur'an Pro</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital@0;1&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
-        :root { 
-            --emerald: #064e3b; 
-            --gold: #fbbf24; 
-            --dark: #022c22;
-            --paper: #fdf6e3;
-        }
+        :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; --text: #1a202c; }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body { 
-            margin: 0; 
-            background-color: var(--dark); 
-            color: var(--dark); 
-            font-family: 'Inter', sans-serif; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column;
-            overflow: hidden;
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            background-color: var(--emerald); overflow: hidden; 
+            font-family: 'Georgia', serif; 
         }
 
-        /* Cornice Ornamentale Mushaf */
-        .app-shell {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border: 8px solid var(--emerald);
-            outline: 2px solid var(--gold);
-            outline-offset: -5px;
-            background-color: var(--paper);
-            margin: env(safe-area-inset-top) 5px env(safe-area-inset-bottom) 5px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
+        /* Contenitore App a tutto schermo */
+        .app-wrapper {
+            display: flex; flex-direction: column; height: 100vh;
+            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
         /* Header Professionale */
-        .header { 
-            background: var(--emerald); 
-            padding: 15px 10px; 
-            color: var(--gold);
-            text-align: center;
-            border-bottom: 2px solid var(--gold);
+        .header { background: var(--emerald); color: var(--gold); padding: 10px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .search-row { display: flex; gap: 5px; padding: 5px 10px; background: rgba(0,0,0,0.2); }
+        .search-row input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-size: 14px; outline: none; }
+
+        /* Area Lettura con bordo Mushaf Tajweed */
+        .reader-container {
+            flex: 1; overflow-y: auto; background-color: var(--paper);
+            margin: 10px; border-radius: 15px; border: 4px double var(--gold);
+            padding: 15px; box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
         }
+
+        .surah-title-box { text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 25px; padding-bottom: 15px; }
+        .surah-name-ar { font-size: 2.2rem; color: var(--emerald); margin: 0; }
         
-        .search-bar {
-            display: flex;
-            gap: 8px;
-            padding: 10px;
-            background: rgba(0,0,0,0.1);
+        /* Grafica Versetti */
+        .ayah-card {
+            margin-bottom: 15px; padding: 15px; border-radius: 12px;
+            background: rgba(255,255,255,0.7); border-left: 5px solid var(--emerald);
+            line-height: 1.8; font-size: 1.2rem; color: var(--text);
+            transition: 0.2s; cursor: pointer;
         }
-
-        .search-bar input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--gold);
-            background: var(--paper);
-            font-size: 14px;
-        }
-
-        /* Area Lettura */
-        .reader-area { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 20px;
-            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
-        }
-
-        .surah-intro {
-            text-align: center;
-            border-bottom: 2px double var(--gold);
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-        }
-
-        .surah-intro h2 { 
-            font-family: 'Amiri', serif; 
-            font-size: 2.5rem; 
-            margin: 0; 
-            color: var(--emerald);
-        }
-
-        .ayah-block {
-            margin-bottom: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.5);
-            border: 1px solid transparent;
-            transition: 0.3s;
-            cursor: pointer;
-            line-height: 1.8;
-            font-size: 1.15rem;
-        }
-
-        .ayah-block:hover { border-color: var(--gold); background: #fff; }
-        .ayah-block.active { border-color: var(--gold); background: #fef3c7; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        .ayah-num {
-            font-weight: bold;
-            color: var(--emerald);
-            border: 1.5px solid var(--emerald);
-            width: 30px;
-            height: 30px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin-right: 10px;
-            font-size: 0.8rem;
-        }
+        .ayah-card.active { background: #fef3c7; border-left-color: var(--gold); transform: scale(1.01); }
+        .ayah-num { color: var(--emerald); font-weight: bold; margin-right: 10px; font-size: 0.9rem; }
 
         /* Navigazione Bottom */
-        .footer-nav {
-            background: var(--emerald);
-            padding: 15px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            color: var(--gold);
-        }
-
-        .btn-action {
-            background: var(--gold);
-            color: var(--dark);
-            border: none;
-            padding: 12px 25px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #b48904;
-        }
-
-        .btn-action:active { transform: translateY(2px); box-shadow: none; }
-
-        #audio-player { display: none; }
+        .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--gold); }
+        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
 
-<div class="app-shell">
+<div class="app-wrapper">
     <div class="header">
-        <div style="font-weight: bold; letter-spacing: 1px;">
-            <i class="fas fa-star-and-crescent"></i> AL-QUR'AN PRO
-        </div>
-        <div class="search-bar">
-            <input type="number" id="suraNum" placeholder="Sura (1-114)">
-            <input type="number" id="ayahNum" placeholder="Vers.">
-            <button onclick="search()" class="btn-action" style="padding: 10px;"><i class="fas fa-search"></i></button>
+        <b style="letter-spacing: 2px;"><i class="fas fa-moon"></i> AL-QUR'AN PRO</b>
+        <div class="search-row">
+            <input type="number" id="sIn" placeholder="Sura (1-114)">
+            <input type="number" id="aIn" placeholder="Versetto">
+            <button onclick="go()" class="btn-nav" style="padding: 10px;"><i class="fas fa-search"></i></button>
         </div>
     </div>
 
-    <div class="reader-area" id="reader">
-        </div>
+    <div class="reader-container" id="reader"></div>
 
-    <audio id="audio-player"></audio>
+    <audio id="player"></audio>
 
-    <div class="footer-nav">
-        <button class="btn-action" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
-        <div id="info" style="text-align: center; font-weight: bold;">Sura 1</div>
-        <button class="btn-action" onclick="nav(1)"><i class="fas fa-chevron-right"></i></button>
+    <div class="footer">
+        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-arrow-left"></i></button>
+        <span id="label" style="color:var(--gold); font-weight:bold;">Sura 1</span>
+        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-arrow-right"></i></button>
     </div>
 </div>
 
 <script>
-    let currentS = 1;
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+
+    let curS = 1;
     const reader = document.getElementById('reader');
-    const player = document.getElementById('audio-player');
+    const player = document.getElementById('player');
 
     async function load(s, a = null) {
-        reader.innerHTML = "<div style='text-align:center; padding:50px;'>Caricamento Sacro Testo...</div>";
+        reader.innerHTML = "<p style='text-align:center'>Caricamento...</p>";
         try {
             const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
             const d = await res.json();
             const surah = d.data;
-            currentS = s;
-            
-            document.getElementById('info').innerHTML = `SURA ${s}<br><small>${surah.englishName}</small>`;
+            curS = s;
+            document.getElementById('label').innerText = `Sura ${s}`;
 
-            let html = `
-                <div class="surah-intro">
-                    <h2>${surah.name}</h2>
-                    <p>${surah.englishNameTranslation}</p>
-                </div>
-            `;
-
+            let html = `<div class="surah-title-box"><h1 class="surah-name-ar">${surah.name}</h1><p>${surah.englishNameTranslation}</p></div>`;
             surah.ayahs.forEach(v => {
-                html += `
-                    <div class="ayah-block" id="v-${v.numberInSurah}" onclick="play(${s}, ${v.numberInSurah}, this)">
-                        <span class="ayah-num">${v.numberInSurah}</span>
-                        <span>${v.text}</span>
-                    </div>
-                `;
+                html += `<div class="ayah-card" id="v-${v.numberInSurah}" onclick="play(${s}, ${v.numberInSurah}, this)">
+                    <span class="ayah-num">${v.numberInSurah}</span> ${v.text}</div>`;
             });
-
             reader.innerHTML = html;
-
-            if(a) {
-                setTimeout(() => {
+            if(a) { 
+                setTimeout(() => { 
                     const el = document.getElementById(`v-${a}`);
                     if(el) { el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.add('active'); }
-                }, 400);
+                }, 500);
             }
-        } catch(e) { reader.innerHTML = "Errore. Verifica connessione."; }
+        } catch(e) { reader.innerHTML = "Errore connessione."; }
     }
 
     function play(s, a, el) {
-        document.querySelectorAll('.ayah-block').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.ayah-card').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
-        
-        // Audio Al-Afasy
-        const sStr = String(s).padStart(3, '0');
-        const aStr = String(a).padStart(3, '0');
-        player.src = `https://www.everyayah.com/data/Alafasy_128kbps/${sStr}${aStr}.mp3`;
+        player.src = `https://www.everyayah.com/data/Alafasy_128kbps/${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`;
         player.play();
     }
 
-    function nav(d) {
-        let n = currentS + d;
-        if(n >= 1 && n <= 114) load(n);
-    }
-
-    function search() {
-        const s = document.getElementById('suraNum').value;
-        const a = document.getElementById('ayahNum').value;
-        if(s >= 1 && s <= 114) load(s, a);
-    }
+    function nav(d) { let n = curS + d; if(n >= 1 && n <= 114) load(n); }
+    function go() { const s = document.getElementById('sIn').value; const a = document.getElementById('aIn').value; if(s >= 1 && s <= 114) load(s, a); }
 
     window.onload = () => load(1);
 </script>
-
 </body>
 </html>
