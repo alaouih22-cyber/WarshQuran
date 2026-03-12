@@ -12,38 +12,40 @@
 
         .app-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: fixed; }
 
-        /* Header compatto */
         .header { background: var(--emerald); color: var(--gold); padding: 10px; text-align: center; border-bottom: 2px solid var(--gold); }
         .controls { display: flex; gap: 8px; padding: 8px; background: rgba(0,0,0,0.2); }
         
-        select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-weight: bold; }
-        .btn-toggle { background: var(--gold); color: var(--emerald); border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-weight: bold; font-size: 14px; }
 
-        /* Area Mushaf Reality */
-        .mushaf-container {
+        /* Area di lettura unificata */
+        .content-area {
             flex: 1;
-            margin: 5px;
+            margin: 8px;
             background-color: var(--paper);
             border: 4px double var(--gold);
             border-radius: 12px;
             overflow-y: auto;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            position: relative;
+            flex-direction: column;
+            gap: 20px;
+            padding-bottom: 20px;
         }
 
-        #mushaf-img {
-            width: 100%;
-            height: auto;
-            display: block;
-            image-rendering: auto;
+        /* Immagine Mushaf Marocchino */
+        .mushaf-box { width: 100%; background: #fff; border-bottom: 2px solid var(--gold); }
+        #mushaf-img { width: 100%; height: auto; display: block; }
+
+        /* Testo Italiano */
+        .translation-box { padding: 15px; }
+        .ayah-card { 
+            margin-bottom: 12px; padding: 12px; border-radius: 8px; 
+            background: white; border-left: 4px solid var(--emerald); 
+            line-height: 1.6; font-size: 1.1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Footer Navigazione */
         .footer { background: var(--emerald); padding: 12px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; }
-        .info { text-align: center; color: var(--gold); }
+        .btn-nav { background: var(--gold); color: var(--emerald); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .info { text-align: center; color: var(--gold); line-height: 1.2; }
     </style>
 </head>
 <body>
@@ -52,32 +54,33 @@
     <div class="header">
         <b><i class="fas fa-quran"></i> WARSH TAJWEED MAROCCHINO</b>
         <div class="controls">
-            <select id="surahSelect" onchange="goToSurah(this.value)"></select>
-            <button class="btn-toggle" onclick="alert('Modalità Tajweed Attiva')"><i class="fas fa-check-circle"></i> Tajweed</button>
+            <select id="surahSelect" onchange="loadSurah(this.value)"></select>
         </div>
     </div>
 
-    <div class="mushaf-container">
-        <img id="mushaf-img" src="https://www.maroc.ma/sites/default/files/corano_page_1.jpg" alt="Mushaf Tajweed">
+    <div class="content-area">
+        <div class="mushaf-box">
+            <img id="mushaf-img" src="" alt="Caricamento Mushaf...">
+        </div>
+
+        <div class="translation-box" id="translation-text">
+            <p style="text-align:center">Seleziona una Sura per leggere...</p>
+        </div>
     </div>
 
     <div class="footer">
-        <button class="btn-nav" onclick="changePage(-1)"><i class="fas fa-arrow-left"></i></button>
+        <button class="btn-nav" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
         <div class="info">
             <b id="surahLabel">Sura 1</b><br>
             <small id="pageLabel">Pagina 1</small>
         </div>
-        <button class="btn-nav" onclick="changePage(1)"><i class="fas fa-arrow-right"></i></button>
+        <button class="btn-nav" onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
     </div>
 </div>
 
 <script>
     let currentPage = 1;
-    const img = document.getElementById('mushaf-img');
-    const surahSelect = document.getElementById('surahSelect');
-
-    // Mappa delle pagine iniziali delle Sure (approssimativa per Warsh)
-    const surahToPage = { 1: 1, 2: 2, 3: 50, 4: 77 }; // Aggiungi le altre pagine qui
+    let currentSurah = 1;
 
     async function init() {
         const res = await fetch('https://api.alquran.cloud/v1/surah');
@@ -86,40 +89,48 @@
             let opt = document.createElement('option');
             opt.value = s.number;
             opt.textContent = `${s.number}. ${s.englishName}`;
-            surahSelect.appendChild(opt);
+            document.getElementById('surahSelect').appendChild(opt);
         });
-        loadPage(1);
+        loadSurah(1);
     }
 
-    function loadPage(p) {
-        if(p < 1) p = 1;
-        if(p > 604) p = 604;
-        currentPage = p;
+    async function loadSurah(s) {
+        currentSurah = parseInt(s);
+        document.getElementById('surahLabel').innerText = `Sura ${s}`;
         
-        // Link alle immagini del Mushaf Warsh Marocchino (Tajweed colori)
-        // Utilizziamo un server affidabile per le immagini Warsh
-        img.src = `https://mushaf.ma/images/warsh/page${String(p).padStart(3, '0')}.png`;
-        
-        document.getElementById('pageLabel').innerText = `Pagina ${p}`;
-        img.onerror = function() {
-            // Backup se il server principale è giù
-            this.src = `https://read.thequran.cloud/images/mushaf/warsh/page${p}.png`;
-        };
+        // Carica dati Sura per trovare la pagina e il testo
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
+        const d = await res.json();
+        const surahData = d.data;
+
+        // Imposta pagina iniziale Mushaf
+        currentPage = surahData.ayahs[0].page;
+        updateView(surahData);
+    }
+
+    function updateView(surahData) {
+        // 1. Aggiorna Immagine (Fonte Mushaf Marocchino Tajweed)
+        // Usiamo un server che supporta i percorsi Warsh
+        const img = document.getElementById('mushaf-img');
+        img.src = `https://www.searchtruth.org/quran/images2/warsh/page${String(currentPage).padStart(3, '0')}.png`;
+        document.getElementById('pageLabel').innerText = `Pagina ${currentPage}`;
+
+        // 2. Aggiorna Testo Italiano
+        let html = "";
+        surahData.ayahs.forEach(v => {
+            html += `<div class="ayah-card"><b>${v.numberInSurah}.</b> ${v.text}</div>`;
+        });
+        document.getElementById('translation-text').innerHTML = html;
     }
 
     function changePage(d) {
-        loadPage(currentPage + d);
-    }
-
-    function goToSurah(s) {
-        // Qui dovresti avere la logica per trovare la pagina esatta della sura
-        // Per ora usiamo una logica di esempio:
-        fetch(`https://api.alquran.cloud/v1/surah/${s}`)
-        .then(res => res.json())
-        .then(d => {
-            loadPage(d.data.ayahs[0].page);
-            document.getElementById('surahLabel').innerText = `Sura ${s}`;
-        });
+        currentPage += d;
+        if(currentPage < 1) currentPage = 1;
+        if(currentPage > 604) currentPage = 604;
+        
+        // Aggiorna solo l'immagine quando sfogli le pagine
+        document.getElementById('mushaf-img').src = `https://www.searchtruth.org/quran/images2/warsh/page${String(currentPage).padStart(3, '0')}.png`;
+        document.getElementById('pageLabel').innerText = `Pagina ${currentPage}`;
     }
 
     window.onload = init;
