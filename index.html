@@ -16,7 +16,7 @@
     <style>
         :root { --emerald: #064e3b; --gold: #fbbf24; --paper: #fdf6e3; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: sans-serif; }
+        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Segoe UI', sans-serif; }
         .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: fixed; }
         .header { background: var(--emerald); color: var(--gold); padding: 10px 5px; text-align: center; border-bottom: 2px solid var(--gold); }
         .nav-bar { display: flex; gap: 8px; padding: 8px; background: rgba(0,0,0,0.2); align-items: center; justify-content: center; }
@@ -24,7 +24,7 @@
         .btn-toggle { padding: 10px 15px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; min-width: 105px; justify-content: center; }
         .main-content { flex: 1; overflow-y: auto; background-color: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); position: relative; }
         #text-view { padding: 15px; display: block; }
-        .ayah-card { margin-bottom: 12px; padding: 15px; border-radius: 10px; background: #fff; border-left: 5px solid var(--emerald); line-height: 1.6; font-size: 1.1rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .ayah-card { margin-bottom: 12px; padding: 15px; border-radius: 10px; background: #fff; border-left: 5px solid var(--emerald); line-height: 1.6; font-size: 1.1rem; cursor: pointer; }
         .ayah-card.active { border-left-color: var(--gold); background: #fef3c7; }
         #reality-view { display: none; width: 100%; }
         #quran-page { width: 100%; height: auto; display: block; }
@@ -37,7 +37,7 @@
 
 <div class="app-container">
     <div class="header">
-        <b><i class="fas fa-star-and-crescent"></i> AL-QUR'AN WARSH</b>
+        <b><i class="fas fa-quran"></i> AL-QUR'AN WARSH PRO</b>
         <div class="nav-bar">
             <select id="surahSelect" onchange="loadSurah(this.value)"></select>
             <button class="btn-toggle" onclick="toggleMode()">
@@ -95,8 +95,8 @@
     function playVoice(s, a, el) {
         document.querySelectorAll('.ayah-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        // Audio Husary Warsh ad alta qualità
-        player.src = `https://mirrors.quranicaudio.com/everyayah/Husary_Warsh_64kbps/${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`;
+        // Audio Husary Warsh ad alta qualità (HTTPS forzato)
+        player.src = `https://everyayah.com/data/Husary_Warsh_64kbps/${String(s).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`;
         player.play().catch(err => console.error("Errore audio:", err));
     }
 
@@ -126,14 +126,7 @@
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        location.reload(); // Ricarica se c'è un aggiornamento
-                    }
-                };
-            };
+            console.log("Service Worker Armonizzato!");
         });
     }
     window.onload = init;
