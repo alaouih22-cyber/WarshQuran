@@ -17,16 +17,15 @@
         
         select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--gold); background: var(--paper); font-size: 14px; font-weight: bold; color: var(--emerald); }
         
-        /* IL BOTTONE SWITCH */
         .btn-toggle { padding: 10px 15px; border-radius: 8px; border: none; background: var(--gold); color: var(--emerald); font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; min-width: 100px; justify-content: center; }
 
         .main-view { flex: 1; overflow-y: auto; background-color: var(--paper); margin: 8px; border-radius: 12px; border: 4px double var(--gold); position: relative; }
 
-        /* VISTA TESTO */
         #text-view { padding: 15px; display: block; }
-        .ayah-card { margin-bottom: 12px; padding: 15px; border-radius: 10px; background: #fff; border-left: 5px solid var(--emerald); line-height: 1.6; font-size: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .ayah-card { margin-bottom: 12px; padding: 15px; border-radius: 10px; background: #fff; border-left: 5px solid var(--emerald); line-height: 1.6; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+        .ayah-card:active { background: #fef3c7; }
+        .ayah-card.active { border-left-color: var(--gold); background: #fef3c7; }
 
-        /* VISTA REALITY (MUSHAF) */
         #reality-view { display: none; width: 100%; height: 100%; }
         #quran-page { width: 100%; height: auto; display: block; }
 
@@ -55,6 +54,8 @@
         </div>
     </div>
 
+    <audio id="audioPlayer"></audio>
+
     <div class="footer">
         <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-chevron-left"></i></button>
         <div class="info-label">
@@ -69,6 +70,7 @@
     let curS = 1;
     let curP = 1;
     let isReality = false;
+    const player = document.getElementById('audioPlayer');
 
     async function init() {
         const res = await fetch('https://api.alquran.cloud/v1/surah');
@@ -87,19 +89,32 @@
         document.getElementById('surahSelect').value = s;
         document.getElementById('surahLabel').innerText = `Sura ${s}`;
 
-        // Carica Traduzione
         const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`);
         const d = await res.json();
         let html = "";
         d.data.ayahs.forEach(v => {
-            html += `<div class="ayah-card"><b>${v.numberInSurah}.</b> ${v.text}</div>`;
+            // Cliccando sulla card parte l'audio di Al-Husary (Warsh)
+            html += `<div class="ayah-card" onclick="playAyah(${s}, ${v.numberInSurah}, this)">
+                        <b>${v.numberInSurah}.</b> ${v.text}
+                     </div>`;
         });
         document.getElementById('text-view').innerHTML = html;
 
-        // Imposta Pagina Reality
         curP = d.data.ayahs[0].page;
         updateRealityImage();
         document.getElementById('scroll-container').scrollTop = 0;
+    }
+
+    function playAyah(s, a, el) {
+        // Rimuove evidenziazione precedente
+        document.querySelectorAll('.ayah-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+
+        // URL Audio Al-Husary (Warsh)
+        const surahTag = String(s).padStart(3, '0');
+        const ayahTag = String(a).padStart(3, '0');
+        player.src = `https://www.everyayah.com/data/Husary_Warsh_64kbps/${surahTag}${ayahTag}.mp3`;
+        player.play();
     }
 
     function updateRealityImage() {
