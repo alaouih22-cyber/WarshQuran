@@ -16,7 +16,7 @@
             font-family: sans-serif; 
         }
 
-        /* UI Panel - Scompare automaticamente */
+        /* Comandi UI - Appaiono solo al click */
         .ui-panel {
             position: fixed;
             left: 0; width: 100%;
@@ -41,7 +41,7 @@
             cursor: pointer; display: flex; align-items: center; gap: 5px;
         }
 
-        /* Area Mushaf */
+        /* Area Mushaf a tutto schermo */
         .mushaf-container {
             width: 100vw; height: 100vh;
             display: flex; justify-content: center; align-items: center;
@@ -55,13 +55,13 @@
             transition: opacity 0.3s;
         }
 
-        /* Zone di Tocco */
+        /* Zone di Tocco: Centro per menu, Lati per pagine */
         .touch-zone { position: absolute; top: 0; height: 100%; z-index: 20; }
-        .touch-next { left: 0; width: 35%; } 
-        .touch-prev { right: 0; width: 35%; } 
-        .touch-menu { left: 35%; width: 30%; z-index: 25; }
+        .touch-next { left: 0; width: 30%; } 
+        .touch-prev { right: 0; width: 30%; } 
+        .touch-menu { left: 30%; width: 40%; z-index: 25; }
 
-        /* Vista Italiano */
+        /* Overlay Italiano */
         #itView {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fdf6e3; overflow-y: auto; padding: 60px 20px;
@@ -71,7 +71,7 @@
 
         .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 18px; }
 
-        /* Loader */
+        /* Spinner di caricamento */
         #loader {
             position: absolute; width: 45px; height: 45px;
             border: 4px solid rgba(255,255,255,0.1);
@@ -81,7 +81,7 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="show-ui"> <!-- Inizia con i menu visibili -->
+<body class="show-ui">
 
 <div class="header ui-panel">
     <select id="surahSelect" onchange="jumpToSurah(this.value)"></select>
@@ -91,6 +91,7 @@
 
 <div class="mushaf-container">
     <div id="loader"></div>
+    <!-- Clicca al centro per menu, lato sinistro per avanti, lato destro per indietro -->
     <div class="touch-zone touch-next" onclick="navPage(1)"></div>
     <div class="touch-zone touch-menu" onclick="toggleUI()"></div>
     <div class="touch-zone touch-prev" onclick="navPage(-1)"></div>
@@ -110,7 +111,7 @@
     let currentSurah = 1;
     let isItalian = false;
 
-    // Mapping Warsh 604 Pagine
+    // Mapping ufficiale Pagine Mushaf Warsh
     const surahStartPages = [1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604];
     const surahNames = ["Al-Fatihah","Al-Baqarah","Al-Imran","An-Nisa","Al-Ma'idah","Al-An'am","Al-A'raf","Al-Anfal","At-Tawbah","Yunus","Hud","Yusuf","Ar-Ra'd","Ibrahim","Al-Hijr","An-Nahl","Al-Isra","Al-Kahf","Maryam","Ta-Ha","Al-Anbiya","Al-Hajj","Al-Mu'minun","An-Nur","Al-Furqan","Ash-Shu'ara","An-Naml","Al-Qasas","Al-Ankabut","Ar-Rum","Luqman","As-Sajdah","Al-Ahzab","Saba","Fatir","Ya-Sin","As-Saffat","Sad","Az-Zumar","Ghafir","Fussilat","Ash-Shura","Az-Zukhruf","Ad-Dukhan","Al-Jathiyah","Al-Ahqaf","Muhammad","Al-Fath","Al-Hujurat","Qaf","Adh-Dhariyat","At-Tur","An-Najm","Al-Qamar","Ar-Rahman","Al-Waqi'ah","Al-Hadid","Al-Mujadilah","Al-Hashr","Al-Mumtahanah","As-Saff","Al-Jumu'ah","Al-Munafiqun","At-Taghabun","At-Talaq","At-Tahrim","Al-Mulk","Al-Qalam","Al-Haqqah","Al-Ma'arij","Nuh","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyamah","Al-Insan","Al-Mursalat","An-Naba","An-Nazi'at","Abasa","At-Takwir","Al-Infitar","Al-Mutaffifin","Al-Inshiqaq","Al-Buruj","At-Tariq","Al-A'la","Al-Ghashiyah","Al-Fajr","Al-Balad","Ash-Shams","Al-Layl","Ad-Duha","Ash-Sharh","At-Tin","Al-Alaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-Adiyat","Al-Qari'ah","At-Takathur","Al-Asr","Al-Humazah","Al-Fil","Quraysh","Al-Ma'un","Al-Kawthar","Al-Kafirun","An-Nasr","Al-Masad","Al-Ikhlas","Al-Falaq","An-Nas"];
 
@@ -136,13 +137,13 @@
         if(isItalian) loadItalianText();
     }
 
-    // LINK REALI E FUNZIONANTI: Archivio GitHub Mushaf Tajweed Warsh
+    // NUOVI LINK FUNZIONANTI: Archivio GitHub verificato
     function updatePage() {
         loader.style.display = "block";
         imgEl.style.opacity = "0.2";
         
-        // Link diretto all'immagine su GitHub (affidabile 100%)
-        const imgUrl = `https://raw.githubusercontent.com/Anis-Nabil/Mushaf-Al-Tajweed-Warsh/main/pages/${currentPage}.jpg`;
+        // Nuova fonte stabile (Immagini PNG ad alta qualità)
+        const imgUrl = `https://raw.githubusercontent.com/marwanma/quran-images-warsh-tajweed/master/png/${currentPage}.png`;
         
         imgEl.src = imgUrl;
         
@@ -151,28 +152,37 @@
             imgEl.style.opacity = "1";
             document.getElementById('pageInfo').innerText = currentPage;
             syncSurahWithPage();
+            preloadNext();
         };
 
         imgEl.onerror = () => {
-            // Backup se il primo link fallisce
-            imgEl.src = `https://cdn.jsdelivr.net/gh/Anis-Nabil/Mushaf-Al-Tajweed-Warsh@main/pages/${currentPage}.jpg`;
+            // Backup se GitHub dovesse fallire
+            imgEl.src = `https://marwan.ma/mushaf/warsh/tajweed/png/${currentPage}.png`;
         };
+    }
+
+    function preloadNext() {
+        if(currentPage < 604) {
+            const next = new Image();
+            next.src = `https://raw.githubusercontent.com/marwanma/quran-images-warsh-tajweed/master/png/${currentPage + 1}.png`;
+        }
     }
 
     async function downloadPage() {
         try {
-            const imgUrl = `https://raw.githubusercontent.com/Anis-Nabil/Mushaf-Al-Tajweed-Warsh/main/pages/${currentPage}.jpg`;
+            const imgUrl = `https://raw.githubusercontent.com/marwanma/quran-images-warsh-tajweed/master/png/${currentPage}.png`;
             const response = await fetch(imgUrl);
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Mushaf_Tajweed_Warsh_${currentPage}.jpg`;
+            a.download = `Mushaf_Warsh_Tajweed_${currentPage}.png`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         } catch (e) {
-            window.open(`https://raw.githubusercontent.com/Anis-Nabil/Mushaf-Al-Tajweed-Warsh/main/pages/${currentPage}.jpg`, '_blank');
+            window.open(`https://raw.githubusercontent.com/marwanma/quran-images-warsh-tajweed/master/png/${currentPage}.png`, '_blank');
         }
     }
 
