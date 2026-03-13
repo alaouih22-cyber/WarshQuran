@@ -17,7 +17,7 @@
             font-family: sans-serif; 
         }
 
-        /* Menu UI */
+        /* UI Panel - Comandi a comparsa */
         .ui-panel {
             position: fixed;
             left: 0; width: 100%;
@@ -27,10 +27,11 @@
             transition: all 0.3s ease-in-out;
             opacity: 0;
             pointer-events: none;
+            border-color: var(--gold);
         }
 
-        .header { top: 0; transform: translateY(-100%); border-bottom: 1px solid var(--gold); padding: 10px; display: flex; gap: 8px; align-items: center; }
-        .footer { bottom: 0; transform: translateY(100%); border-top: 1px solid var(--gold); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .header { top: 0; transform: translateY(-100%); border-bottom: 2px solid var(--gold); padding: 10px; display: flex; gap: 8px; align-items: center; }
+        .footer { bottom: 0; transform: translateY(100%); border-top: 2px solid var(--gold); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
 
         body.show-ui .ui-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
@@ -38,12 +39,11 @@
         
         .btn-action { 
             background: var(--gold); color: white; border: none; 
-            padding: 10px; border-radius: 8px; font-weight: bold; 
+            padding: 10px 14px; border-radius: 8px; font-weight: bold; 
             cursor: pointer; display: flex; align-items: center; gap: 5px;
-            font-size: 12px;
         }
 
-        /* Area Mushaf Full Screen */
+        /* Area Mushaf */
         .mushaf-container {
             width: 100vw; height: 100vh;
             display: flex; justify-content: center; align-items: center;
@@ -73,8 +73,9 @@
 
         .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 18px; }
 
+        /* Spinner */
         #loader {
-            position: absolute; width: 40px; height: 40px;
+            position: absolute; width: 45px; height: 45px;
             border: 4px solid rgba(255,255,255,0.1);
             border-top: 4px solid var(--gold); border-radius: 50%;
             animation: spin 0.8s linear infinite; z-index: 10;
@@ -87,15 +88,17 @@
 <div class="header ui-panel">
     <select id="surahSelect" onchange="jumpToSurah(this.value)"></select>
     <button class="btn-action" onclick="toggleItalian()" id="modeBtn"><i class="fas fa-language"></i> ITA</button>
-    <button class="btn-action" onclick="downloadCurrentPage()" style="background:#0066cc;"><i class="fas fa-download"></i></button>
+    <button class="btn-action" onclick="downloadPage()" style="background:#0066cc;"><i class="fas fa-download"></i></button>
 </div>
 
 <div class="mushaf-container">
     <div id="loader"></div>
+    <!-- Clicca al centro per menu, lati per voltare pagina -->
     <div class="touch-zone touch-next" onclick="navPage(1)"></div>
     <div class="touch-zone touch-menu" onclick="toggleUI()"></div>
     <div class="touch-zone touch-prev" onclick="navPage(-1)"></div>
-    <img id="mushafImg" src="" alt="">
+    
+    <img id="mushafImg" src="" alt="Caricamento...">
     <div id="itView"></div>
 </div>
 
@@ -135,12 +138,16 @@
         if(isItalian) loadItalianText();
     }
 
+    // TECNICA DELL'INGANNO GOOGLE: Bypassa i blocchi dei server 403/404
     function updatePage() {
         loader.style.display = "block";
         imgEl.style.opacity = "0.2";
-        // Utilizzo di wsrv.nl che è gratuito e senza limiti CORS per immagini
+        
         const targetUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
-        imgEl.src = `https://wsrv.nl/?url=${encodeURIComponent(targetUrl)}&w=1200`;
+        // Usiamo il proxy di Google Focus (molto più difficile da bloccare)
+        const googleProxy = `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${encodeURIComponent(targetUrl)}`;
+        
+        imgEl.src = googleProxy;
         
         imgEl.onload = () => {
             loader.style.display = "none";
@@ -148,23 +155,40 @@
             document.getElementById('pageInfo').innerText = currentPage;
             syncSurahWithPage();
         };
+
+        imgEl.onerror = () => {
+            // Backup estremo tramite WordPress Jetpack
+            imgEl.src = `https://i0.wp.com/easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+        };
     }
 
-    // NUOVA FUNZIONE DOWNLOAD CHE FUNZIONA OVUNQUE
-    function downloadCurrentPage() {
-        const targetUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
-        // Usiamo il parametro dl=1 di weserv per forzare il download dell'immagine
-        const downloadUrl = `https://wsrv.nl/?url=${encodeURIComponent(targetUrl)}&dl=Mushaf_Warsh_Pagina_${currentPage}.jpg`;
-        
-        // Apre il link in una nuova scheda che avvierà il download automatico
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.target = '_blank';
-        a.click();
+    // DOWNLOAD PROFESSIONALE: Scarica l'immagine come blob
+    async function downloadPage() {
+        try {
+            const targetUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+            // Proxy per il download (usiamo AllOrigins per bypassare CORS)
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+            
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error();
+            
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Mushaf_Warsh_Pagina_${currentPage}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (e) {
+            alert("Il server blocca il download automatico. Tieni premuto sull'immagine e seleziona 'Scarica Immagine'.");
+        }
     }
 
     async function loadItalianText() {
-        itView.innerHTML = "<p style='text-align:center;padding:120px'>Caricamento...</p>";
+        itView.innerHTML = "<p style='text-align:center;padding:120px'>Caricamento traduzione...</p>";
         try {
             const r = await fetch(`https://api.alquran.cloud/v1/surah/${currentSurah}/it.piccardo`);
             const d = await r.json();
@@ -172,8 +196,8 @@
             d.data.ayahs.forEach(a => {
                 h += `<div class="ayah-it"><b>${a.numberInSurah}.</b> ${a.text}</div>`;
             });
-            view.innerHTML = h;
-        } catch(e) { }
+            itView.innerHTML = h;
+        } catch(e) { itView.innerHTML = "<p>Errore connessione.</p>"; }
     }
 
     function navPage(direction) {
