@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="referrer" content="no-referrer">
-    <title>Mushaf Tajweed Warsh Pro + Download</title>
+    <title>Mushaf Tajweed Warsh Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --emerald: #064e3b; --gold: #c5a059; }
@@ -17,7 +17,7 @@
             font-family: sans-serif; 
         }
 
-        /* UI CONTROLS (Nascosti di default) */
+        /* Menu UI */
         .ui-panel {
             position: fixed;
             left: 0; width: 100%;
@@ -43,7 +43,7 @@
             font-size: 12px;
         }
 
-        /* AREA MUSHAF FULL SCREEN */
+        /* Area Mushaf Full Screen */
         .mushaf-container {
             width: 100vw; height: 100vh;
             display: flex; justify-content: center; align-items: center;
@@ -63,7 +63,7 @@
         .touch-prev { right: 0; width: 35%; } 
         .touch-menu { left: 35%; width: 30%; z-index: 25; }
 
-        /* VISTA ITALIANO OVERLAY */
+        /* Vista Italiano */
         #itView {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fdf6e3; overflow-y: auto; padding: 60px 20px;
@@ -84,14 +84,12 @@
 </head>
 <body>
 
-<!-- Menu superiore -->
 <div class="header ui-panel">
     <select id="surahSelect" onchange="jumpToSurah(this.value)"></select>
     <button class="btn-action" onclick="toggleItalian()" id="modeBtn"><i class="fas fa-language"></i> ITA</button>
     <button class="btn-action" onclick="downloadCurrentPage()" style="background:#0066cc;"><i class="fas fa-download"></i></button>
 </div>
 
-<!-- Immagine -->
 <div class="mushaf-container">
     <div id="loader"></div>
     <div class="touch-zone touch-next" onclick="navPage(1)"></div>
@@ -101,7 +99,6 @@
     <div id="itView"></div>
 </div>
 
-<!-- Menu inferiore -->
 <div class="footer ui-panel">
     <button class="btn-nav" onclick="navPage(-1)"><i class="fas fa-chevron-right"></i></button>
     <div id="pageInfo" style="font-weight:bold; color:var(--gold); font-size: 20px;">1</div>
@@ -123,7 +120,7 @@
     function init() {
         const sel = document.getElementById('surahSelect');
         surahNames.forEach((n, i) => {
-            let o = document.createElement('option'); o.value = i+1; o.textContent = `${i+1}. ${n}`;
+            let o = document.createElement('option'); o.value = i + 1; o.textContent = `${i+1}. ${n}`;
             sel.appendChild(o);
         });
         updatePage();
@@ -138,13 +135,12 @@
         if(isItalian) loadItalianText();
     }
 
-    // Caricamento via Google Proxy
     function updatePage() {
         loader.style.display = "block";
         imgEl.style.opacity = "0.2";
+        // Utilizzo di wsrv.nl che è gratuito e senza limiti CORS per immagini
         const targetUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
-        const proxyUrl = `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${encodeURIComponent(targetUrl)}`;
-        imgEl.src = proxyUrl;
+        imgEl.src = `https://wsrv.nl/?url=${encodeURIComponent(targetUrl)}&w=1200`;
         
         imgEl.onload = () => {
             loader.style.display = "none";
@@ -154,31 +150,17 @@
         };
     }
 
-    // FUNZIONE DOWNLOAD REALISTICA
-    async function downloadCurrentPage() {
-        const confirmDownload = confirm(`Vuoi scaricare la pagina ${currentPage}?`);
-        if(!confirmDownload) return;
-
-        try {
-            // Usiamo un proxy CORS per permettere il download del file binario
-            const targetUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
-            const downloadProxy = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
-            
-            const response = await fetch(downloadProxy);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `Mushaf_Warsh_Pagina_${currentPage}.jpg`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            alert("Download avviato!");
-        } catch (error) {
-            alert("Errore nel download. Prova a tenere premuto sull'immagine e seleziona 'Scarica immagine'.");
-        }
+    // NUOVA FUNZIONE DOWNLOAD CHE FUNZIONA OVUNQUE
+    function downloadCurrentPage() {
+        const targetUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+        // Usiamo il parametro dl=1 di weserv per forzare il download dell'immagine
+        const downloadUrl = `https://wsrv.nl/?url=${encodeURIComponent(targetUrl)}&dl=Mushaf_Warsh_Pagina_${currentPage}.jpg`;
+        
+        // Apre il link in una nuova scheda che avvierà il download automatico
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.target = '_blank';
+        a.click();
     }
 
     async function loadItalianText() {
@@ -190,8 +172,8 @@
             d.data.ayahs.forEach(a => {
                 h += `<div class="ayah-it"><b>${a.numberInSurah}.</b> ${a.text}</div>`;
             });
-            itView.innerHTML = h;
-        } catch(e) { itView.innerHTML = "<p>Errore.</p>"; }
+            view.innerHTML = h;
+        } catch(e) { }
     }
 
     function navPage(direction) {
