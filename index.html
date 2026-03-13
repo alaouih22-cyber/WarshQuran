@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mushaf Tajweed Warsh 604</title>
+    <title>Mushaf Tajweed Warsh</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --emerald: #064e3b; --gold: #c5a059; --paper: #f4ecd8; }
-        
+        :root { --emerald: #064e3b; --gold: #c5a059; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body, html { 
@@ -19,20 +18,22 @@
 
         .app-wrapper { display: flex; flex-direction: column; height: 100vh; position: fixed; width: 100%; }
 
-        /* Header ultra-compatta */
+        /* Header */
         .header { 
             background: var(--emerald); 
-            padding: 8px; 
+            padding: 10px; 
             display: flex; 
-            gap: 8px; 
+            gap: 10px; 
             justify-content: center; 
             align-items: center;
             border-bottom: 2px solid var(--gold); 
+            z-index: 100;
         }
         
         #surahSelect { 
             background: #fff; border: 1px solid var(--gold); 
-            padding: 8px; border-radius: 6px; font-weight: bold; width: 180px; 
+            padding: 8px; border-radius: 6px; font-weight: bold; width: 200px; 
+            font-size: 16px;
         }
 
         /* Area Mushaf */
@@ -44,36 +45,42 @@
             align-items: center;
             position: relative;
             overflow: hidden;
-            touch-action: none;
         }
 
         #mushafImage {
             max-width: 100%;
             max-height: 100%;
             display: block;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            transition: opacity 0.3s;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            transition: opacity 0.3s ease;
+            background-color: #f4ecd8; /* Colore carta se non carica subito */
         }
 
-        /* Bottoni invisibili per cambiare pagina (stile Kindle/eReader) */
-        .page-nav-overlay {
-            position: absolute; top: 0; height: 100%; width: 40%; z-index: 10;
+        /* Pulsanti Navigazione Invisibili (Stile eReader) */
+        .nav-zone {
+            position: absolute; top: 0; height: 100%; width: 30%; z-index: 20;
         }
-        .nav-left { right: 0; } /* Per l'arabo, clicca a destra per andare avanti */
-        .nav-right { left: 0; }
+        .nav-next { left: 0; } /* Clicca a sinistra per andare AVANTI (pagina 2, 3...) */
+        .nav-prev { right: 0; } /* Clicca a destra per tornare INDIETRO */
 
         /* Footer */
         .footer { 
             background: var(--emerald); 
-            padding: 10px 20px; 
+            padding: 15px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             border-top: 2px solid var(--gold); 
         }
 
-        .page-indicator { color: var(--gold); font-weight: bold; font-size: 1.1rem; }
-        .btn-nav { background: var(--gold); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
+        .page-indicator { color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+        .btn-nav { background: var(--gold); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        #status {
+            position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); color: white; padding: 5px 15px; border-radius: 20px;
+            font-size: 12px; z-index: 50; display: none;
+        }
     </style>
 </head>
 <body>
@@ -81,34 +88,37 @@
 <div class="app-wrapper">
     <div class="header">
         <select id="surahSelect" onchange="goToSurah(this.value)"></select>
-        <div id="loading" style="color: white; font-size: 12px; display:none;">Caricamento...</div>
     </div>
 
     <div class="mushaf-container">
-        <!-- Overlay per cambio pagina al tocco -->
-        <div class="page-nav-overlay nav-right" onclick="changePage(1)"></div>
-        <div class="page-nav-overlay nav-left" onclick="changePage(-1)"></div>
+        <div id="status">Caricamento...</div>
+        <!-- Zone di tocco per cambiare pagina -->
+        <div class="nav-zone nav-next" onclick="changePage(1)"></div>
+        <div class="nav-zone nav-prev" onclick="changePage(-1)"></div>
         
-        <img id="mushafImage" src="" alt="Mushaf Page">
+        <img id="mushafImage" src="" alt="Caricamento pagina...">
     </div>
 
     <div class="footer">
-        <button class="btn-nav" onclick="changePage(1)"><i class="fas fa-chevron-left"></i> Prec.</button>
-        <div class="page-indicator">Pagina <span id="pageNumber">1</span></div>
-        <button class="btn-nav" onclick="changePage(-1)">Succ. <i class="fas fa-chevron-right"></i></button>
+        <button class="btn-nav" onclick="changePage(-1)"><i class="fas fa-chevron-right"></i> Indietro</button>
+        <div class="page-indicator">P. <span id="pageNumber">1</span></div>
+        <button class="btn-nav" onclick="changePage(1)">Avanti <i class="fas fa-chevron-left"></i></button>
     </div>
 </div>
 
 <script>
     let currentPage = 1;
-    
-    // Mappatura precisa delle pagine d'inizio delle 114 Sure (Mushaf 604 pagine standard)
+    const imgEl = document.getElementById('mushafImage');
+    const statusEl = document.getElementById('status');
+    const pageNumEl = document.getElementById('pageNumber');
+
+    // Mappatura precisa delle pagine (Mushaf Tajweed Warsh 604)
     const surahStartPages = [
         1, 2, 50, 77, 106, 128, 151, 177, 187, 208, 221, 235, 249, 255, 262, 267, 282, 293, 305, 312, 
         322, 332, 342, 350, 359, 367, 377, 385, 396, 404, 411, 415, 418, 428, 434, 440, 446, 453, 458, 
         467, 477, 483, 489, 496, 499, 502, 507, 511, 515, 518, 520, 523, 526, 528, 531, 534, 537, 542, 
         545, 549, 551, 553, 554, 556, 558, 560, 562, 564, 566, 568, 570, 572, 574, 575, 577, 578, 580, 
-        582, 583, 585, 586, 587, 587, 589, 590, 591, 591, 592, 593, 594, 595, 595, 596, 596, 597, 597, 
+        582, 583, 585, 586, 587, 588, 589, 590, 591, 591, 592, 593, 594, 595, 595, 596, 596, 597, 597, 
         598, 598, 599, 599, 600, 600, 601, 601, 601, 602, 602, 602, 603, 603, 603, 604, 604, 604
     ];
 
@@ -139,29 +149,34 @@
     }
 
     function updatePage() {
-        const img = document.getElementById('mushafImage');
-        const loader = document.getElementById('loading');
-        loader.style.display = "block";
-        img.style.opacity = "0.5";
-
-        // URL del database Mushaf Tajweed Dar Al-Ma'rifah (standard 604 pagine)
-        // Utilizziamo un server CDN che ospita le scansioni ufficiali Warsh
-        const paddedPage = String(currentPage).padStart(3, '0');
-        const imgUrl = `https://raw.githubusercontent.com/QuranHub/quran-pages-images/master/warsh/604/${currentPage}.png`;
+        statusEl.style.display = "block";
+        imgEl.style.opacity = "0.3";
         
-        img.src = imgUrl;
-        img.onload = () => {
-            img.style.opacity = "1";
-            loader.style.display = "none";
-        };
-        img.onerror = () => {
-            // Fallback se GitHub ha problemi
-            img.src = `https://www.easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+        // Formattazione numero pagina (es: 1 -> 001)
+        const pStr = String(currentPage).padStart(3, '0');
+        
+        // FONTE PRINCIPALE: Server dedicato alle immagini Warsh Tajweed
+        const primaryUrl = `https://www.easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+        // FONTE SECONDARIA: Server GitHub Backup
+        const secondaryUrl = `https://raw.githubusercontent.com/habibm-dev/quran-images/main/images/warsh/${currentPage}.png`;
+
+        imgEl.src = primaryUrl;
+
+        imgEl.onload = () => {
+            imgEl.style.opacity = "1";
+            statusEl.style.display = "none";
         };
 
-        document.getElementById('pageNumber').innerText = currentPage;
-        
-        // Aggiorna il selettore se cambiamo pagina sfogliando
+        imgEl.onerror = () => {
+            console.log("Fonte primaria fallita, provo backup...");
+            if (imgEl.src !== secondaryUrl) {
+                imgEl.src = secondaryUrl;
+            } else {
+                statusEl.innerText = "Errore di connessione";
+            }
+        };
+
+        pageNumEl.innerText = currentPage;
         updateSurahSelect();
     }
 
@@ -179,7 +194,6 @@
     }
 
     function updateSurahSelect() {
-        // Trova la sura corrispondente alla pagina attuale
         let currentSurahIdx = 0;
         for (let i = 0; i < surahStartPages.length; i++) {
             if (currentPage >= surahStartPages[i]) {
@@ -191,15 +205,13 @@
         document.getElementById('surahSelect').value = surahStartPages[currentSurahIdx];
     }
 
-    // Gestione swipe su mobile
-    let touchstartX = 0;
-    let touchendX = 0;
-    
-    document.addEventListener('touchstart', e => touchstartX = e.changedTouches[0].screenX);
+    // Supporto Swipe per Mobile
+    let startX = 0;
+    document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     document.addEventListener('touchend', e => {
-        touchendX = e.changedTouches[0].screenX;
-        if (touchendX < touchstartX - 50) changePage(-1); // Swipe Sinistra -> Avanti (Arabo)
-        if (touchendX > touchstartX + 50) changePage(1);  // Swipe Destra -> Indietro (Arabo)
+        let endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) changePage(1);  // Swipe Sinistra -> Avanti
+        if (endX - startX > 50) changePage(-1); // Swipe Destra -> Indietro
     });
 
     window.onload = init;
