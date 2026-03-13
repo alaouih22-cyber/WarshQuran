@@ -3,92 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="referrer" content="no-referrer">
-    <title>Al-Qur'an Warsh Pro</title>
+    <title>Mushaf Tajweed Warsh Marocchino</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --emerald: #064e3b; --gold: #c5a059; --paper: #fdf6e3; --white: #ffffff; }
+        :root { 
+            --emerald: #064e3b; 
+            --gold: #c5a059; 
+            --paper: #fdf6e3; 
+            --mushaf-bg: #fffcf5;
+            --taj-madd: #eb0000; 
+            --taj-ghunnah: #00a651; 
+            --taj-qalqalah: #0072bc;
+        }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Amiri', serif; }
 
-        /* HEADER */
-        .header { background: var(--emerald); padding: 12px; border-bottom: 2px solid var(--gold); z-index: 100; position: relative; }
-        .controls { display: flex; gap: 8px; align-items: center; justify-content: center; }
-        
-        select { padding: 10px; border-radius: 8px; border: none; font-weight: bold; flex: 1; font-size: 16px; background: #fff; }
-        .btn-mode { background: var(--gold); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .app-wrapper { display: flex; flex-direction: column; height: 100vh; position: fixed; width: 100%; }
 
-        /* AREA CONTENUTO */
-        .content-area { flex: 1; height: calc(100vh - 140px); overflow-y: auto; transition: background 0.3s; }
+        /* Header */
+        .header { background: var(--emerald); padding: 10px; border-bottom: 2px solid var(--gold); }
+        .controls-row { display: flex; gap: 8px; justify-content: center; align-items: center; }
+        select { padding: 10px; border-radius: 8px; border: none; font-weight: bold; background: #fff; flex: 1; }
 
-        /* STILE ITALIANO (Cards) */
-        .mode-it { background-color: var(--paper); padding: 15px; }
-        .ayah-card {
-            background: white; padding: 15px; border-radius: 10px;
-            border-left: 5px solid var(--emerald);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            margin-bottom: 12px; cursor: pointer;
+        /* Area Lettura */
+        .reader-container {
+            flex: 1; overflow-y: auto; margin: 10px; border-radius: 10px;
+            padding: 20px; background-color: var(--mushaf-bg);
+            border: 12px solid; border-image: linear-gradient(45deg, #c5a059, #8d6e35, #c5a059) 1;
+            direction: rtl; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
-        .ayah-card b { color: var(--emerald); display: block; margin-bottom: 5px; font-size: 0.9rem; }
-        .ayah-card p { font-size: 1.15rem; line-height: 1.5; color: #333; }
 
-        /* STILE ARABO WARSH (Sfondo Bianco) */
-        .mode-ar { background-color: var(--white); padding: 25px; direction: rtl; text-align: right; }
-        .quran-ar { 
-            font-family: 'Scheherazade New', serif; font-size: 2.3rem; 
-            line-height: 2.8; color: #111; text-align: justify;
+        /* Titolo Sura Marocchino */
+        .surah-frame {
+            border: 2px solid var(--emerald); background: #fff;
+            padding: 10px; margin: -10px auto 20px; width: 85%; border-radius: 50px;
+            font-size: 1.8rem; color: var(--emerald); font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .ayah-ar-wrap { cursor: pointer; display: inline; border-radius: 4px; padding: 0 5px; transition: 0.2s; }
-        .ayah-ar-wrap:hover { background: #f0f0f0; }
-        
-        /* Simbolo Fine Versetto */
+
+        .bismillah { font-size: 2.2rem; margin: 20px 0; color: #000; font-family: 'Scheherazade New', serif; }
+
+        /* Testo Quran */
+        .mushaf-text { 
+            font-size: 2.1rem; line-height: 2.6; color: #1a1a1a; 
+            font-family: 'Scheherazade New', serif; text-align: justify;
+        }
+
+        /* Colori Tajweed */
+        .taj-madd { color: var(--taj-madd) !important; font-weight: bold; }
+        .taj-ghun { color: var(--taj-ghunnah) !important; font-weight: bold; }
+        .taj-qal  { color: var(--taj-qalqalah) !important; font-weight: bold; }
+
         .ayah-num {
-            font-family: sans-serif; font-size: 1.2rem; color: var(--gold);
-            border: 2px solid var(--gold); border-radius: 50%;
-            display: inline-flex; width: 38px; height: 38px;
-            align-items: center; justify-content: center;
-            margin: 0 10px; direction: ltr; vertical-align: middle;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; 
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 5 L90 30 L90 70 L50 95 L10 70 L10 30 Z" fill="none" stroke="%23c5a059" stroke-width="6"/></svg>');
+            background-size: contain; font-size: 0.9rem; font-weight: bold; margin: 0 8px; color: #8d6e35; vertical-align: middle;
         }
 
-        /* FOOTER */
-        .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1.3rem; cursor: pointer; }
+        .active-ayah { background: rgba(197, 160, 89, 0.2); border-radius: 8px; }
 
-        .active-playing { background: #fff9e6 !important; border-color: var(--gold) !important; color: var(--gold) !important; }
-        #loader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--gold); font-weight: bold; display: none; z-index: 1000; }
+        /* Footer */
+        .footer { background: var(--emerald); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
+        .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; }
+
+        /* Legenda Tajweed */
+        .legend { background: #fff; border-top: 1px solid var(--gold); padding: 5px; display: flex; justify-content: space-around; font-size: 0.7rem; font-weight: bold; }
+        .leg-item { display: flex; align-items: center; gap: 4px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
     </style>
 </head>
 <body>
 
-<div id="loader">Caricamento Warsh...</div>
+<div class="app-wrapper">
+    <div class="header">
+        <div class="controls-row">
+            <select id="surahSelect" onchange="loadSurah(this.value)"></select>
+            <button onclick="toggleMode()" id="modeBtn" style="background:var(--gold); color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">ITA</button>
+        </div>
+    </div>
 
-<div class="header">
-    <div class="controls">
-        <select id="surahSelect" onchange="loadSurah(this.value)"></select>
-        <button class="btn-mode" onclick="toggleMode()" id="modeBtn">WARSH</button>
+    <div id="reader" class="reader-container">
+        <!-- Contenuto caricato qui -->
+    </div>
+
+    <div class="legend">
+        <div class="leg-item"><div class="dot" style="background:var(--taj-madd)"></div> Madd</div>
+        <div class="leg-item"><div class="dot" style="background:var(--taj-ghunnah)"></div> Ghunnah</div>
+        <div class="leg-item"><div class="dot" style="background:var(--taj-qalqalah)"></div> Qalqalah</div>
+    </div>
+
+    <div class="footer">
+        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-arrow-right"></i></button>
+        <span id="surahLabel" style="color:var(--gold); font-weight:bold;">Al-Fatihah</span>
+        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-arrow-left"></i></button>
     </div>
 </div>
 
-<div class="content-area" id="mainContent"></div>
-
-<div class="footer">
-    <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-chevron-right"></i></button>
-    <span id="label" style="color:var(--gold); font-weight:bold; font-size: 1.2rem;">Sura</span>
-    <button class="btn-nav" onclick="nav(1)"><i class="fas fa-chevron-left"></i></button>
-</div>
-
-<audio id="audioPlayer" preload="auto"></audio>
+<audio id="quranPlayer"></audio>
 
 <script>
     let currentSurah = 1;
-    let mode = 'it'; // Parte in Italiano
-    const container = document.getElementById('mainContent');
-    const player = document.getElementById('audioPlayer');
-    const modeBtn = document.getElementById('modeBtn');
+    let mode = 'ar'; 
+    const player = document.getElementById('quranPlayer');
 
-    // Popola lista Sure
     async function populateSurahs() {
         const res = await fetch('https://api.alquran.cloud/v1/surah');
         const d = await res.json();
@@ -104,82 +125,77 @@
     async function loadSurah(s) {
         currentSurah = parseInt(s);
         document.getElementById('surahSelect').value = s;
-        document.getElementById('loader').style.display = 'block';
-        container.innerHTML = "";
+        const reader = document.getElementById('reader');
+        reader.innerHTML = "Caricamento...";
 
-        // EDIZIONE WARSH REALE: 'quran-warsh' è la più accurata per il Resm
-        const edition = (mode === 'it') ? 'it.piccardo' : 'quran-warsh';
+        // Usiamo l'edizione Tajweed per i colori e poi patchiamo per Warsh
+        const edition = (mode === 'ar') ? 'ar.tajweed' : 'it.piccardo';
         
         try {
             const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/${edition}`);
             const d = await res.json();
             const surah = d.data;
-            document.getElementById('label').innerText = surah.englishName;
+            
+            document.getElementById('surahLabel').innerText = surah.englishName;
 
-            if (mode === 'it') {
-                container.className = "content-area mode-it";
-                surah.ayahs.forEach(v => {
-                    const card = document.createElement('div');
-                    card.className = 'ayah-card';
-                    card.onclick = () => playAudio(v.numberInSurah, card);
-                    card.innerHTML = `<b>VERSETTO ${v.numberInSurah}</b><p>${v.text}</p>`;
-                    container.appendChild(card);
-                });
-            } else {
-                container.className = "content-area mode-ar";
-                const div = document.createElement('div');
-                div.className = "quran-ar";
-                surah.ayahs.forEach(v => {
-                    const span = document.createElement('span');
-                    span.className = "ayah-ar-wrap";
-                    span.onclick = () => playAudio(v.numberInSurah, span);
-                    // Testo Warsh + Numero
-                    span.innerHTML = `${v.text} <span class="ayah-num">${v.numberInSurah}</span> `;
-                    div.appendChild(span);
-                });
-                container.appendChild(div);
+            let html = `<div class="surah-frame">${surah.name}</div>`;
+            if(currentSurah !== 1 && currentSurah !== 9) {
+                html += `<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`;
             }
-        } catch (e) {
-            container.innerHTML = "<p style='text-align:center; padding:20px;'>Connessione fallita. Riprova.</p>";
-        }
-        document.getElementById('loader').style.display = 'none';
-        container.scrollTop = 0;
+
+            html += `<div class="mushaf-text">`;
+            surah.ayahs.forEach(v => {
+                let text = v.text;
+                
+                // --- PATCH WARSH (Esempio: Maliki invece di Maaliki in Al-Fatiha) ---
+                if(currentSurah === 1 && v.numberInSurah === 4) {
+                    text = text.replace("مَـٰلِكِ", "مَلِكِ"); 
+                }
+
+                // Parser Tajweed
+                if(mode === 'ar') {
+                    text = text.replace(/\[m/g, '<span class="taj-madd">')
+                               .replace(/\[g/g, '<span class="taj-ghun">')
+                               .replace(/\[q/g, '<span class="taj-qal">')
+                               .replace(/\]/g, '</span>');
+                    html += `<span class="ayah-item" onclick="playAudio(${v.numberInSurah}, this)">${text} <span class="ayah-num">${v.numberInSurah}</span></span> `;
+                } else {
+                    html += `<div style="text-align:left; direction:ltr; font-family:sans-serif; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:5px;" onclick="playAudio(${v.numberInSurah}, this)">
+                                <b>${v.numberInSurah}.</b> ${text}
+                             </div>`;
+                }
+            });
+            html += `</div>`;
+            reader.innerHTML = html;
+        } catch(e) { reader.innerHTML = "Errore connessione."; }
+    }
+
+    function playAudio(ayah, el) {
+        // Rimuovi evidenziazione
+        document.querySelectorAll('.ayah-item, div').forEach(x => x.classList.remove('active-ayah'));
+        el.classList.add('active-ayah');
+
+        const s = String(currentSurah).padStart(3, '0');
+        const a = String(ayah).padStart(3, '0');
+        
+        // FONTE AUDIO: Al-Hussary (WARSH Narration)
+        player.src = `https://www.everyayah.com/data/Husary_Warsh_64kbps/${s}${a}.mp3`;
+        
+        // Questo comando ora funzionerà perché è attivato da un click dell'utente
+        player.play().catch(e => {
+            alert("Tocca di nuovo per riprodurre (il browser aveva bloccato l'audio)");
+        });
     }
 
     function toggleMode() {
-        mode = (mode === 'it') ? 'ar' : 'it';
-        modeBtn.innerText = (mode === 'it') ? 'WARSH' : 'ITALIANO';
+        mode = (mode === 'ar') ? 'it' : 'ar';
+        document.getElementById('modeBtn').innerText = (mode === 'ar') ? 'ITA' : 'WARSH';
         loadSurah(currentSurah);
     }
 
-    function playAudio(ayahNum, element) {
-        // Evidenziazione visiva
-        document.querySelectorAll('.ayah-card, .ayah-ar-wrap').forEach(el => el.classList.remove('active-playing'));
-        element.classList.add('active-playing');
-
-        const s = String(currentSurah).padStart(3, '0');
-        const a = String(ayahNum).padStart(3, '0');
-        
-        // SORGENTE AUDIO: Al-Hussary (Warsh Narration)
-        // Utilizziamo un link diretto più affidabile
-        const audioUrl = `https://www.everyayah.com/data/Husary_Warsh_64kbps/${s}${a}.mp3`;
-        
-        player.src = audioUrl;
-        player.load();
-        
-        // Gestione errore audio
-        const playPromise = player.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("Riproduzione bloccata o file mancante: " + audioUrl);
-                alert("Tocca di nuovo per riprodurre l'audio (il browser ha bloccato l'avvio automatico)");
-            });
-        }
-    }
-
-    function nav(dir) {
-        let n = currentSurah + dir;
-        if (n >= 1 && n <= 114) loadSurah(n);
+    function nav(d) {
+        let n = currentSurah + d;
+        if(n >= 1 && n <= 114) loadSurah(n);
     }
 
     window.onload = () => {
