@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- Trucco 1: Azzeriamo il referrer a livello globale -->
     <meta name="referrer" content="no-referrer">
-    <title>Mushaf Tajweed Warsh Pro</title>
+    <title>Mushaf Tajweed Warsh Ultra</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --emerald: #064e3b; --gold: #c5a059; }
@@ -14,50 +15,49 @@
             height: 100%; width: 100%; 
             background-color: #000; 
             overflow: hidden; 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: sans-serif; 
         }
 
-        /* COMANDI UI - Nascosti di default */
+        /* UI CONTROLS (Nascosti di default) */
         .ui-panel {
             position: fixed;
             left: 0; width: 100%;
-            background: rgba(6, 78, 59, 0.95);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
             z-index: 100;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease-in-out;
             opacity: 0;
             pointer-events: none;
         }
 
-        .header { top: 0; transform: translateY(-100%); border-bottom: 2px solid var(--gold); padding: 10px; display: flex; gap: 8px; }
-        .footer { bottom: 0; transform: translateY(100%); border-top: 2px solid var(--gold); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header { top: 0; transform: translateY(-100%); border-bottom: 1px solid var(--gold); padding: 10px; display: flex; gap: 10px; }
+        .footer { bottom: 0; transform: translateY(100%); border-top: 1px solid var(--gold); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Classe per mostrare i menu quando si clicca al centro */
+        /* Classe per mostrare i menu */
         body.show-ui .ui-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
         #surahSelect { flex: 1; padding: 10px; border-radius: 8px; font-weight: bold; border: none; font-size: 16px; background: #fff; }
         .btn-mode { background: var(--gold); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* AREA MUSHAF IMMERSIVA */
+        /* AREA MUSHAF FULL SCREEN */
         .mushaf-container {
             width: 100vw; height: 100vh;
             display: flex; justify-content: center; align-items: center;
-            background: #111; position: relative;
+            background: #000; position: relative;
         }
 
         #mushafImg {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 100%; max-height: 100%;
             object-fit: contain;
             display: block;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s;
         }
 
         /* Zone di Tocco */
         .touch-zone { position: absolute; top: 0; height: 100%; z-index: 20; }
-        .touch-next { left: 0; width: 30%; } /* Clicca a sinistra per AVANTI */
-        .touch-prev { right: 0; width: 30%; } /* Clicca a destra per INDIETRO */
-        .touch-menu { left: 30%; width: 40%; z-index: 25; } /* Clicca al centro per MENU */
+        .touch-next { left: 0; width: 35%; } /* Avanti */
+        .touch-prev { right: 0; width: 35%; } /* Indietro */
+        .touch-menu { left: 35%; width: 30%; z-index: 25; } /* Mostra menu */
 
         /* VISTA ITALIANO OVERLAY */
         #itView {
@@ -67,29 +67,27 @@
         }
         .ayah-it { padding: 15px; border-bottom: 1px solid #e0d8c0; font-size: 1.15rem; line-height: 1.6; color: #2d2d2d; }
 
-        .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 20px; }
+        .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 18px; }
 
         /* Spinner di Caricamento */
         #loader {
-            position: absolute; width: 50px; height: 50px;
-            border: 5px solid rgba(255,255,255,0.1);
-            border-top: 5px solid var(--gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            z-index: 10;
+            position: absolute; width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--gold); border-radius: 50%;
+            animation: spin 0.8s linear infinite; z-index: 10;
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<!-- Menu Superiore -->
+<!-- Menu superiore (nascondibile) -->
 <div class="header ui-panel">
     <select id="surahSelect" onchange="jumpToSurah(this.value)"></select>
     <button class="btn-mode" onclick="toggleItalian()" id="modeBtn">ITALIANO</button>
 </div>
 
-<!-- Area Immagine Full Screen -->
+<!-- Immagine a tutto schermo -->
 <div class="mushaf-container">
     <div id="loader"></div>
     
@@ -104,10 +102,10 @@
     <div id="itView"></div>
 </div>
 
-<!-- Menu Inferiore -->
+<!-- Menu inferiore (nascondibile) -->
 <div class="footer ui-panel">
     <button class="btn-nav" onclick="navPage(-1)"><i class="fas fa-chevron-right"></i></button>
-    <div id="pageInfo" style="font-weight:bold; color:var(--gold); font-size: 24px;">1</div>
+    <div id="pageInfo" style="font-weight:bold; color:var(--gold); font-size: 20px;">1</div>
     <button class="btn-nav" onclick="navPage(1)"><i class="fas fa-chevron-left"></i></button>
 </div>
 
@@ -116,7 +114,6 @@
     let currentSurah = 1;
     let isItalian = false;
 
-    // Mapping Warsh 604 Pagine
     const surahStartPages = [1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604];
     const surahNames = ["Al-Fatihah","Al-Baqarah","Al-Imran","An-Nisa","Al-Ma'idah","Al-An'am","Al-A'raf","Al-Anfal","At-Tawbah","Yunus","Hud","Yusuf","Ar-Ra'd","Ibrahim","Al-Hijr","An-Nahl","Al-Isra","Al-Kahf","Maryam","Ta-Ha","Al-Anbiya","Al-Hajj","Al-Mu'minun","An-Nur","Al-Furqan","Ash-Shu'ara","An-Naml","Al-Qasas","Al-Ankabut","Ar-Rum","Luqman","As-Sajdah","Al-Ahzab","Saba","Fatir","Ya-Sin","As-Saffat","Sad","Az-Zumar","Ghafir","Fussilat","Ash-Shura","Az-Zukhruf","Ad-Dukhan","Al-Jathiyah","Al-Ahqaf","Muhammad","Al-Fath","Al-Hujurat","Qaf","Adh-Dhariyat","At-Tur","An-Najm","Al-Qamar","Ar-Rahman","Al-Waqi'ah","Al-Hadid","Al-Mujadilah","Al-Hashr","Al-Mumtahanah","As-Saff","Al-Jumu'ah","Al-Munafiqun","At-Taghabun","At-Talaq","At-Tahrim","Al-Mulk","Al-Qalam","Al-Haqqah","Al-Ma'arij","Nuh","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyamah","Al-Insan","Al-Mursalat","An-Naba","An-Nazi'at","Abasa","At-Takwir","Al-Infitar","Al-Mutaffifin","Al-Inshiqaq","Al-Buruj","At-Tariq","Al-A'la","Al-Ghashiyah","Al-Fajr","Al-Balad","Ash-Shams","Al-Layl","Ad-Duha","Ash-Sharh","At-Tin","Al-Alaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-Adiyat","Al-Qari'ah","At-Takathur","Al-Asr","Al-Humazah","Al-Fil","Quraysh","Al-Ma'un","Al-Kawthar","Al-Kafirun","An-Nasr","Al-Masad","Al-Ikhlas","Al-Falaq","An-Nas"];
 
@@ -133,10 +130,10 @@
         updatePage();
     }
 
-    // Toggle UI (Clicca al centro)
+    // MOSTRA/NASCONDI UI
     function toggleUI() { document.body.classList.toggle('show-ui'); }
 
-    // Toggle Italiano
+    // MODALITÀ ITALIANO
     function toggleItalian() {
         isItalian = !isItalian;
         itView.style.display = isItalian ? 'block' : 'none';
@@ -144,17 +141,16 @@
         if(isItalian) loadItalianText();
     }
 
-    // CARICAMENTO CON DOPPIO "INGANNO" (Proxy + Referrer bypass)
+    // TECNICA DEFINITIVA: Google OpenSocial Proxy
     function updatePage() {
         loader.style.display = "block";
-        imgEl.style.opacity = "0";
+        imgEl.style.opacity = "0.2";
 
-        // Costruiamo il link diretto all'immagine (che è quello che sta dentro i tuoi link)
-        // Utilizziamo Jetpack per "spingere" il caricamento e saltare i blocchi
-        const originalImgUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
-        const proxiedUrl = `https://i0.wp.com/easyquran.com/quran-jpg-w/${currentPage}.jpg?quality=90&strip=all`;
+        // Questo è il link "ingannevole" che usa i server di Google per prelevare l'immagine
+        const targetUrl = `https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+        const googleProxy = `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${encodeURIComponent(targetUrl)}`;
 
-        imgEl.src = proxiedUrl;
+        imgEl.src = googleProxy;
         
         imgEl.onload = () => {
             loader.style.display = "none";
@@ -165,15 +161,15 @@
         };
 
         imgEl.onerror = () => {
-            // Backup se il primo proxy fallisce
-            imgEl.src = `https://images.weserv.nl/?url=${encodeURIComponent(originalImgUrl)}&n=-1`;
+            // Se Google fallisce, proviamo l'ultimo bypass via WordPress Jetpack
+            imgEl.src = `https://i0.wp.com/easyquran.com/quran-jpg-w/${currentPage}.jpg`;
         };
     }
 
     function preloadNext() {
         if(currentPage < 604) {
-            const next = new Image();
-            next.src = `https://i0.wp.com/easyquran.com/quran-jpg-w/${currentPage + 1}.jpg`;
+            const nextImg = new Image();
+            nextImg.src = `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${encodeURIComponent('https://easyquran.com/quran-jpg-w/' + (currentPage + 1) + '.jpg')}`;
         }
     }
 
@@ -187,7 +183,6 @@
                 h += `<div class="ayah-it"><b>${a.numberInSurah}.</b> ${a.text}</div>`;
             });
             itView.innerHTML = h;
-            itView.scrollTop = 0;
         } catch(e) { itView.innerHTML = "<p>Errore di connessione.</p>"; }
     }
 
