@@ -2,8 +2,9 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer"> <!-- L'INGANNO: Nasconde l'origine della richiesta -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Warsh Pro</title>
+    <title>Warsh Pro Tajweed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --emerald: #064e3b; --gold: #c5a059; }
@@ -11,91 +12,96 @@
         
         body, html { 
             height: 100%; width: 100%; 
-            background-color: #000; 
+            background-color: #121212; 
             overflow: hidden; 
             font-family: sans-serif; 
         }
 
         .app-wrapper { display: flex; flex-direction: column; height: 100vh; }
 
-        /* Toolbar superiore minimale */
+        /* Toolbar */
         .header { 
             background: var(--emerald); 
-            padding: 5px 10px; 
+            padding: 8px 12px; 
             display: flex; 
             gap: 10px; 
             align-items: center;
-            border-bottom: 1px solid var(--gold);
+            border-bottom: 2px solid var(--gold);
+            z-index: 100;
         }
         
         #surahSelect { 
             flex: 1; 
-            padding: 8px; 
-            border-radius: 4px; 
-            border: none; 
-            font-size: 14px; 
+            padding: 10px; 
+            border-radius: 6px; 
+            border: 1px solid var(--gold); 
+            font-size: 15px; 
             font-weight: bold;
+            background: #fff;
         }
 
         .btn-mode {
             background: var(--gold);
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
+            padding: 10px 15px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
+            cursor: pointer;
         }
 
-        /* Area Mushaf: Solo l'immagine, niente fronzoli */
-        .mushaf-container {
+        /* Area Mushaf */
+        .reader-container {
             flex: 1;
             position: relative;
             background: #1a1a1a;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         #mushafImg {
             max-width: 100%;
             max-height: 100%;
             display: block;
-            background-color: #fff;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
+            transition: opacity 0.2s;
         }
 
-        /* Navigazione rapida (Zone di tocco invisibili) */
-        .nav-zone {
-            position: absolute; top: 0; height: 100%; width: 40%; z-index: 10;
-        }
-        .nav-next { left: 0; }
-        .nav-prev { right: 0; }
+        /* Navigazione Tattile Invisibile */
+        .nav-tap { position: absolute; top: 0; height: 100%; width: 40%; z-index: 10; }
+        .tap-next { left: 0; }
+        .tap-prev { right: 0; }
 
         /* Vista Italiano */
         #itView {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #fdf6e3; overflow-y: auto; padding: 20px;
-            display: none; z-index: 20;
+            background: #fdf6e3; overflow-y: auto; padding: 25px;
+            display: none; z-index: 50;
         }
-        .ayah-it { padding: 15px; border-bottom: 1px solid #ddd; font-size: 1.1rem; line-height: 1.5; color: #333; }
+        .ayah-it { padding: 18px; border-bottom: 1px solid #e0d8c0; font-size: 1.2rem; line-height: 1.6; color: #2d2d2d; }
 
         /* Footer */
         .footer { 
             background: var(--emerald); 
-            padding: 10px; 
+            padding: 12px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-top: 1px solid var(--gold);
+            border-top: 2px solid var(--gold);
         }
-        .btn-nav { background: var(--gold); color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; }
-        #pageIndicator { color: var(--gold); font-weight: bold; }
+        .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        #pageIndicator { color: var(--gold); font-weight: bold; font-size: 18px; }
 
-        /* Caricamento */
+        /* Loading Spinner */
         #loader {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: var(--gold); font-size: 12px; z-index: 5;
+            position: absolute; width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold);
+            border-radius: 50%; animation: spin 0.8s linear infinite; z-index: 5;
         }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -106,20 +112,20 @@
         <button class="btn-mode" onclick="toggleMode()" id="modeBtn">ITALIANO</button>
     </div>
 
-    <div class="mushaf-container">
-        <div id="loader">Caricamento...</div>
+    <div class="reader-container">
+        <div id="loader"></div>
         <div id="itView"></div>
         
-        <div class="nav-zone nav-next" onclick="nav(-1)"></div>
-        <div class="nav-zone nav-prev" onclick="nav(1)"></div>
+        <div class="nav-tap tap-next" onclick="nav(1)"></div>
+        <div class="nav-tap tap-prev" onclick="nav(-1)"></div>
         
-        <img id="mushafImg" src="" alt="Mushaf">
+        <img id="mushafImg" src="" alt="Caricamento...">
     </div>
 
     <div class="footer">
-        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-arrow-right"></i></button>
+        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-arrow-right"></i></button>
         <div id="pageIndicator">P. 1</div>
-        <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-arrow-left"></i></button>
+        <button class="btn-nav" onclick="nav(1)"><i class="fas fa-arrow-left"></i></button>
     </div>
 </div>
 
@@ -128,6 +134,7 @@
     let surah = 1;
     let isIt = false;
 
+    // Mappatura Warsh 604
     const surahStartPages = [1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604];
     const surahNames = ["Al-Fatihah","Al-Baqarah","Al-Imran","An-Nisa","Al-Ma'idah","Al-An'am","Al-A'raf","Al-Anfal","At-Tawbah","Yunus","Hud","Yusuf","Ar-Ra'd","Ibrahim","Al-Hijr","An-Nahl","Al-Isra","Al-Kahf","Maryam","Ta-Ha","Al-Anbiya","Al-Hajj","Al-Mu'minun","An-Nur","Al-Furqan","Ash-Shu'ara","An-Naml","Al-Qasas","Al-Ankabut","Ar-Rum","Luqman","As-Sajdah","Al-Ahzab","Saba","Fatir","Ya-Sin","As-Saffat","Sad","Az-Zumar","Ghafir","Fussilat","Ash-Shura","Az-Zukhruf","Ad-Dukhan","Al-Jathiyah","Al-Ahqaf","Muhammad","Al-Fath","Al-Hujurat","Qaf","Adh-Dhariyat","At-Tur","An-Najm","Al-Qamar","Ar-Rahman","Al-Waqi'ah","Al-Hadid","Al-Mujadilah","Al-Hashr","Al-Mumtahanah","As-Saff","Al-Jumu'ah","Al-Munafiqun","At-Taghabun","At-Talaq","At-Tahrim","Al-Mulk","Al-Qalam","Al-Haqqah","Al-Ma'arij","Nuh","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyamah","Al-Insan","Al-Mursalat","An-Naba","An-Nazi'at","Abasa","At-Takwir","Al-Infitar","Al-Mutaffifin","Al-Inshiqaq","Al-Buruj","At-Tariq","Al-A'la","Al-Ghashiyah","Al-Fajr","Al-Balad","Ash-Shams","Al-Layl","Ad-Duha","Ash-Sharh","At-Tin","Al-Alaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-Adiyat","Al-Qari'ah","At-Takathur","Al-Asr","Al-Humazah","Al-Fil","Quraysh","Al-Ma'un","Al-Kawthar","Al-Kafirun","An-Nasr","Al-Masad","Al-Ikhlas","Al-Falaq","An-Nas"];
 
@@ -147,42 +154,53 @@
         if(isIt) loadIt(); else loadPage();
     }
 
+    // CARICAMENTO CON INGANNO REFERRER
     function loadPage() {
         if(isIt) return;
         const img = document.getElementById('mushafImg');
         const loader = document.getElementById('loader');
         loader.style.display = "block";
-        
-        // --- TRIPLA SPINTA CARICAMENTO ---
-        // Proviamo il proxy più veloce con parametri di ottimizzazione
-        const proxy1 = `https://images.weserv.nl/?url=easyquran.com/quran-jpg-w/${page}.jpg&w=1000&q=70&il`;
-        const proxy2 = `https://wsrv.nl/?url=www.easyquran.com/quran-jpg-w/${page}.jpg&output=jpg`;
-        
-        img.src = proxy1;
+        img.style.opacity = "0";
 
-        img.onload = () => { loader.style.display = "none"; };
-        img.onerror = () => { img.src = proxy2; }; // Se il primo fallisce, usa il secondo
+        // Usiamo un proxy che pulisce i pacchetti e consegna l'immagine
+        const url = `https://images.weserv.nl/?url=easyquran.com/quran-jpg-w/${page}.jpg&w=1200&il`;
+        
+        img.src = url;
 
-        document.getElementById('pageIndicator').innerText = `P. ${page}`;
-        syncSurah();
-        preload();
+        img.onload = () => {
+            loader.style.display = "none";
+            img.style.opacity = "1";
+            document.getElementById('pageIndicator').innerText = `Pag. ${page}`;
+            updateSurahIndex();
+            preloadNext();
+        };
+
+        img.onerror = () => {
+            // Secondo tentativo con proxy alternativo se il primo fallisce
+            img.src = `https://wsrv.nl/?url=easyquran.com/quran-jpg-w/${page}.jpg`;
+        };
+    }
+
+    function preloadNext() {
+        if(page < 604) {
+            const next = new Image();
+            next.src = `https://images.weserv.nl/?url=easyquran.com/quran-jpg-w/${page+1}.jpg&w=1200&il`;
+        }
     }
 
     async function loadIt() {
         const view = document.getElementById('itView');
-        view.innerHTML = "Caricamento...";
+        view.innerHTML = "<p style='text-align:center;padding:20px'>Caricamento traduzione...</p>";
         try {
             const r = await fetch(`https://api.alquran.cloud/v1/surah/${surah}/it.piccardo`);
             const d = await r.json();
-            let h = `<h2>${d.data.englishName}</h2>`;
-            d.data.ayahs.forEach(a => { h += `<div class="ayah-it"><b>${a.numberInSurah}.</b> ${a.text}</div>`; });
+            let h = `<h1 style="text-align:center;color:var(--emerald);margin-bottom:20px">${d.data.englishName}</h1>`;
+            d.data.ayahs.forEach(a => {
+                h += `<div class="ayah-it"><b>${a.numberInSurah}.</b> ${a.text}</div>`;
+            });
             view.innerHTML = h;
             document.getElementById('pageIndicator').innerText = `Sura ${surah}`;
-        } catch(e) { view.innerHTML = "Errore."; }
-    }
-
-    function preload() {
-        if(page < 604) new Image().src = `https://images.weserv.nl/?url=easyquran.com/quran-jpg-w/${page+1}.jpg&w=1000&q=70&il`;
+        } catch(e) { view.innerHTML = "<p style='padding:20px'>Errore di connessione.</p>"; }
     }
 
     function nav(d) {
@@ -190,25 +208,38 @@
             surah = Math.max(1, Math.min(114, surah + d));
             page = surahStartPages[surah-1];
             loadIt();
+            document.getElementById('surahSelect').value = surah;
         } else {
-            // Per l'arabo d è invertito
-            page = Math.max(1, Math.min(604, page + d));
-            loadPage();
+            let next = page + d;
+            if(next >= 1 && next <= 604) {
+                page = next;
+                loadPage();
+            }
         }
     }
 
-    function jump(s) {
+    function jumpTo(s) {
         surah = parseInt(s);
         page = surahStartPages[surah-1];
         if(isIt) loadIt(); else loadPage();
     }
 
-    function syncSurah() {
+    function updateSurahIndex() {
         for (let i = 0; i < surahStartPages.length; i++) {
-            if (page >= surahStartPages[i]) surah = i + 1; else break;
+            if (page >= surahStartPages[i]) surah = i + 1;
+            else break;
         }
         document.getElementById('surahSelect').value = surah;
     }
+
+    // Swipe gestures
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+    document.addEventListener('touchend', e => {
+        let touchEndX = e.changedTouches[0].clientX;
+        let diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 50) nav(diff > 0 ? 1 : -1);
+    });
 
     window.onload = init;
 </script>
