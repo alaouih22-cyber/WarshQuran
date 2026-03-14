@@ -4,84 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="referrer" content="no-referrer">
-    <title>Al-Qur'an Pro Warsh</title>
+    <title>Mushaf Tajweed Warsh Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --emerald: #064e3b; --gold: #c5a059; --paper: #fdf6e3; --text: #2d3748; }
+        :root { --emerald: #064e3b; --gold: #c5a059; --paper: #fdf6e3; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        body, html { height: 100%; width: 100%; background-color: var(--emerald); overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        body, html { height: 100%; width: 100%; background-color: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
 
-        /* HEADER */
-        .header { background: var(--emerald); padding: 10px; border-bottom: 2px solid var(--gold); z-index: 100; position: relative; }
-        .controls { display: flex; flex-direction: column; gap: 8px; }
-        .row { display: flex; gap: 4px; width: 100%; }
-        
-        select { padding: 10px; border-radius: 8px; border: 1px solid var(--gold); font-weight: bold; flex: 1; font-size: 14px; background: white; }
-        .btn-mode { background: var(--gold); color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; font-size: 10px; opacity: 0.7; }
-        .btn-mode.active { opacity: 1; border: 1px solid white; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        /* UI Pannelli */
+        .ui-panel {
+            position: fixed; left: 0; width: 100%;
+            background: rgba(6, 78, 59, 0.95); backdrop-filter: blur(10px);
+            z-index: 100; transition: all 0.3s ease; opacity: 0; pointer-events: none;
+            border-color: var(--gold);
+        }
+        .header { top: 0; transform: translateY(-100%); border-bottom: 2px solid var(--gold); padding: 10px; display: flex; gap: 5px; align-items: center; }
+        .footer { bottom: 0; transform: translateY(100%); border-top: 2px solid var(--gold); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* AREA CONTENUTO */
-        .content-area {
-            height: calc(100vh - 175px);
-            overflow-y: auto;
-            background: var(--paper);
-            display: flex;
-            flex-direction: column;
+        body.show-ui .ui-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        select { flex: 2; padding: 10px; border-radius: 8px; border: none; font-size: 14px; font-weight: bold; background: #fff; }
+        .btn-mode { background: var(--gold); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 10px; flex: 1; }
+
+        /* Area Lettura */
+        .main-container {
+            width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: #111; position: relative; overflow: hidden;
         }
 
-        /* VISTA TESTO (ITA/WARSH) */
-        .text-container { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        /* Immagine Mushaf (Scribd Version) */
+        #mushafImg {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain; display: none;
+            transition: opacity 0.3s;
+        }
+
+        /* Testo Digitale */
+        #textView {
+            width: 100%; height: 100%; overflow-y: auto;
+            background: var(--paper); padding: 20px; padding-top: 60px; padding-bottom: 80px;
+            display: none;
+        }
         .ayah-card {
             background: white; padding: 18px; border-radius: 12px;
-            border-left: 5px solid var(--emerald); box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-            cursor: pointer;
+            border-left: 5px solid var(--emerald); box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            margin-bottom: 15px; cursor: pointer;
         }
         .ayah-card.playing { border-left-color: var(--gold); background: #fffbeb; }
-        .text-ar { direction: rtl; text-align: right; font-family: 'Amiri', serif; font-size: 1.9rem; line-height: 2.3; color: #111; display: block; margin-bottom: 10px; }
-        .text-it { direction: ltr; text-align: left; font-size: 1.1rem; color: var(--text); display: block; font-style: italic; }
+        .text-ar { direction: rtl; text-align: right; font-family: 'Amiri', serif; font-size: 1.8rem; line-height: 2.2; color: #111; }
+        .text-it { font-size: 1.1rem; line-height: 1.5; color: #333; margin-top: 10px; font-style: italic; }
 
-        /* VISTA MUSHAF (PAGINE) */
-        #mushafView { width: 100%; height: 100%; display: none; background: #111; position: relative; overflow: auto; }
-        #mushafImg { width: 100%; height: auto; display: block; margin: 0 auto; }
+        /* Zone di Tocco */
+        .t-zone { position: absolute; top: 0; height: 100%; z-index: 20; }
+        .t-next { left: 0; width: 30%; } 
+        .t-prev { right: 0; width: 30%; } 
+        .t-menu { left: 30%; width: 40%; z-index: 25; }
 
-        /* FOOTER */
-        .footer { background: var(--emerald); padding: 12px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
-        .btn-nav { background: var(--gold); color: white; border: none; padding: 10px 25px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
-
-        #loader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--gold); font-weight: bold; display: none; z-index: 200; text-align: center; }
-        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid var(--gold); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        .btn-nav { background: var(--gold); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 1.2rem; }
+        #loader { position: absolute; width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; z-index: 10; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="show-ui">
 
-<div class="header">
-    <div class="controls">
-        <div class="row">
-            <select id="surahSelect" onchange="jumpToSurah(this.value)"></select>
-        </div>
-        <div class="row">
-            <button class="btn-mode active" id="btn-ita" onclick="setMode('ita')">ITA</button>
-            <button class="btn-mode" id="btn-warsh" onclick="setMode('warsh')">WARSH (TESTO)</button>
-            <button class="btn-mode" id="btn-mushaf" onclick="setMode('mushaf')">MUSHAF (PAGINA)</button>
-        </div>
-    </div>
+<div class="header ui-panel">
+    <select id="surahSelect" onchange="jumpToSurah(this.value)"></select>
+    <button class="btn-mode" onclick="setMode('ita')">ITA</button>
+    <button class="btn-mode" onclick="setMode('warsh')">WARSH</button>
+    <button class="btn-mode" onclick="setMode('mushaf')">PAGINA</button>
 </div>
 
-<div id="loader"><div class="spinner"></div>Caricamento...</div>
-
-<div class="content-area" id="mainContent">
-    <div id="textDisplay" class="text-container"></div>
-    <div id="mushafView">
-        <img id="mushafImg" src="">
-    </div>
+<div class="main-container">
+    <div id="loader"></div>
+    <div class="t-zone t-next" onclick="nav(1)"></div>
+    <div class="t-zone t-menu" onclick="toggleUI()"></div>
+    <div class="t-zone t-prev" onclick="nav(-1)"></div>
+    
+    <img id="mushafImg" src="" alt="Mushaf Tajweed">
+    <div id="textView"></div>
 </div>
 
-<div class="footer">
+<div class="footer ui-panel">
     <button class="btn-nav" onclick="nav(-1)"><i class="fas fa-arrow-right"></i></button>
-    <span id="infoLabel" style="color:var(--gold); font-weight:bold; font-size: 1rem;">Sura 1</span>
+    <span id="infoLabel" style="color:var(--gold); font-weight:bold; font-size: 1.2rem;">1</span>
     <button class="btn-nav" onclick="nav(1)"><i class="fas fa-arrow-left"></i></button>
 </div>
 
@@ -90,13 +98,12 @@
 <script>
     let currentSurah = 1;
     let currentPage = 1;
-    let mode = 'ita'; // ita, warsh, mushaf
-    const textDisplay = document.getElementById('textDisplay');
-    const mushafView = document.getElementById('mushafView');
-    const mushafImg = document.getElementById('mushafImg');
+    let mode = 'mushaf'; // mushaf, warsh, ita
+    const img = document.getElementById('mushafImg');
+    const textV = document.getElementById('textView');
+    const loader = document.getElementById('loader');
     const player = document.getElementById('audioPlayer');
 
-    // Mapping Standard 604 pagine (Warsh)
     const surahStartPages = [1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604];
     const surahNames = ["Al-Fatihah","Al-Baqarah","Al-Imran","An-Nisa","Al-Ma'idah","Al-An'am","Al-A'raf","Al-Anfal","At-Tawbah","Yunus","Hud","Yusuf","Ar-Ra'd","Ibrahim","Al-Hijr","An-Nahl","Al-Isra","Al-Kahf","Maryam","Ta-Ha","Al-Anbiya","Al-Hajj","Al-Mu'minun","An-Nur","Al-Furqan","Ash-Shu'ara","An-Naml","Al-Qasas","Al-Ankabut","Ar-Rum","Luqman","As-Sajdah","Al-Ahzab","Saba","Fatir","Ya-Sin","As-Saffat","Sad","Az-Zumar","Ghafir","Fussilat","Ash-Shura","Az-Zukhruf","Ad-Dukhan","Al-Jathiyah","Al-Ahqaf","Muhammad","Al-Fath","Al-Hujurat","Qaf","Adh-Dhariyat","At-Tur","An-Najm","Al-Qamar","Ar-Rahman","Al-Waqi'ah","Al-Hadid","Al-Mujadilah","Al-Hashr","Al-Mumtahanah","As-Saff","Al-Jumu'ah","Al-Munafiqun","At-Taghabun","At-Talaq","At-Tahrim","Al-Mulk","Al-Qalam","Al-Haqqah","Al-Ma'arij","Nuh","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyamah","Al-Insan","Al-Mursalat","An-Naba","An-Nazi'at","Abasa","At-Takwir","Al-Infitar","Al-Mutaffifin","Al-Inshiqaq","Al-Buruj","At-Tariq","Al-A'la","Al-Ghashiyah","Al-Fajr","Al-Balad","Ash-Shams","Al-Layl","Ad-Duha","Ash-Sharh","At-Tin","Al-Alaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-Adiyat","Al-Qari'ah","At-Takathur","Al-Asr","Al-Humazah","Al-Fil","Quraysh","Al-Ma'un","Al-Kawthar","Al-Kafirun","An-Nasr","Al-Masad","Al-Ikhlas","Al-Falaq","An-Nas"];
 
@@ -106,62 +113,66 @@
             let o = document.createElement('option'); o.value = i + 1; o.textContent = `${i+1}. ${n}`;
             sel.appendChild(o);
         });
-        loadSurah(1);
+        updateDisplay();
     };
+
+    function toggleUI() { document.body.classList.toggle('show-ui'); }
 
     function setMode(m) {
         mode = m;
-        document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + m).classList.add('active');
-        if(m === 'mushaf') {
-            currentPage = surahStartPages[currentSurah - 1];
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        if(mode === 'mushaf') {
+            textV.style.display = 'none';
+            img.style.display = 'block';
             loadMushaf();
         } else {
-            loadSurah(currentSurah);
+            img.style.display = 'none';
+            textV.style.display = 'block';
+            loadText();
         }
     }
 
-    async function loadSurah(s) {
-        currentSurah = parseInt(s);
-        document.getElementById('surahSelect').value = s;
-        document.getElementById('infoLabel').innerText = surahNames[s-1];
-        document.getElementById('loader').style.display = 'block';
-        textDisplay.innerHTML = "";
-        textDisplay.style.display = "flex";
-        mushafView.style.display = "none";
+    function loadMushaf() {
+        loader.style.display = "block";
+        img.style.opacity = "0.3";
+        // Archivio specchio del documento Scribd (Mushaf Tajweed Warsh)
+        img.src = `https://raw.githubusercontent.com/marwanma/quran-images-warsh-tajweed/master/png/${currentPage}.png`;
+        img.onload = () => {
+            loader.style.display = "none";
+            img.style.opacity = "1";
+            document.getElementById('infoLabel').innerText = `Pagina ${currentPage}`;
+            syncSurah();
+        };
+        img.onerror = () => {
+            img.src = `https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${currentPage}.jpg`;
+        };
+    }
 
+    async function loadText() {
+        textV.innerHTML = "<p style='text-align:center;padding:50px'>Caricamento...</p>";
+        const edition = (mode === 'warsh') ? 'ar.warsh' : 'it.piccardo';
         try {
-            const ed = (mode === 'warsh') ? 'ar.warsh' : 'it.piccardo';
-            const res = await fetch(`https://api.alquran.cloud/v1/surah/${s}/${ed}`);
-            const data = await res.json();
-
-            data.data.ayahs.forEach(v => {
+            const r = await fetch(`https://api.alquran.cloud/v1/surah/${currentSurah}/${edition}`);
+            const d = await r.json();
+            textV.innerHTML = "";
+            d.data.ayahs.forEach(v => {
                 const card = document.createElement('div');
                 card.className = 'ayah-card';
                 card.onclick = () => playAudio(v.numberInSurah, card);
                 
-                let html = `<b style="color:var(--emerald)">Verso ${v.numberInSurah}</b>`;
-                if(mode === 'warsh') html += `<span class="text-ar">${v.text}</span>`;
-                else html += `<span class="text-it">${v.text}</span>`;
-                
-                card.innerHTML = html;
-                textDisplay.appendChild(card);
-            });
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('mainContent').scrollTop = 0;
-        } catch(e) { textDisplay.innerHTML = "Errore connessione."; }
-    }
+                let textAr = v.text;
+                if(currentSurah === 1 && v.numberInSurah === 4 && mode === 'warsh') textAr = "مَلِكِ يَوْمِ الدِّينِ";
 
-    function loadMushaf() {
-        document.getElementById('loader').style.display = 'block';
-        textDisplay.style.display = "none";
-        mushafView.style.display = "block";
-        document.getElementById('infoLabel').innerText = `Pagina ${currentPage}`;
-        
-        // Caricamento immagine (Mushaf Tajweed Warsh stabile)
-        mushafImg.src = `https://raw.githubusercontent.com/MohamedBassem/quran-images/master/images-warsh/${currentPage}.png`;
-        mushafImg.onload = () => { document.getElementById('loader').style.display = 'none'; };
-        mushafImg.onerror = () => { mushafImg.src = `https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${currentPage}.jpg`; };
+                card.innerHTML = `<b style="color:var(--emerald)">Versetto ${v.numberInSurah}</b>
+                                  <p class="${mode === 'warsh' ? 'text-ar' : 'text-it'}">${textAr}</p>`;
+                textV.appendChild(card);
+            });
+            document.getElementById('infoLabel').innerText = surahNames[currentSurah-1];
+            textV.scrollTop = 0;
+        } catch(e) { }
     }
 
     function playAudio(v, el) {
@@ -178,19 +189,28 @@
             currentPage = Math.max(1, Math.min(604, currentPage + d));
             loadMushaf();
         } else {
-            let n = currentSurah + d;
-            if(n >= 1 && n <= 114) loadSurah(n);
+            let next = currentSurah + d;
+            if(next >= 1 && next <= 114) jumpToSurah(next);
         }
     }
 
     function jumpToSurah(s) {
         currentSurah = parseInt(s);
+        document.getElementById('surahSelect').value = s;
         if(mode === 'mushaf') {
-            currentPage = surahStartPages[currentSurah - 1];
+            currentPage = surahStartPages[currentSurah-1];
             loadMushaf();
         } else {
-            loadSurah(currentSurah);
+            loadText();
         }
+    }
+
+    function syncSurah() {
+        for (let i = 0; i < surahStartPages.length; i++) {
+            if (currentPage >= surahStartPages[i]) currentSurah = i + 1;
+            else break;
+        }
+        document.getElementById('surahSelect').value = currentSurah;
     }
 </script>
 </body>
