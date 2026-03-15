@@ -1,18 +1,11 @@
 {
-  "name": "Al-Qur'an Pro",
-  "short_name": "QuranPro",
-  "description": "Leggi e ascolta il Sacro Corano",
-  "start_url": "index.html",
+  "name": "Corano Warsh Pro",
+  "short_name": "WarshIT",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#064e3b",
-  "theme_color": "#064e3b",
-  "orientation": "portrait",
+  "background_color": "#065f46",
+  "theme_color": "#065f46",
   "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/2800/2800458.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2800/2800458.png",
       "sizes": "512x512",
