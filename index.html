@@ -35,24 +35,25 @@
         .tab { flex: 1; padding: 10px; text-align: center; color: rgba(255, 255, 255, 0.5); font-weight: 700; font-size: 0.75rem; cursor: pointer; border-radius: 10px; transition: 0.3s; }
         .tab.active { background: var(--gold); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* Content */
+        /* Main Content */
         .main-content { flex: 1; overflow-y: auto; padding: 15px; position: relative; scroll-behavior: smooth; }
 
         /* Mushaf Style */
-        #mushafContainer { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
-        #mushafImg { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: block; background: #fff; min-height: 200px; }
+        #mushafContainer { width: 100%; display: flex; flex-direction: column; align-items: center; min-height: 400px; }
+        #mushafImg { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: none; background: white; }
 
         /* Ayah Cards */
         .ayah-card { background: var(--card); border-radius: 20px; padding: 22px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border-left: 5px solid var(--gold); cursor: pointer; }
         .ayah-card.playing { background: #fff9e6; border-left-color: var(--gold-light); transform: scale(1.01); transition: 0.3s; }
 
-        .arabic-text { direction: rtl; font-family: 'Scheherazade New', serif; font-size: 2.2rem; line-height: 2.4; color: #0f172a; text-align: right; margin-bottom: 12px; }
+        .arabic-text { direction: rtl; font-family: 'Scheherazade New', serif; font-size: 2.1rem; line-height: 2.4; color: #0f172a; text-align: right; margin-bottom: 12px; }
         .translation-text { font-size: 1rem; color: #475569; line-height: 1.5; border-top: 1px solid #f1f5f9; padding-top: 12px; font-style: italic; }
 
         /* Player Bar */
         .audio-player-bar { background: white; padding: 15px 20px; border-top: 3px solid var(--gold); display: flex; align-items: center; gap: 15px; }
         .play-btn { width: 50px; height: 50px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; cursor: pointer; }
 
+        /* Spinner */
         #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; flex-direction: column; align-items: center; z-index: 20; }
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -83,7 +84,7 @@
     </header>
 
     <main class="main-content" id="mainContent">
-        <div id="loader"><div class="spinner"></div><p style="color:white; margin-top:10px; font-size: 0.7rem;">Caricamento...</p></div>
+        <div id="loader"><div class="spinner"></div><p style="color:white; margin-top:10px;">Caricamento...</p></div>
         <div id="renderArea"></div>
     </main>
 
@@ -93,7 +94,7 @@
         </div>
         <div style="flex: 1; overflow: hidden;">
             <div id="currentAyahName" style="font-size: 0.8rem; font-weight: 800; color: var(--p-green); white-space: nowrap;">Pronto</div>
-            <div style="font-size: 0.65rem; color: #64748b;">Tocca un versetto per l'audio</div>
+            <div id="playingReciter" style="font-size: 0.65rem; color: #64748b;">Seleziona un versetto</div>
         </div>
         <i class="fas fa-step-forward" style="color: var(--gold); font-size: 1.2rem; cursor: pointer;" onclick="nextAyah()"></i>
     </footer>
@@ -162,14 +163,18 @@
         renderArea.innerHTML = "";
         if (activeTab === 'mushaf') {
             const pNum = pageMapping[currentSurah - 1];
-            // NUOVA SORGENTE: Utilizzo del repository affidabile di Quran.com-images o backup Statically
-            const imgUrl = `https://cdn.statically.io/gh/marwanma/quran-images-warsh-tajweed/master/png/${pNum}.png`;
+            // TECNICA DELL'INGANNO WORDPRESS: i0.wp.com è l'acceleratore Jetpack
+            // Usiamo l'indirizzo originale di EasyQuran passandolo per WordPress.
+            // WordPress scarica la foto per noi e ce la serve senza blocchi.
+            const targetUrl = `easyquran.com/quran-jpg-w/${pNum}.jpg`;
+            const wpProxy = `https://i0.wp.com/${targetUrl}?quality=90&strip=all`;
+            
             renderArea.innerHTML = `
                 <div id="mushafContainer">
-                    <img id="mushafImg" src="${imgUrl}" 
-                         onerror="this.src='https://images.weserv.nl/?url=https://easyquran.com/quran-jpg-w/${pNum}.jpg&w=1000'"
-                         onload="this.style.display='block'">
-                    <p style="color:var(--gold-light); margin-top:15px; font-size:0.75rem; font-weight:bold;">Pagina ${pNum} - Tajweed Warsh</p>
+                    <img id="mushafImg" src="${wpProxy}" 
+                         onload="this.style.display='block'"
+                         onerror="this.src='https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${pNum}.jpg'">
+                    <p style="color:var(--gold-light); margin-top:15px; font-size:0.75rem; font-weight:bold;">PAGINA ${pNum} - MUSHAF TAJWEED WARSH</p>
                 </div>`;
             return;
         }
@@ -179,10 +184,10 @@
             card.className = `ayah-card ${currentAyahIdx === index && isPlaying ? 'playing' : ''}`;
             card.id = `ayah-${index}`;
             let arText = a.ar;
-            if(currentSurah === 1 && a.num === 4) arText = "مَلِكِ يَوْمِ الدِّينِ"; // Correzione Warsh
-            
+            if(currentSurah === 1 && a.num === 4) arText = "مَلِكِ يَوْمِ الدِّينِ"; // Patch Warsh
+
             card.innerHTML = `
-                <div class="arabic-text">${arText} <span style="color:var(--gold); font-size:1.2rem; font-family:sans-serif;">(${a.num})</span></div>
+                <div class="arabic-text">${arText} <span style="color:var(--gold); font-size:1.1rem; font-family:sans-serif;">(${a.num})</span></div>
                 <div class="translation-text">${activeTab === 'tafsir' ? '<b style="color:var(--gold)">TAFSIR: </b>' + a.taf : a.it}</div>
             `;
             card.onclick = () => playAyah(index);
@@ -216,9 +221,15 @@
     function updateUI() {
         document.getElementById('masterPlay').innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
         document.getElementById('currentAyahName').innerText = `${surahNames[currentSurah-1]} - Verso ${ayahsData[currentAyahIdx].num}`;
+        document.getElementById('playingReciter').innerText = document.getElementById('reciterSelect').options[document.getElementById('reciterSelect').selectedIndex].text;
+        
         document.querySelectorAll('.ayah-card').forEach((c, i) => {
             c.classList.toggle('playing', i === currentAyahIdx && isPlaying);
         });
+        if(isPlaying && activeTab !== 'mushaf') {
+            const activeCard = document.getElementById(`ayah-${currentAyahIdx}`);
+            if(activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 
     audio.onended = () => {
