@@ -19,41 +19,35 @@
         body { background-color: var(--p-green); font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; color: #1e293b; }
         .app-shell { display: flex; flex-direction: column; height: 100vh; background: linear-gradient(135deg, #042f2e 0%, #022c22 100%); }
         
-        /* Header Premium */
         .header { padding: 15px 20px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(217, 119, 6, 0.3); }
         .logo { color: var(--gold-light); font-weight: 800; font-size: 1.1rem; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
         .selector-row { display: flex; gap: 8px; }
         select { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(217, 119, 6, 0.4); padding: 10px; border-radius: 12px; font-size: 0.85rem; flex: 1; outline: none; }
         option { background: #042f2e; color: white; }
 
-        /* Tabs */
         .tabs { display: flex; background: rgba(0, 0, 0, 0.2); padding: 4px; border-radius: 14px; margin-top: 12px; }
         .tab { flex: 1; padding: 10px; text-align: center; color: rgba(255, 255, 255, 0.5); font-weight: 700; font-size: 0.75rem; cursor: pointer; border-radius: 10px; transition: 0.3s; }
         .tab.active { background: var(--gold); color: white; }
 
         .main-content { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; position: relative; }
         
-        /* Ayah Card Style */
         .ayah-card { background: var(--card); border-radius: 20px; padding: 22px; margin-bottom: 15px; border-left: 5px solid var(--gold); box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; transition: 0.2s; }
         .ayah-card.playing { background: #fff9e6; border-left-color: var(--gold-light); transform: scale(1.01); }
         .arabic-text { direction: rtl; font-family: 'Scheherazade New', serif; font-size: 2.1rem; line-height: 2.4; text-align: right; color: #0f172a; margin-bottom: 10px; }
         .translation-text { font-size: 0.95rem; color: #475569; line-height: 1.5; font-style: italic; border-top: 1px solid #f1f5f9; padding-top: 10px; }
         
-        /* Tafsir & Asbab Style */
         .tafsir-box { margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
         .tafsir-label { font-size: 0.7rem; font-weight: 800; color: var(--gold); text-transform: uppercase; margin-bottom: 5px; display: block; }
         .tafsir-text { font-size: 0.9rem; color: #1e293b; line-height: 1.6; }
 
-        /* Mushaf Image */
         #mushafContainer { width: 100%; text-align: center; padding-bottom: 30px; }
         #mushafImg { width: 100%; border-radius: 15px; display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.5); background: white; }
 
-        /* Footer Player */
         .player-bar { background: white; padding: 15px 20px; border-top: 3px solid var(--gold); display: flex; align-items: center; gap: 15px; }
         .play-btn { width: 54px; height: 54px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(217,119,6,0.3); }
 
         #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; flex-direction: column; align-items: center; z-index: 100; }
-        .spinner { width: 45px; height: 45px; border: 5px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold-light); border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold-light); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -61,14 +55,18 @@
 
 <div class="app-shell">
     <header class="header">
-        <div class="logo"><i class="fas fa-crown"></i> QUR'AN PRO WARSH</div>
+        <div class="logo">QUR'AN PREMIUM PRO</div>
         <div class="selector-row">
             <select id="surahSelect" onchange="loadSurah(this.value)"></select>
             <select id="reciterSelect">
                 <option value="Husary_Warsh_64kbps">Al-Hussary (Warsh)</option>
-                <option value="Husary_64kbps">Al-Hussary (Hafs)</option>
                 <option value="Alafasy_128kbps">Alafasy</option>
                 <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
+                <option value="Husary_64kbps">Al-Hussary (Hafs)</option>
+                <option value="Minshawi_Murattal_128kbps">Al-Minshawi</option>
+                <option value="Ghamadi_64kbps">Al-Ghamadi</option>
+                <option value="Shuraym_64kbps">Saud Al-Shuraim</option>
+                <option value="Sudais_64kbps">Abdurrahman Al-Sudais</option>
             </select>
         </div>
         <div class="tabs">
@@ -87,7 +85,7 @@
         <div class="play-btn" onclick="togglePlayback()"><i class="fas fa-play" id="playIcon"></i></div>
         <div style="flex:1; overflow: hidden;">
             <div id="currentAyahName" style="font-size:0.85rem; font-weight:800; color:var(--p-green); white-space: nowrap; text-overflow: ellipsis;">Seleziona versetto</div>
-            <div id="statusSub" style="font-size:0.65rem; color:#64748b;">Recitazione Warsh</div>
+            <div id="statusSub" style="font-size:0.65rem; color:#64748b;">Recitazione in corso</div>
         </div>
         <i class="fas fa-step-forward" style="color:var(--gold); font-size:1.4rem; cursor:pointer;" onclick="nextAyah()"></i>
     </footer>
@@ -124,7 +122,6 @@
         currentSurah = parseInt(s);
         loader.style.display = 'flex';
         try {
-            // Fetch contemporaneo: Testo Warsh, Italiano, Tafsir Jalalayn
             const [resAr, resIt, resTaf] = await Promise.all([
                 fetch(`https://api.alquran.cloud/v1/surah/${s}/ar.warsh`),
                 fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`),
@@ -149,26 +146,24 @@
         renderArea.innerHTML = "";
         if (activeTab === 'mushaf') {
             const p = pageMapping[currentSurah - 1];
-            // PERMALINK GITHUB muslimDevCommunity
+            // LINK RIPRISTINATO DAL PERMALINK GITHUB
             const githubRawBase = "https://raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/";
             const imgUrl = `${githubRawBase}page${p.toString().padStart(3, '0')}.png`;
-            renderArea.innerHTML = `<div id="mushafContainer"><img id="mushafImg" src="${imgUrl}" onload="this.style.display='block'"></div>`;
+            renderArea.innerHTML = `<div id="mushafContainer"><img id="mushafImg" src="${imgUrl}" onload="this.style.display='block'" onerror="this.src='https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${p}.jpg'"></div>`;
             return;
         }
 
         ayahsData.forEach((a, i) => {
             const card = document.createElement('div');
             card.className = `ayah-card ${currentAyahIdx === i && isPlaying ? 'playing' : ''}`;
-            let arText = (currentSurah === 1 && a.num === 4) ? "مَلِكِ يَوْمِ الدِّينِ" : a.ar;
+            let text = (currentSurah === 1 && a.num === 4) ? "مَلِكِ يَوْمِ الدِّينِ" : a.ar;
             
-            let html = `<div class="arabic-text">${arText} (${a.num})</div>`;
-            
+            let html = `<div class="arabic-text">${text} (${a.num})</div>`;
             if (activeTab === 'tafsir') {
-                html += `<div class="tafsir-box"><span class="tafsir-label">Tafsir Jalalayn / Asbab</span><p class="tafsir-text">${a.taf}</p></div>`;
+                html += `<div class="tafsir-box"><span class="tafsir-label">Tafsir / Asbab</span><p class="tafsir-text">${a.taf}</p></div>`;
             } else {
                 html += `<div class="translation-text">${a.it}</div>`;
             }
-            
             card.innerHTML = html;
             card.onclick = () => playAyah(i);
             renderArea.appendChild(card);
@@ -179,8 +174,11 @@
         currentAyahIdx = idx;
         const s = String(currentSurah).padStart(3, '0'), v = String(ayahsData[idx].num).padStart(3, '0');
         const reciter = document.getElementById('reciterSelect').value;
+        // Audio riparato Husary Warsh
         audio.src = `https://www.everyayah.com/data/${reciter}/${s}${v}.mp3`;
-        audio.play(); isPlaying = true; updateUI();
+        audio.play().catch(e => console.log("Audio Error:", e));
+        isPlaying = true; 
+        updateUI();
     }
 
     function togglePlayback() {
