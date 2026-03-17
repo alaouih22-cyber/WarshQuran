@@ -65,8 +65,7 @@
                 <option value="Husary_64kbps">Al-Hussary (Hafs)</option>
                 <option value="Minshawi_Murattal_128kbps">Al-Minshawi</option>
                 <option value="Ghamadi_64kbps">Al-Ghamadi</option>
-                <option value="Shuraym_64kbps">Saud Al-Shuraim</option>
-                <option value="Sudais_64kbps">Abdurrahman Al-Sudais</option>
+                <option value="Sudais_64kbps">Al-Sudais</option>
             </select>
         </div>
         <div class="tabs">
@@ -94,7 +93,18 @@
 <audio id="audioEngine"></audio>
 
 <script>
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            reg.onupdatefound = () => {
+                const installingWorker = reg.installing;
+                installingWorker.onstatechange = () => {
+                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        window.location.reload();
+                    }
+                };
+            };
+        });
+    }
 
     let currentSurah = 1, currentAyahIdx = 0, ayahsData = [], isPlaying = false, activeTab = 'reader';
     const audio = document.getElementById('audioEngine'), renderArea = document.getElementById('renderArea'), loader = document.getElementById('loader');
@@ -146,9 +156,8 @@
         renderArea.innerHTML = "";
         if (activeTab === 'mushaf') {
             const p = pageMapping[currentSurah - 1];
-            // LINK RIPRISTINATO DAL PERMALINK GITHUB
-            const githubRawBase = "https://raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/";
-            const imgUrl = `${githubRawBase}page${p.toString().padStart(3, '0')}.png`;
+            // UTILIZZO LINK DIRETTO GITHUB muslimDevCommunity (RAW)
+            const imgUrl = `https://raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/page${p.toString().padStart(3, '0')}.png`;
             renderArea.innerHTML = `<div id="mushafContainer"><img id="mushafImg" src="${imgUrl}" onload="this.style.display='block'" onerror="this.src='https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${p}.jpg'"></div>`;
             return;
         }
@@ -160,7 +169,7 @@
             
             let html = `<div class="arabic-text">${text} (${a.num})</div>`;
             if (activeTab === 'tafsir') {
-                html += `<div class="tafsir-box"><span class="tafsir-label">Tafsir / Asbab</span><p class="tafsir-text">${a.taf}</p></div>`;
+                html += `<div class="tafsir-box"><span class="tafsir-label">Tafsir Jalalayn</span><p class="tafsir-text">${a.taf}</p></div>`;
             } else {
                 html += `<div class="translation-text">${a.it}</div>`;
             }
@@ -174,9 +183,8 @@
         currentAyahIdx = idx;
         const s = String(currentSurah).padStart(3, '0'), v = String(ayahsData[idx].num).padStart(3, '0');
         const reciter = document.getElementById('reciterSelect').value;
-        // Audio riparato Husary Warsh
         audio.src = `https://www.everyayah.com/data/${reciter}/${s}${v}.mp3`;
-        audio.play().catch(e => console.log("Audio Error:", e));
+        audio.play(); 
         isPlaying = true; 
         updateUI();
     }
