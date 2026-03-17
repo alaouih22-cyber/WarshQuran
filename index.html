@@ -7,7 +7,8 @@
     <meta name="theme-color" content="#042f2e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Al-Qur'an Pro</title>
+    <meta name="referrer" content="no-referrer">
+    <title>Al-Qur'an Premium Pro (Warsh)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
@@ -15,73 +16,91 @@
     <style>
         :root { --p-green: #042f2e; --gold: #d97706; --gold-light: #fbbf24; --card: #ffffff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { background-color: var(--p-green); font-family: sans-serif; height: 100vh; overflow: hidden; color: #1e293b; }
+        body { background-color: var(--p-green); font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; color: #1e293b; }
         .app-shell { display: flex; flex-direction: column; height: 100vh; background: linear-gradient(135deg, #042f2e 0%, #022c22 100%); }
         
+        /* Header Premium */
         .header { padding: 15px 20px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(217, 119, 6, 0.3); }
-        .selector-row { display: flex; gap: 8px; margin-top: 10px; }
+        .logo { color: var(--gold-light); font-weight: 800; font-size: 1.1rem; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .selector-row { display: flex; gap: 8px; }
         select { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(217, 119, 6, 0.4); padding: 10px; border-radius: 12px; font-size: 0.85rem; flex: 1; outline: none; }
-        
+        option { background: #042f2e; color: white; }
+
+        /* Tabs */
         .tabs { display: flex; background: rgba(0, 0, 0, 0.2); padding: 4px; border-radius: 14px; margin-top: 12px; }
-        .tab { flex: 1; padding: 10px; text-align: center; color: rgba(255, 255, 255, 0.5); font-weight: 700; font-size: 0.75rem; cursor: pointer; border-radius: 10px; }
+        .tab { flex: 1; padding: 10px; text-align: center; color: rgba(255, 255, 255, 0.5); font-weight: 700; font-size: 0.75rem; cursor: pointer; border-radius: 10px; transition: 0.3s; }
         .tab.active { background: var(--gold); color: white; }
 
-        .main-content { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
-        .ayah-card { background: var(--card); border-radius: 20px; padding: 22px; margin-bottom: 15px; border-left: 5px solid var(--gold); cursor: pointer; }
-        .ayah-card.playing { background: #fffbeb; border-left-color: var(--gold-light); transform: scale(1.01); transition: 0.2s; }
-        .arabic-text { direction: rtl; font-family: 'Scheherazade New', serif; font-size: 2.1rem; line-height: 2.4; text-align: right; }
+        .main-content { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; position: relative; }
         
-        #mushafImg { width: 100%; border-radius: 12px; display: none; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* Ayah Card Style */
+        .ayah-card { background: var(--card); border-radius: 20px; padding: 22px; margin-bottom: 15px; border-left: 5px solid var(--gold); box-shadow: 0 10px 25px rgba(0,0,0,0.2); cursor: pointer; transition: 0.2s; }
+        .ayah-card.playing { background: #fff9e6; border-left-color: var(--gold-light); transform: scale(1.01); }
+        .arabic-text { direction: rtl; font-family: 'Scheherazade New', serif; font-size: 2.1rem; line-height: 2.4; text-align: right; color: #0f172a; margin-bottom: 10px; }
+        .translation-text { font-size: 0.95rem; color: #475569; line-height: 1.5; font-style: italic; border-top: 1px solid #f1f5f9; padding-top: 10px; }
         
-        .player-bar { background: white; padding: 15px 20px; border-top: 3px solid var(--gold); display: flex; align-items: center; gap: 15px; }
-        .play-btn { width: 50px; height: 50px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; }
+        /* Tafsir & Asbab Style */
+        .tafsir-box { margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .tafsir-label { font-size: 0.7rem; font-weight: 800; color: var(--gold); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .tafsir-text { font-size: 0.9rem; color: #1e293b; line-height: 1.6; }
 
-        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; z-index: 20; color: white; }
+        /* Mushaf Image */
+        #mushafContainer { width: 100%; text-align: center; padding-bottom: 30px; }
+        #mushafImg { width: 100%; border-radius: 15px; display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.5); background: white; }
+
+        /* Footer Player */
+        .player-bar { background: white; padding: 15px 20px; border-top: 3px solid var(--gold); display: flex; align-items: center; gap: 15px; }
+        .play-btn { width: 54px; height: 54px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(217,119,6,0.3); }
+
+        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; flex-direction: column; align-items: center; z-index: 100; }
+        .spinner { width: 45px; height: 45px; border: 5px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold-light); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="app-shell">
     <header class="header">
-        <div style="color:var(--gold-light); font-weight:800;">AL-QUR'AN PRO</div>
+        <div class="logo"><i class="fas fa-crown"></i> QUR'AN PRO WARSH</div>
         <div class="selector-row">
             <select id="surahSelect" onchange="loadSurah(this.value)"></select>
             <select id="reciterSelect">
                 <option value="Husary_Warsh_64kbps">Al-Hussary (Warsh)</option>
+                <option value="Husary_64kbps">Al-Hussary (Hafs)</option>
                 <option value="Alafasy_128kbps">Alafasy</option>
                 <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
             </select>
         </div>
         <div class="tabs">
             <div class="tab active" onclick="switchTab('reader')">LETTURA</div>
+            <div class="tab" onclick="switchTab('tafsir')">TAFSIR & ASBAB</div>
             <div class="tab" onclick="switchTab('mushaf')">MUSHAF</div>
         </div>
     </header>
 
     <main class="main-content" id="mainContent">
-        <div id="loader">Caricamento...</div>
+        <div id="loader"><div class="spinner"></div></div>
         <div id="renderArea"></div>
     </main>
 
     <footer class="player-bar">
         <div class="play-btn" onclick="togglePlayback()"><i class="fas fa-play" id="playIcon"></i></div>
-        <div style="flex:1">
-            <div id="currentAyahName" style="font-size:0.8rem; font-weight:800;">Seleziona versetto</div>
+        <div style="flex:1; overflow: hidden;">
+            <div id="currentAyahName" style="font-size:0.85rem; font-weight:800; color:var(--p-green); white-space: nowrap; text-overflow: ellipsis;">Seleziona versetto</div>
+            <div id="statusSub" style="font-size:0.65rem; color:#64748b;">Recitazione Warsh</div>
         </div>
-        <i class="fas fa-step-forward" style="color:var(--gold); font-size:1.2rem;" onclick="nextAyah()"></i>
+        <i class="fas fa-step-forward" style="color:var(--gold); font-size:1.4rem; cursor:pointer;" onclick="nextAyah()"></i>
     </footer>
 </div>
 
 <audio id="audioEngine"></audio>
 
 <script>
-    // REGISTRAZIONE SERVICE WORKER
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js');
-    }
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
 
     let currentSurah = 1, currentAyahIdx = 0, ayahsData = [], isPlaying = false, activeTab = 'reader';
     const audio = document.getElementById('audioEngine'), renderArea = document.getElementById('renderArea'), loader = document.getElementById('loader');
+
     const surahNames = ["Al-Fatihah","Al-Baqarah","Al-Imran","An-Nisa","Al-Ma'idah","Al-An'am","Al-A'raf","Al-Anfal","At-Tawbah","Yunus","Hud","Yusuf","Ar-Ra'd","Ibrahim","Al-Hijr","An-Nahl","Al-Isra","Al-Kahf","Maryam","Ta-Ha","Al-Anbiya","Al-Hajj","Al-Mu'minun","An-Nur","Al-Furqan","Ash-Shu'ara","An-Naml","Al-Qasas","Al-Ankabut","Ar-Rum","Luqman","As-Sajdah","Al-Ahzab","Saba","Fatir","Ya-Sin","As-Saffat","Sad","Az-Zumar","Ghafir","Fussilat","Ash-Shura","Az-Zukhruf","Ad-Dukhan","Al-Jathiyah","Al-Ahqaf","Muhammad","Al-Fath","Al-Hujurat","Qaf","Adh-Dhariyat","At-Tur","An-Najm","Al-Qamar","Ar-Rahman","Al-Waqi'ah","Al-Hadid","Al-Mujadilah","Al-Hashr","Al-Mumtahanah","As-Saff","Al-Jumu'ah","Al-Munafiqun","At-Taghabun","At-Talaq","At-Tahrim","Al-Mulk","Al-Qalam","Al-Haqqah","Al-Ma'arij","Nuh","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyamah","Al-Insan","Al-Mursalat","An-Naba","An-Nazi'at","Abasa","At-Takwir","Al-Infitar","Al-Mutaffifin","Al-Inshiqaq","Al-Buruj","At-Tariq","Al-A'la","Al-Ghashiyah","Al-Fajr","Al-Balad","Ash-Shams","Al-Layl","Ad-Duha","Ash-Sharh","At-Tin","Al-Alaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-Adiyat","Al-Qari'ah","At-Takathur","Al-Asr","Al-Humazah","Al-Fil","Quraysh","Al-Ma'un","Al-Kawthar","Al-Kafirun","An-Nasr","Al-Masad","Al-Ikhlas","Al-Falaq","An-Nas"];
     const pageMapping = [1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604];
 
@@ -103,15 +122,24 @@
 
     async function loadSurah(s) {
         currentSurah = parseInt(s);
-        loader.style.display = 'block';
+        loader.style.display = 'flex';
         try {
-            const [resAr, resIt] = await Promise.all([
+            // Fetch contemporaneo: Testo Warsh, Italiano, Tafsir Jalalayn
+            const [resAr, resIt, resTaf] = await Promise.all([
                 fetch(`https://api.alquran.cloud/v1/surah/${s}/ar.warsh`),
-                fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`)
+                fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`),
+                fetch(`https://api.alquran.cloud/v1/surah/${s}/ar.jalalayn`)
             ]);
             const dataAr = await resAr.json();
             const dataIt = await resIt.json();
-            ayahsData = dataAr.data.ayahs.map((a, i) => ({ num: a.numberInSurah, ar: a.text, it: dataIt.data.ayahs[i].text }));
+            const dataTaf = await resTaf.json();
+            
+            ayahsData = dataAr.data.ayahs.map((a, i) => ({ 
+                num: a.numberInSurah, 
+                ar: a.text, 
+                it: dataIt.data.ayahs[i].text,
+                taf: dataTaf.data.ayahs[i].text
+            }));
             renderContent();
         } catch (e) { renderArea.innerHTML = "Errore connessione."; }
         loader.style.display = 'none';
@@ -121,16 +149,27 @@
         renderArea.innerHTML = "";
         if (activeTab === 'mushaf') {
             const p = pageMapping[currentSurah - 1];
-            // Tecnica Bypass Immagini WordPress
-            const wpProxy = `https://i0.wp.com/easyquran.com/quran-jpg-w/${p}.jpg`;
-            renderArea.innerHTML = `<img id="mushafImg" src="${wpProxy}" style="display:block">`;
+            // PERMALINK GITHUB muslimDevCommunity
+            const githubRawBase = "https://raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/";
+            const imgUrl = `${githubRawBase}page${p.toString().padStart(3, '0')}.png`;
+            renderArea.innerHTML = `<div id="mushafContainer"><img id="mushafImg" src="${imgUrl}" onload="this.style.display='block'"></div>`;
             return;
         }
+
         ayahsData.forEach((a, i) => {
             const card = document.createElement('div');
             card.className = `ayah-card ${currentAyahIdx === i && isPlaying ? 'playing' : ''}`;
-            let text = (currentSurah === 1 && a.num === 4) ? "مَلِكِ يَوْمِ الدِّينِ" : a.ar;
-            card.innerHTML = `<div class="arabic-text">${text} (${a.num})</div><div style="font-size:0.9rem; color:#64748b; margin-top:10px;">${a.it}</div>`;
+            let arText = (currentSurah === 1 && a.num === 4) ? "مَلِكِ يَوْمِ الدِّينِ" : a.ar;
+            
+            let html = `<div class="arabic-text">${arText} (${a.num})</div>`;
+            
+            if (activeTab === 'tafsir') {
+                html += `<div class="tafsir-box"><span class="tafsir-label">Tafsir Jalalayn / Asbab</span><p class="tafsir-text">${a.taf}</p></div>`;
+            } else {
+                html += `<div class="translation-text">${a.it}</div>`;
+            }
+            
+            card.innerHTML = html;
             card.onclick = () => playAyah(i);
             renderArea.appendChild(card);
         });
@@ -139,7 +178,8 @@
     function playAyah(idx) {
         currentAyahIdx = idx;
         const s = String(currentSurah).padStart(3, '0'), v = String(ayahsData[idx].num).padStart(3, '0');
-        audio.src = `https://www.everyayah.com/data/${document.getElementById('reciterSelect').value}/${s}${v}.mp3`;
+        const reciter = document.getElementById('reciterSelect').value;
+        audio.src = `https://www.everyayah.com/data/${reciter}/${s}${v}.mp3`;
         audio.play(); isPlaying = true; updateUI();
     }
 
@@ -155,7 +195,7 @@
         document.querySelectorAll('.ayah-card').forEach((c, i) => c.classList.toggle('playing', i === currentAyahIdx && isPlaying));
     }
 
-    audio.onended = () => { if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1); else isPlaying = false; updateUI(); };
+    audio.onended = () => { if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1); else { isPlaying = false; updateUI(); } };
     function nextAyah() { if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1); }
 </script>
 </body>
