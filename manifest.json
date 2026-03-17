@@ -1,8 +1,7 @@
 {
-  "name": "Al-Qur'an Premium Pro",
+  "name": "Al-Quran Premium Pro",
   "short_name": "QuranPro",
-  "description": "Mushaf Tajweed Warsh con Audio e Tafsir",
-  "start_url": "index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#042f2e",
   "theme_color": "#042f2e",
