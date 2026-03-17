@@ -1,11 +1,19 @@
 {
-  "name": "Corano Warsh Pro",
-  "short_name": "WarshIT",
-  "start_url": ".",
+  "name": "Al-Qur'an Premium Pro",
+  "short_name": "QuranPro",
+  "description": "Mushaf Tajweed Warsh con Audio e Tafsir",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#065f46",
-  "theme_color": "#065f46",
+  "background_color": "#042f2e",
+  "theme_color": "#042f2e",
+  "orientation": "portrait",
   "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2800/2800458.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2800/2800458.png",
       "sizes": "512x512",
