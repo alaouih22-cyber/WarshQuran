@@ -36,8 +36,8 @@
 
         .main-content { flex: 1; overflow-y: auto; padding: 15px; position: relative; scroll-behavior: smooth; }
 
-        #mushafContainer { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; }
-        #mushafImg { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: block; background: white; }
+        #mushafContainer { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px; min-height: 500px; }
+        #mushafImg { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); display: block; background: #fff; }
 
         .ayah-card { background: var(--card); border-radius: 20px; padding: 22px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border-left: 5px solid var(--gold); transition: 0.3s; cursor: pointer; }
         .ayah-card.playing { background: #fffbeb; border-left-color: var(--gold-light); transform: scale(1.02); }
@@ -68,7 +68,6 @@
                 <option value="Alafasy_128kbps">Mishary Alafasy</option>
                 <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
                 <option value="Minshawi_Murattal_128kbps">Al-Minshawi</option>
-                <option value="Menshawi_64kbps">Al-Minshawi (Mujawwad)</option>
             </select>
         </div>
         <div class="tabs">
@@ -79,7 +78,7 @@
     </header>
 
     <main class="main-content" id="mainContent">
-        <div id="loader"><div class="spinner"></div></div>
+        <div id="loader"><div class="spinner"></div><p style="color:white; margin-top:10px;">Caricamento...</p></div>
         <div id="renderArea"></div>
     </main>
 
@@ -88,8 +87,8 @@
             <i class="fas fa-play"></i>
         </div>
         <div style="flex: 1; overflow: hidden;">
-            <div id="currentAyahName" style="font-size: 0.8rem; font-weight: 800; color: var(--p-green); white-space: nowrap; text-overflow: ellipsis;">Pronto</div>
-            <div style="font-size: 0.65rem; color: #64748b;">Seleziona un versetto</div>
+            <div id="currentAyahName" style="font-size: 0.8rem; font-weight: 800; color: var(--p-green); white-space: nowrap;">Pronto</div>
+            <div style="font-size: 0.65rem; color: #64748b;">Recitazione Warsh</div>
         </div>
         <i class="fas fa-step-forward" style="color: var(--gold); font-size: 1.2rem; cursor: pointer;" onclick="nextAyah()"></i>
     </footer>
@@ -158,12 +157,14 @@
         renderArea.innerHTML = "";
         if (activeTab === 'mushaf') {
             const pNum = pageMapping[currentSurah - 1];
-            // Sistema di caricamento Mushaf stabile (GitHub + Proxy per evitare blocchi)
-            const imgUrl = `https://i0.wp.com/raw.githubusercontent.com/marwanma/quran-images-warsh-tajweed/master/png/${pNum}.png`;
+            // SORGENTE DEFINITIVA: jsDelivr (la più stabile per GitHub)
+            const imgUrl = `https://cdn.jsdelivr.net/gh/marwanma/quran-images-warsh-tajweed@master/png/${pNum}.png`;
             renderArea.innerHTML = `
                 <div id="mushafContainer">
-                    <img id="mushafImg" src="${imgUrl}" onerror="this.src='https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${pNum}.jpg'">
-                    <p style="color:var(--gold-light); margin-top:15px; font-size:0.75rem; font-weight:bold;">Pagina ${pNum} - Mushaf Tajweed Warsh</p>
+                    <img id="mushafImg" src="${imgUrl}" 
+                         onerror="this.src='https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${pNum}.jpg'"
+                         onload="document.getElementById('loader').style.display='none'">
+                    <p style="color:var(--gold-light); margin-top:15px; font-size:0.8rem; font-weight:bold;">Pagina ${pNum} - Tajweed Warsh</p>
                 </div>`;
             return;
         }
@@ -176,7 +177,7 @@
             if(currentSurah === 1 && a.num === 4) arText = "مَلِكِ يَوْمِ الدِّينِ";
             
             card.innerHTML = `
-                <div class="arabic-text">${arText} <span style="color:var(--gold); font-size:1.1rem; font-family:sans-serif;">(${a.num})</span></div>
+                <div class="arabic-text">${arText} <span style="color:var(--gold); font-size:1.2rem; font-family:serif;">(${a.num})</span></div>
                 <div class="translation-text">${activeTab === 'tafsir' ? '<b style="color:var(--gold)">TAFSIR: </b>' + a.taf : a.it}</div>
             `;
             card.onclick = () => playAyah(index);
@@ -191,6 +192,7 @@
         const v = String(ayah.num).padStart(3, '0');
         const reciter = document.getElementById('reciterSelect').value;
         
+        // Link audio diretto testato
         audio.src = `https://www.everyayah.com/data/${reciter}/${s}${v}.mp3`;
         audio.play();
         isPlaying = true;
