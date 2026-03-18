@@ -38,7 +38,7 @@
         
         .tafsir-box { margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
         .tafsir-label { font-size: 0.7rem; font-weight: 800; color: var(--gold); text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .tafsir-text { font-size: 0.9rem; color: #1e293b; line-height: 1.6; }
+        .tafsir-text { font-size: 0.9rem; color: #1e293b; line-height: 1.6; direction: rtl; text-align: right; }
 
         #mushafContainer { width: 100%; text-align: center; padding-bottom: 30px; }
         #mushafImg { width: 100%; border-radius: 15px; display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.5); background: white; }
@@ -47,7 +47,7 @@
         .play-btn { width: 54px; height: 54px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 12px rgba(217,119,6,0.3); }
 
         #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; flex-direction: column; align-items: center; z-index: 100; }
-        .spinner { width: 45px; height: 45px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold-light); border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner { width: 45px; height: 45px; border: 5px solid rgba(255,255,255,0.1); border-top: 4px solid var(--gold-light); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -55,17 +55,15 @@
 
 <div class="app-shell">
     <header class="header">
-        <div class="logo">QUR'AN PREMIUM PRO</div>
+        <div class="logo"><i class="fas fa-crown"></i> QUR'AN PRO WARSH</div>
         <div class="selector-row">
             <select id="surahSelect" onchange="loadSurah(this.value)"></select>
             <select id="reciterSelect">
                 <option value="Husary_Warsh_64kbps">Al-Hussary (Warsh)</option>
-                <option value="Alafasy_128kbps">Alafasy</option>
-                <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
-                <option value="Husary_64kbps">Al-Hussary (Hafs)</option>
                 <option value="Minshawi_Murattal_128kbps">Al-Minshawi</option>
-                <option value="Ghamadi_64kbps">Al-Ghamadi</option>
-                <option value="Sudais_64kbps">Al-Sudais</option>
+                <option value="Ghamadi_40kbps">Saad Al-Ghamidi</option>
+                <option value="Alafasy_128kbps">Alafasy</option>
+                <option value="Husary_64kbps">Al-Hussary (Hafs)</option>
             </select>
         </div>
         <div class="tabs">
@@ -83,8 +81,8 @@
     <footer class="player-bar">
         <div class="play-btn" onclick="togglePlayback()"><i class="fas fa-play" id="playIcon"></i></div>
         <div style="flex:1; overflow: hidden;">
-            <div id="currentAyahName" style="font-size:0.85rem; font-weight:800; color:var(--p-green); white-space: nowrap; text-overflow: ellipsis;">Seleziona versetto</div>
-            <div id="statusSub" style="font-size:0.65rem; color:#64748b;">Recitazione in corso</div>
+            <div id="currentAyahName" style="font-size:0.85rem; font-weight:800; color:var(--p-green); white-space: nowrap; text-overflow: ellipsis;">Pronto</div>
+            <div id="statusSub" style="font-size:0.65rem; color:#64748b;">Seleziona un versetto</div>
         </div>
         <i class="fas fa-step-forward" style="color:var(--gold); font-size:1.4rem; cursor:pointer;" onclick="nextAyah()"></i>
     </footer>
@@ -93,18 +91,7 @@
 <audio id="audioEngine"></audio>
 
 <script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
-            reg.onupdatefound = () => {
-                const installingWorker = reg.installing;
-                installingWorker.onstatechange = () => {
-                    if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        window.location.reload();
-                    }
-                };
-            };
-        });
-    }
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js'); }
 
     let currentSurah = 1, currentAyahIdx = 0, ayahsData = [], isPlaying = false, activeTab = 'reader';
     const audio = document.getElementById('audioEngine'), renderArea = document.getElementById('renderArea'), loader = document.getElementById('loader');
@@ -156,9 +143,15 @@
         renderArea.innerHTML = "";
         if (activeTab === 'mushaf') {
             const p = pageMapping[currentSurah - 1];
-            // UTILIZZO LINK DIRETTO GITHUB muslimDevCommunity (RAW)
-            const imgUrl = `https://raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/page${p.toString().padStart(3, '0')}.png`;
-            renderArea.innerHTML = `<div id="mushafContainer"><img id="mushafImg" src="${imgUrl}" onload="this.style.display='block'" onerror="this.src='https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${p}.jpg'"></div>`;
+            // SOLUZIONE FIX MUSHAF: Uso del proxy Weserv per caricare da GitHub senza blocchi
+            const githubUrl = `https://raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/page${p.toString().padStart(3, '0')}.png`;
+            const proxiedUrl = `https://wsrv.nl/?url=${encodeURIComponent(githubUrl)}&n=-1`;
+            
+            renderArea.innerHTML = `
+                <div id="mushafContainer">
+                    <img id="mushafImg" src="${proxiedUrl}" onload="this.style.display='block'" onerror="this.src='https://i0.wp.com/easyquran.com/quran-jpg-w/${p}.jpg'">
+                    <p style="color:white; margin-top:10px; font-size:0.7rem;">Pagina ${p} - Mushaf Tajweed Warsh</p>
+                </div>`;
             return;
         }
 
@@ -169,7 +162,7 @@
             
             let html = `<div class="arabic-text">${text} (${a.num})</div>`;
             if (activeTab === 'tafsir') {
-                html += `<div class="tafsir-box"><span class="tafsir-label">Tafsir Jalalayn</span><p class="tafsir-text">${a.taf}</p></div>`;
+                html += `<div class="tafsir-box"><span class="tafsir-label">Esegesi Al-Jalalayn</span><p class="tafsir-text">${a.taf}</p></div>`;
             } else {
                 html += `<div class="translation-text">${a.it}</div>`;
             }
@@ -181,8 +174,11 @@
 
     function playAyah(idx) {
         currentAyahIdx = idx;
-        const s = String(currentSurah).padStart(3, '0'), v = String(ayahsData[idx].num).padStart(3, '0');
+        const ayah = ayahsData[idx];
+        const s = String(currentSurah).padStart(3, '0'), v = String(ayah.num).padStart(3, '0');
         const reciter = document.getElementById('reciterSelect').value;
+        
+        // FIX AUDIO: Indirizzi precisi per everyayah.com
         audio.src = `https://www.everyayah.com/data/${reciter}/${s}${v}.mp3`;
         audio.play(); 
         isPlaying = true; 
