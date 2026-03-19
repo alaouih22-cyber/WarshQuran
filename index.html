@@ -11,360 +11,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        :root{
-            --dark-bg:#050505;
-            --panel:#0f0f0f;
-            --panel-2:#111;
-            --panel-3:#161616;
-            --emerald-ui:#042f2e;
-            --gold-ui:#d4af37;
-            --gold-bright:#f1c40f;
-            --text-main:#ffffff; /* Aggiunta */
-            --text-dim:#a0aec0;
-            --soft-border:#1f1f1f;
-            --danger:#8b1e1e;
-            --ok:#123c30;
-            --mushaf-scale:1;
+        :root {
+            --dark-bg: #050505;
+            --panel: #0f0f0f;
+            --emerald-ui: #042f2e;
+            --gold-ui: #d4af37;
+            --gold-bright: #f1c40f;
+            --text-main: #ffffff;
+            --text-dim: #a0aec0;
+            --card-bg: #111111;
         }
 
-        /* --- TEMA GIORNO (Aggiunto) --- */
         body.light-mode {
             --dark-bg: #f4ece1;
             --panel: #eaddca;
-            --panel-2: #ffffff;
-            --panel-3: #fcfaf7;
             --emerald-ui: #064e3b;
             --gold-ui: #b45309;
             --gold-bright: #d97706;
             --text-main: #1a202c;
             --text-dim: #4a5568;
-            --soft-border: #d6bd96;
+            --card-bg: #ffffff;
         }
 
-        *{
-            box-sizing:border-box;
-            -webkit-tap-highlight-color:transparent;
-            margin:0;
-            padding:0;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; background: var(--dark-bg); color: var(--text-main); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
 
-        html, body{
-            height:100%;
-            overflow:hidden;
-            background:var(--dark-bg);
-            color:var(--text-main);
-            font-family:'Segoe UI', sans-serif;
-            transition: background 0.3s, color 0.3s;
-        }
+        .overlay-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1500; display: none; backdrop-filter: blur(5px); }
+        .sidebar { position: fixed; top: 0; left: -100%; width: 85%; max-width: 320px; height: 100%; background: var(--panel); z-index: 2000; transition: 0.4s; border-right: 2px solid var(--gold-ui); overflow-y: auto; }
+        .sidebar.open { left: 0; }
+        .side-header { padding: 40px 20px; background: linear-gradient(to bottom, var(--emerald-ui), #000); border-bottom: 2px solid var(--gold-ui); text-align: center; color: var(--gold-bright); font-weight: bold; }
+        .side-group { padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.2); }
+        .side-item { padding: 16px 25px; display: flex; align-items: center; gap: 20px; cursor: pointer; color: var(--text-main); }
+        .side-item i { color: var(--gold-ui); font-size: 1.2rem; width: 25px; text-align: center; }
 
-        body.fullscreen-mushaf .navbar,
-        body.fullscreen-mushaf .top-selectors,
-        body.fullscreen-mushaf .tabs,
-        body.fullscreen-mushaf .player-bar{
-            display:none !important;
-        }
+        .app-shell { display: flex; flex-direction: column; height: 100vh; }
+        .navbar { padding: 15px 20px; background: var(--emerald-ui); display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid var(--gold-ui); z-index: 500; }
+        .nav-icon { font-size: 1.3rem; color: var(--gold-bright); cursor: pointer; }
+        .nav-title { font-weight: 800; color: var(--gold-bright); font-size: .9rem; letter-spacing: 1px; }
 
-        body.fullscreen-mushaf .content-area{
-            height:100vh !important;
-        }
+        .top-selectors { display: flex; flex-direction: column; background: var(--panel); padding: 10px; gap: 8px; border-bottom: 1px solid rgba(212,175,55,0.1); }
+        select { background: var(--dark-bg); color: var(--text-main); border: 1.5px solid var(--gold-ui); padding: 10px; border-radius: 12px; flex: 1; font-weight: bold; outline: none; }
 
-        .overlay-bg{
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,0.8);
-            z-index:1500;
-            display:none;
-            backdrop-filter:blur(5px);
-        }
+        .tabs { display: flex; background: rgba(0,0,0,0.3); padding: 5px; gap: 5px; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: .75rem; font-weight: 800; color: var(--text-dim); cursor: pointer; border-radius: 8px; }
+        .tab.active { background: var(--gold-ui); color: #000; }
 
-        .sidebar{
-            position:fixed;
-            top:0;
-            left:-100%;
-            width:85%;
-            max-width:320px;
-            height:100%;
-            background:var(--panel);
-            z-index:2000;
-            transition:.4s cubic-bezier(0.4,0,0.2,1);
-            border-right:1.5px solid var(--gold-ui);
-            overflow-y:auto;
-            box-shadow:20px 0 50px rgba(0,0,0,0.8);
-        }
+        .content-area { flex: 1; overflow-y: auto; background: var(--dark-bg); position: relative; scroll-behavior: smooth; }
+        .ayah-card { padding: 25px; border-bottom: 1px solid rgba(212,175,55,0.1); cursor: pointer; background: var(--card-bg); margin: 10px; border-radius: 18px; }
+        .ayah-card.active { border-right: 6px solid var(--gold-ui); background: rgba(212,175,55,0.08); }
+        .arabic-text { direction: rtl; font-family: 'Scheherazade New', serif; font-size: 2.2rem; line-height: 2.4; text-align: right; color: var(--text-main); }
+        .extra-box { margin-top: 15px; padding: 15px; background: rgba(128,128,128,0.05); border-radius: 12px; border: 1px dashed var(--gold-ui); }
 
-        .sidebar.open{ left:0; }
+        .mushaf-shell { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 100px; }
+        .mushaf-image { width: 98%; max-width: 800px; height: auto; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); background: white; margin-top: 10px; display: none; }
 
-        .side-header{
-            padding:40px 20px;
-            background:linear-gradient(to bottom, var(--emerald-ui),#0a0a0a);
-            border-bottom:2px solid var(--gold-ui);
-            text-align:center;
-            font-weight:700;
-            color: var(--gold-bright);
-        }
-
-        .side-group{
-            padding:10px 0;
-            border-bottom:1px solid rgba(255,255,255,0.1);
-        }
-
-        .side-item{
-            padding:16px 25px;
-            display:flex;
-            align-items:center;
-            gap:20px;
-            cursor:pointer;
-            transition:.2s;
-            color: var(--text-main);
-        }
-
-        .side-item:active{ background:rgba(212, 175, 55, 0.1); }
-
-        .side-item i{
-            color:var(--gold-ui);
-            font-size:1.2rem;
-            width:25px;
-            text-align:center;
-        }
-
-        .side-label{
-            font-size:.95rem;
-            font-weight:500;
-        }
-
-        .app-shell{
-            display:flex;
-            flex-direction:column;
-            height:100vh;
-            position:relative;
-        }
-
-        .navbar{
-            padding:15px 20px;
-            background:var(--emerald-ui);
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            border-bottom:1.5px solid var(--gold-ui);
-            z-index:500;
-            gap:12px;
-        }
-
-        .nav-icon{
-            font-size:1.3rem;
-            color:var(--gold-bright);
-            cursor:pointer;
-        }
-
-        .nav-title{
-            font-weight:800;
-            color:var(--gold-bright);
-            font-size:.9rem;
-            letter-spacing:1px;
-            text-align:center;
-            flex:1;
-        }
-
-        .top-selectors{
-            display:flex;
-            flex-direction:column;
-            background:var(--panel);
-            padding:10px;
-            gap:8px;
-            border-bottom:1px solid rgba(255,255,255,0.1);
-        }
-
-        .search-row{
-            display:flex;
-            gap:8px;
-        }
-
-        .search-row input{
-            flex:1;
-            background:var(--dark-bg);
-            color:var(--text-main);
-            border:1px solid var(--gold-ui);
-            padding:11px 12px;
-            border-radius:10px;
-            font-size:.82rem;
-            outline:none;
-        }
-
-        .search-btn{
-            background:var(--gold-ui);
-            color:#000;
-            border:none;
-            border-radius:10px;
-            padding:0 14px;
-            font-weight:800;
-            cursor:pointer;
-        }
-
-        .selectors-row{
-            display:flex;
-            gap:8px;
-        }
-
-        select{
-            background:var(--dark-bg);
-            color:var(--text-main);
-            border:1px solid var(--gold-ui);
-            padding:10px;
-            border-radius:10px;
-            flex:1;
-            font-weight:bold;
-            font-size:.8rem;
-            outline:none;
-        }
-
-        .tabs{
-            display:flex;
-            background:rgba(0,0,0,0.3);
-            padding:5px;
-            gap:5px;
-        }
-
-        .tab{
-            flex:1;
-            padding:12px;
-            text-align:center;
-            font-size:.75rem;
-            font-weight:800;
-            color:var(--text-dim);
-            cursor:pointer;
-            border-radius:8px;
-            transition:.3s;
-        }
-
-        .tab.active{
-            background:var(--gold-ui);
-            color:black;
-            box-shadow:0 4px 10px rgba(212,175,55,.3);
-        }
-
-        .content-area{
-            flex:1;
-            overflow-y:auto;
-            background:var(--dark-bg);
-            position:relative;
-            scroll-behavior:smooth;
-        }
-
-        .ayah-card{
-            padding:25px;
-            border-bottom:1px solid rgba(255,255,255,0.05);
-            cursor:pointer;
-            transition:.3s;
-            background: var(--panel-2);
-            margin: 10px;
-            border-radius: 15px;
-        }
-
-        .ayah-card.active{
-            background:rgba(212,175,55,.1);
-            border-right:5px solid var(--gold-ui);
-        }
-
-        .ayah-num-badge{
-            font-size:.72rem;
-            font-weight:800;
-            color:#000;
-            background:var(--gold-ui);
-            border-radius:999px;
-            padding:4px 10px;
-        }
-
-        .arabic-text{
-            direction:rtl;
-            font-family:'Scheherazade New', serif;
-            font-size:2.15rem;
-            line-height:2.35;
-            text-align:right;
-            color:var(--text-main);
-            margin-bottom:15px;
-        }
-
-        .it-text{
-            font-size:.95rem;
-            color:var(--text-dim);
-            line-height:1.6;
-            font-style:italic;
-            display:block;
-            margin-bottom:10px;
-        }
-
-        .extra-box{
-            margin-top:15px;
-            padding:15px;
-            background:rgba(255,255,255,.03);
-            border-radius:12px;
-            border:1px dashed var(--gold-ui);
-        }
-
-        .player-bar{
-            background:var(--panel);
-            padding:15px 18px;
-            border-top:2px solid var(--gold-ui);
-            display:flex;
-            align-items:center;
-            gap:16px;
-        }
-
-        .play-main{
-            width:55px;
-            height:55px;
-            background:var(--gold-ui);
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:1.6rem;
-            color:black;
-            box-shadow:0 4px 15px rgba(212,175,55,.4);
-            cursor:pointer;
-        }
-
-        .mushaf-shell{
-            width:100%;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            padding-bottom: 100px;
-        }
-
-        .mushaf-image{
-            width:min(95%, 800px);
-            height:auto;
-            display:none;
-            border-radius:10px;
-            box-shadow:0 10px 40px rgba(0,0,0,.8);
-            background:white;
-            margin-top: 20px;
-        }
-
-        #loader{
-            position:absolute;
-            top:50%;
-            left:50%;
-            transform:translate(-50%,-50%);
-            z-index:2100;
-            display:none;
-        }
-
-        .spinner{
-            width:50px;
-            height:50px;
-            border:5px solid #333;
-            border-top:5px solid var(--gold-bright);
-            border-radius:50%;
-            animation:spin 1s linear infinite;
-        }
-
-        @keyframes spin{ 100%{ transform:rotate(360deg); } }
-
-        @media (max-width: 480px){
-            .arabic-text{ font-size:1.95rem; }
-        }
+        .player-bar { background: var(--panel); padding: 15px 18px; border-top: 2px solid var(--gold-ui); display: flex; align-items: center; gap: 16px; }
+        .play-main { width: 55px; height: 55px; background: var(--gold-ui); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #000; cursor: pointer; }
+        
+        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2100; display: none; text-align: center; color: var(--gold-bright); }
+        .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--gold-bright); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -372,74 +78,37 @@
 <div class="overlay-bg" id="overlay" onclick="toggleSidebar()"></div>
 
 <div class="sidebar" id="sidebar">
-    <div class="side-header">القائمة الرئيسية (Menu)</div>
-    
-    <!-- Sezione Temi (Aggiunta) -->
+    <div class="side-header">MENU PREMIUM</div>
     <div class="side-group">
-        <div class="side-item" onclick="setTheme('light')">
-            <i class="fas fa-sun"></i>
-            <span class="side-label">Tema Giorno</span>
-        </div>
-        <div class="side-item" onclick="setTheme('dark')">
-            <i class="fas fa-moon"></i>
-            <span class="side-label">Tema Notte</span>
-        </div>
+        <div class="side-item" onclick="setTheme('light')"><i class="fas fa-sun"></i> <span>Tema Giorno</span></div>
+        <div class="side-item" onclick="setTheme('dark')"><i class="fas fa-moon"></i> <span>Tema Notte</span></div>
     </div>
-
     <div class="side-group">
-        <div class="side-item" onclick="setExtra('tafsir')">
-            <i class="fas fa-book"></i>
-            <span class="side-label">التفسير (Tafsir Jalalayn)</span>
-        </div>
-        <div class="side-item" onclick="setExtra('asbab')">
-            <i class="fas fa-history"></i>
-            <span class="side-label">أسباب النزول (Asbab al-Nuzul)</span>
-        </div>
-        <div class="side-item" onclick="setExtra('maani')">
-            <i class="fas fa-language"></i>
-            <span class="side-label">معاني الكلمات (Ma'ani)</span>
-        </div>
+        <div class="side-item" onclick="setExtra('tafsir')"><i class="fas fa-book"></i> <span>Tafsir Jalalayn</span></div>
+        <div class="side-item" onclick="setExtra('asbab')"><i class="fas fa-history"></i> <span>Asbab al-Nuzul</span></div>
+        <div class="side-item" onclick="setExtra('maani')"><i class="fas fa-language"></i> <span>Ma'ani (Significati)</span></div>
     </div>
-
     <div class="side-group">
-        <div class="side-item" onclick="switchTab('mushaf')">
-            <i class="fas fa-file-alt"></i>
-            <span class="side-label">Mushaf Tajweed Warsh</span>
-        </div>
-        <div class="side-item" onclick="toggleMushafFullscreen()">
-            <i class="fas fa-expand"></i>
-            <span class="side-label">Fullscreen Mushaf</span>
-        </div>
-        <div class="side-item" onclick="resetAppState()">
-            <i class="fas fa-rotate-left"></i>
-            <span class="side-label">Reset preferenze</span>
-        </div>
-        <div class="side-item" onclick="window.location.reload()">
-            <i class="fas fa-sync"></i>
-            <span class="side-label">Ricarica App</span>
-        </div>
+        <div class="side-item" onclick="switchTab('mushaf')"><i class="fas fa-file-alt"></i> <span>Mushaf Tajweed Warsh</span></div>
+        <div class="side-item" onclick="window.location.reload()"><i class="fas fa-sync"></i> <span>Ricarica</span></div>
     </div>
 </div>
 
-<div class="app-shell" id="appShell">
+<div class="app-shell">
     <header class="navbar">
         <i class="fas fa-bars-staggered nav-icon" onclick="toggleSidebar()"></i>
-        <div class="nav-title">QUR'AN PREMIUM PRO</div>
-        <i class="fas fa-expand nav-icon" onclick="toggleMushafFullscreen()"></i>
+        <div class="nav-title">AL-QUR'AN PRO</div>
+        <i class="fas fa-info-circle nav-icon"></i>
     </header>
 
     <div class="top-selectors">
-        <div class="search-row">
-            <input id="surahSearch" type="text" placeholder="Cerca numero sura..." onkeydown="if(event.key==='Enter') searchSurah()">
-            <button class="search-btn" onclick="searchSurah()"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="selectors-row">
-            <select id="surahSelect" onchange="jumpToSurah(this.value)"></select>
-            <select id="reciterSelect" onchange="saveState()">
+        <div style="display:flex; gap:8px;">
+            <select id="surahSelect" onchange="loadSurah(this.value)"></select>
+            <select id="reciterSelect">
                 <option value="Husary_Warsh_64kbps">Al-Hussary (Warsh)</option>
                 <option value="Kushayli_64kbps">Al-Qazabri (Warsh)</option>
                 <option value="Minshawi_Murattal_128kbps">Al-Minshawi</option>
-                <option value="Alafasy_128kbps">Mishary Al-Afasy</option>
+                <option value="Alafasy_128kbps">Mishary Alafasy</option>
                 <option value="Abdul_Basit_Murattal_64kbps">Abdul Basit</option>
                 <option value="Husary_64kbps">Al-Hussary (Hafs)</option>
             </select>
@@ -448,12 +117,12 @@
 
     <div class="tabs">
         <div class="tab active" id="tab-reader" onclick="switchTab('reader')">LETTURA</div>
-        <div class="tab" id="tab-tafsir" onclick="switchTab('tafsir')">INFO EXTRA</div>
+        <div class="tab" id="tab-tafsir" onclick="switchTab('tafsir')">TAFSIR & ASBAB</div>
         <div class="tab" id="tab-mushaf" onclick="switchTab('mushaf')">MUSHAF</div>
     </div>
 
     <main class="content-area" id="mainContent">
-        <div id="loader"><div class="spinner"></div></div>
+        <div id="loader"><div class="spinner"></div><p>Caricamento...</p></div>
         <div id="renderArea"></div>
     </main>
 
@@ -467,62 +136,32 @@
     </footer>
 </div>
 
-<audio id="audioEngine"></audio>
+<audio id="audioEngine" preload="auto"></audio>
 
 <script>
-    let currentSurah = 1, currentAyahIdx = 0, ayahsData = [], isPlaying = false, activeTab = 'reader', extraMode = 'tafsir', mushafFullscreen = false;
-
+    let currentSurah = 1, currentAyahIdx = 0, ayahsData = [], isPlaying = false, activeTab = 'reader', extraMode = 'tafsir';
     const audio = document.getElementById('audioEngine'), renderArea = document.getElementById('renderArea'), loader = document.getElementById('loader');
 
     const surahNames = ["Al-Fatihah","Al-Baqarah","Al-Imran","An-Nisa","Al-Ma'idah","Al-An'am","Al-A'raf","Al-Anfal","At-Tawbah","Yunus","Hud","Yusuf","Ar-Ra'd","Ibrahim","Al-Hijr","An-Nahl","Al-Isra","Al-Kahf","Maryam","Ta-Ha","Al-Anbiya","Al-Hajj","Al-Mu'minun","An-Nur","Al-Furqan","Ash-Shu'ara","An-Naml","Al-Qasas","Al-Ankabut","Ar-Rum","Luqman","As-Sajdah","Al-Ahzab","Saba","Fatir","Ya-Sin","As-Saffat","Sad","Az-Zumar","Ghafir","Fussilat","Ash-Shura","Az-Zukhruf","Ad-Dukhan","Al-Jathiyah","Al-Ahqaf","Muhammad","Al-Fath","Al-Hujurat","Qaf","Adh-Dhariyat","At-Tur","An-Najm","Al-Qamar","Ar-Rahman","Al-Waqi'ah","Al-Hadid","Al-Mujadilah","Al-Hashr","Al-Mumtahanah","As-Saff","Al-Jumu'ah","Al-Munafiqun","At-Taghabun","At-Talaq","At-Tahrim","Al-Mulk","Al-Qalam","Al-Haqqah","Al-Ma'arij","Nuh","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyamah","Al-Insan","Al-Mursalat","An-Naba","An-Nazi'at","Abasa","At-Takwir","Al-Infitar","Al-Mutaffifin","Al-Inshiqaq","Al-Buruj","At-Tariq","Al-A'la","Al-Ghashiyah","Al-Fajr","Al-Balad","Ash-Shams","Al-Layl","Ad-Duha","Ash-Sharh","At-Tin","Al-Alaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-Adiyat","Al-Qari'ah","At-Takathur","Al-Asr","Al-Humazah","Al-Fil","Quraysh","Al-Ma'un","Al-Kawthar","Al-Kafirun","An-Nasr","Al-Masad","Al-Ikhlas","Al-Falaq","An-Nas"];
     const pageMapping = [1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604];
 
-    function getStored(k, d){ try{ let v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch{return d;} }
-    function setStored(k, v){ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
-
     window.onload = () => {
-        currentSurah = getStored('qp_surah', 1);
-        activeTab = getStored('qp_tab', 'reader');
-        extraMode = getStored('qp_extra', 'tafsir');
-        const theme = getStored('qp_theme', 'dark');
-        if(theme==='light') document.body.classList.add('light-mode');
-
         const sel = document.getElementById('surahSelect');
         surahNames.forEach((n, i) => {
             let o = document.createElement('option'); o.value = i + 1; o.textContent = `${i+1}. ${n}`;
             sel.appendChild(o);
         });
-        sel.value = currentSurah;
-
-        document.getElementById('reciterSelect').value = getStored('qp_reciter', 'Husary_Warsh_64kbps');
-        switchTab(activeTab);
-        loadSurah(currentSurah);
+        loadSurah(1);
     };
 
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none'; }
-    
-    function setTheme(m) { 
-        if(m === 'light') document.body.classList.add('light-mode'); 
-        else document.body.classList.remove('light-mode'); 
-        setStored('qp_theme', m);
-        toggleSidebar(); 
-    }
-
-    function switchTab(t) { 
-        activeTab = t; 
-        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active')); 
-        document.getElementById(`tab-${t}`).classList.add('active'); 
-        if(document.getElementById('sidebar').classList.contains('open')) toggleSidebar(); 
-        setStored('qp_tab', t);
-        renderContent(); 
-    }
-
-    function setExtra(m) { extraMode = m; setStored('qp_extra', m); switchTab('tafsir'); }
+    function setTheme(m) { if(m === 'light') document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode'); toggleSidebar(); }
+    function switchTab(t) { activeTab = t; document.querySelectorAll('.tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${t}`).classList.add('active'); if(document.getElementById('sidebar').classList.contains('open')) toggleSidebar(); renderContent(); }
+    function setExtra(m) { extraMode = m; switchTab('tafsir'); }
 
     async function loadSurah(s) {
         currentSurah = parseInt(s);
-        loader.style.display = 'block';
-        saveState();
+        loader.style.display = 'flex';
         try {
             let edEx = extraMode === 'asbab' ? 'ar.asbab' : (extraMode === 'maani' ? 'ar.muyassar' : 'ar.jalalayn');
             const [resAr, resIt, resEx] = await Promise.all([
@@ -544,9 +183,9 @@
         if (activeTab === 'mushaf') {
             const p = pageMapping[currentSurah - 1];
             const p3 = String(p).padStart(3, '0');
-            // INGANNO WORDPRESS JETPACK SU GITHUB PERMALINK (MOLTO POTENTE)
-            const rawUrl = `raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/page${p3}.png`;
-            const proxiedUrl = `https://i0.wp.com/${rawUrl}`;
+            // INGANNO GOOGLE PROXY: Il metodo più potente per caricare immagini bloccate
+            const rawUrl = `https://raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/page${p3}.png`;
+            const proxiedUrl = `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${encodeURIComponent(rawUrl)}`;
             
             renderArea.innerHTML = `
                 <div class="mushaf-shell">
@@ -571,11 +210,28 @@
         currentAyahIdx = idx;
         const s = String(currentSurah).padStart(3, '0'), v = String(ayahsData[idx].num).padStart(3, '0');
         const rec = document.getElementById('reciterSelect').value;
-        audio.src = (rec === "Kushayli_64kbps") ? `https://www.everyayah.com/data/Kushayli_64kbps/${s}${v}.mp3` : `https://www.everyayah.com/data/${rec}/${s}${v}.mp3`;
-        audio.play().then(() => { isPlaying = true; updateUI(); }).catch(e => { audio.src=`https://www.everyayah.com/data/Husary_Warsh_64kbps/${s}${v}.mp3`; audio.play(); });
+        
+        // Audio Link corretti (EveryAyah + Fallback Mirror)
+        const audioUrl = (rec === "Kushayli_64kbps") 
+            ? `https://www.everyayah.com/data/Kushayli_64kbps/${s}${v}.mp3` 
+            : `https://www.everyayah.com/data/${rec}/${s}${v}.mp3`;
+
+        audio.src = audioUrl;
+        audio.play().then(() => {
+            isPlaying = true;
+            updateUI();
+        }).catch(e => {
+            // Fallback se il primario fallisce
+            audio.src = `https://mirrors.quranicaudio.com/everyayah/${rec}/${s}${v}.mp3`;
+            audio.play();
+        });
     }
 
-    function togglePlayback() { if (isPlaying) { audio.pause(); isPlaying = false; } else { if(!audio.src) playAyah(0); else audio.play(); isPlaying = true; } updateUI(); }
+    function togglePlayback() { 
+        if (isPlaying) { audio.pause(); isPlaying = false; } 
+        else { if(!audio.src) playAyah(currentAyahIdx); else audio.play(); isPlaying = true; } 
+        updateUI(); 
+    }
 
     function updateUI() {
         document.getElementById('playIcon').className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
@@ -583,14 +239,8 @@
         document.querySelectorAll('.ayah-card').forEach((c, i) => c.classList.toggle('active', i === currentAyahIdx && isPlaying));
     }
 
-    function nextAyah() { if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1); }
-    function jumpToSurah(s) { loadSurah(s); }
-    function saveState() { setStored('qp_surah', currentSurah); setStored('qp_reciter', document.getElementById('reciterSelect').value); }
-    function resetAppState() { localStorage.clear(); window.location.reload(); }
-    function toggleMushafFullscreen() { document.body.classList.toggle('fullscreen-mushaf'); }
-    function searchSurah() { let v = document.getElementById('surahSearch').value; if(v >= 1 && v <= 114) loadSurah(v); }
-
     audio.onended = () => { if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1); else { isPlaying = false; updateUI(); } };
+    function nextAyah() { if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1); }
 </script>
 </body>
 </html>
