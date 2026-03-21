@@ -1,278 +1,270 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="referrer" content="no-referrer">
-    <link rel="manifest" href="manifest.json">
-    <title>Qur'an Premium Warsh Pro</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root { 
-            --p-green: #042f2e; --s-green: #064e3b; 
-            --gold: #d4af37; --gold-light: #fbbf24; 
-            --card: #111111; --text: #ffffff; 
-            --font-size: 2.2rem;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body.light-mode {
-            --p-green: #f4ece1; --s-green: #eaddca; 
-            --gold: #b45309; --gold-light: #d97706; 
-            --card: #ffffff; --text: #1a202c;
-        }
+<title>Quran Ultimate Offline</title>
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { background-color: var(--p-green); color: var(--text); font-family: 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; transition: 0.3s; }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        /* --- SIDEBAR --- */
-        .sidebar { position: fixed; top: 0; left: -100%; width: 85%; max-width: 320px; height: 100%; background: #0f0f0f; z-index: 2000; transition: 0.4s; border-right: 2px solid var(--gold); overflow-y: auto; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
-        .sidebar.open { left: 0; }
-        .side-header { padding: 40px 20px; background: linear-gradient(to bottom, #042f2e, #000); border-bottom: 2px solid var(--gold); text-align: center; color: var(--gold-light); font-weight: bold; }
-        .side-group-label { padding: 15px 25px 5px; font-size: 0.7rem; color: var(--gold); font-weight: 800; text-transform: uppercase; }
-        .side-item { padding: 14px 25px; color: #fff; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
-        .side-item i { color: var(--gold); width: 25px; text-align: center; }
+<style>
+:root{
+--bg:#042f2e;
+--card:#111;
+--gold:#d4af37;
+--text:#fff;
+}
 
-        /* --- APP SHELL --- */
-        .app-shell { display: flex; flex-direction: column; height: 100vh; }
-        .navbar { padding: 15px 20px; background: var(--s-green); display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid var(--gold); z-index: 500; }
-        .nav-title { font-weight: 800; color: var(--gold-light); font-size: 0.9rem; letter-spacing: 1px; }
+body{margin:0;background:var(--bg);color:var(--text);font-family:sans-serif}
 
-        .top-nav { background: #111; padding: 10px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #222; }
-        .selectors { display: flex; gap: 8px; }
-        select { background: #1a1a1a; color: white; border: 1px solid var(--gold); padding: 10px; border-radius: 10px; flex: 1; font-weight: bold; outline: none; font-size: 0.8rem; }
+header{padding:15px;background:#000;color:var(--gold);text-align:center}
 
-        .tabs { display: flex; background: #000; padding: 5px; gap: 5px; }
-        .tab { flex: 1; padding: 12px; text-align: center; font-size: 0.75rem; font-weight: 800; color: var(--gold); cursor: pointer; border-radius: 8px; }
-        .tab.active { background: var(--gold); color: black; }
+select,button{
+margin:5px;
+padding:10px;
+background:#111;
+color:#fff;
+border:1px solid var(--gold);
+border-radius:10px;
+}
 
-        /* --- MAIN CONTENT --- */
-        .main-content { flex: 1; overflow-y: auto; background: #080808; position: relative; scroll-behavior: smooth; }
-        body.light-mode .main-content { background: #fdf6e3; }
+.tabs{display:flex;background:#000}
+.tab{flex:1;padding:12px;text-align:center;color:var(--gold)}
+.tab.active{background:var(--gold);color:#000}
 
-        .ayah-card { padding: 25px; border-bottom: 1px solid rgba(212,175,55,0.1); cursor: pointer; background: var(--card); margin: 10px; border-radius: 20px; transition: 0.3s; }
-        .ayah-card.active { border-right: 6px solid var(--gold); background: rgba(212,175,55,0.1); }
-        
-        .arabic-text { direction: rtl; font-family: 'Scheherazade New', serif; font-size: var(--font-size); line-height: 2.3; text-align: right; color: var(--text); }
-        .extra-box { margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px dashed var(--gold); font-size: 0.9rem; color: #ccc; }
-        body.light-mode .extra-text { color: #444; }
+#content{height:75vh;overflow:hidden}
 
-        /* --- MUSHAF MODE --- */
-        .mushaf-container { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 120px; }
-        .mushaf-img { width: 98%; max-width: 900px; display: none; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); margin-top: 10px; }
+.ayah{padding:10px;border-radius:10px;margin-bottom:10px}
 
-        /* --- PLAYER BAR --- */
-        .player-bar { background: #0f0f0f; padding: 15px 20px; border-top: 2px solid var(--gold); display: flex; align-items: center; gap: 15px; }
-        body.light-mode .player-bar { background: #fff; }
-        .play-main { width: 55px; height: 55px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #000; cursor: pointer; }
-        
-        /* --- SUBHA & ADHKAR OVERLAYS --- */
-        .full-overlay { position: fixed; inset: 0; background: var(--p-green); z-index: 3000; display: none; flex-direction: column; padding: 30px 20px; overflow-y: auto; }
-        .subha-circle { width: 200px; height: 200px; border: 8px solid var(--gold); border-radius: 50%; margin: 50px auto; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: 900; color: var(--gold); cursor: pointer; }
-
-        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2100; display: none; text-align: center; }
-        .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .overlay-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1500; display: none; backdrop-filter: blur(5px); }
-    </style>
+</style>
 </head>
+
 <body>
 
-<div class="overlay-bg" id="overlay" onclick="toggleSidebar()"></div>
+<header>QURAN OFFLINE PRO</header>
 
-<!-- SIDEBAR INTEGRALE (TUTTE LE FUNZIONI) -->
-<div class="sidebar" id="sidebar">
-    <div class="side-header">المصحf الإلكتروني (Warsh Pro)</div>
-    
-    <div class="side-group-label">STUDIO & ANALISI</div>
-    <div class="side-item" onclick="setExtra('tafsir')"><i class="fas fa-book"></i> <span>التفسير (Esegesi)</span></div>
-    <div class="side-item" onclick="setExtra('asbab')"><i class="fas fa-history"></i> <span>أسباب النزول (Storia)</span></div>
-    <div class="side-item" onclick="setExtra('maani')"><i class="fas fa-language"></i> <span>معاني الكلمات (Significati)</span></div>
-    
-    <div class="side-group-label">STRUMENTI MUSULMANO</div>
-    <div class="side-item" onclick="openTool('adhkar')"><i class="fas fa-sun"></i> <span>أذكار المسلم (Adhkar)</span></div>
-    <div class="side-item" onclick="openTool('subha')"><i class="fas fa-circle-notch"></i> <span>السبحة (Subha)</span></div>
-    <div class="side-item" onclick="openTool('ruqyah')"><i class="fas fa-shield-alt"></i> <span>الرقية الشرعية (Ruqyah)</span></div>
-    
-    <div class="side-group-label">IMPOSTAZIONI</div>
-    <div class="side-item" onclick="setTheme('light')"><i class="fas fa-adjust"></i> <span>Tema Giorno</span></div>
-    <div class="side-item" onclick="setTheme('dark')"><i class="fas fa-moon"></i> <span>Tema Notte</span></div>
-    <div class="side-item" onclick="changeFontSize(2)"><i class="fas fa-plus"></i> <span>Ingrandisci Testo</span></div>
-    <div class="side-item" onclick="changeFontSize(-2)"><i class="fas fa-minus"></i> <span>Riduci Testo</span></div>
-    <div class="side-item" onclick="window.location.reload()"><i class="fas fa-sync"></i> <span>Ricarica App</span></div>
+<select id="surahSelect"></select>
+<select id="reciterSelect">
+<option value="Husary_Warsh_64kbps">Warsh</option>
+</select>
+
+<button onclick="downloadSurah()">⬇️ Download Surah</button>
+
+<div class="tabs">
+<div class="tab active" onclick="switchTab('mushaf')" id="tab-mushaf">المصحف</div>
+<div class="tab" onclick="switchTab('reader')" id="tab-reader">قراءة</div>
 </div>
 
-<div class="app-shell">
-    <header class="navbar">
-        <i class="fas fa-bars-staggered nav-icon" onclick="toggleSidebar()"></i>
-        <div class="nav-title">AL-QUR'AN PREMIUM PRO</div>
-        <i class="fas fa-cog nav-icon" onclick="toggleSidebar()"></i>
-    </header>
+<div id="content"></div>
 
-    <div class="top-nav">
-        <div class="selectors">
-            <select id="surahSelect" onchange="loadSurah(this.value)"></select>
-            <select id="reciterSelect">
-                <option value="Husary_Warsh_64kbps">Al-Hussary (Warsh)</option>
-                <option value="Kushayli_64kbps">Al-Qazabri (Warsh)</option>
-                <option value="Minshawi_Murattal_128kbps">Al-Minshawi</option>
-                <option value="Alafasy_128kbps">Mishary Alafasy</option>
-            </select>
-        </div>
-        <div class="tabs">
-            <div class="tab active" id="tab-reader" onclick="switchTab('reader')">القرآن</div>
-            <div class="tab" id="tab-tafsir" onclick="switchTab('tafsir')">التفسير</div>
-            <div class="tab" id="tab-mushaf" onclick="switchTab('mushaf')">المصحف</div>
-        </div>
-    </div>
-
-    <main class="main-content" id="mainContent">
-        <div id="loader"><div class="spinner"></div></div>
-        <div id="renderArea"></div>
-    </main>
-
-    <footer class="player-bar">
-        <div class="play-main" onclick="togglePlayback()"><i class="fas fa-play" id="playIcon"></i></div>
-        <div style="flex:1; overflow:hidden; margin-left:15px;">
-            <div id="curAyahName" style="font-size:.85rem; font-weight:800; color:var(--gold-light); white-space:nowrap;">اختر آية</div>
-            <div id="curStatus" style="font-size:.65rem; color:var(--text-dim);">برواية ورش عن نافع</div>
-        </div>
-        <i class="fas fa-repeat" id="repeatIcon" style="color:var(--text-dim); cursor:pointer;" onclick="toggleRepeat()"></i>
-        <i class="fas fa-step-forward" style="color:var(--gold); font-size:1.3rem; cursor:pointer;" onclick="nextAyah()"></i>
-    </footer>
-</div>
-
-<!-- OVERLAYS PER SUBHA, ADHKAR, RUQYAH -->
-<div id="toolOverlay" class="full-overlay">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 id="toolTitle" style="color:var(--gold)"></h2>
-        <i class="fas fa-times" style="font-size:1.5rem;" onclick="closeTool()"></i>
-    </div>
-    <div id="toolContent"></div>
-</div>
-
-<audio id="audioEngine"></audio>
+<audio id="audio"></audio>
 
 <script>
-    let currentSurah = 1, currentAyahIdx = 0, ayahsData = [], isPlaying = false, activeTab = 'reader', extraMode = 'tafsir', isRepeat = false;
-    let subhaCount = 0;
 
-    const audio = document.getElementById('audioEngine'), renderArea = document.getElementById('renderArea'), loader = document.getElementById('loader');
+// ====== STATE ======
+let currentSurah=1;
+let ayahs=[];
+let currentAyah=0;
+let currentPage=0;
+let isPlaying=false;
+let tab="mushaf";
 
-    const surahNames = ["Al-Fatihah","Al-Baqarah","Al-Imran","An-Nisa","Al-Ma'idah","Al-An'am","Al-A'raf","Al-Anfal","At-Tawbah","Yunus","Hud","Yusuf","Ar-Ra'd","Ibrahim","Al-Hijr","An-Nahl","Al-Isra","Al-Kahf","Maryam","Ta-Ha","Al-Anbiya","Al-Hajj","Al-Mu'minun","An-Nur","Al-Furqan","Ash-Shu'ara","An-Naml","Al-Qasas","Al-Ankabut","Ar-Rum","Luqman","As-Sajdah","Al-Ahzab","Saba","Fatir","Ya-Sin","As-Saffat","Sad","Az-Zumar","Ghafir","Fussilat","Ash-Shura","Az-Zukhruf","Ad-Dukhan","Al-Jathiyah","Al-Ahqaf","Muhammad","Al-Fath","Al-Hujurat","Qaf","Adh-Dhariyat","At-Tur","An-Najm","Al-Qamar","Ar-Rahman","Al-Waqi'ah","Al-Hadid","Al-Mujadilah","Al-Hashr","Al-Mumtahanah","As-Saff","Al-Jumu'ah","Al-Munafiqun","At-Taghabun","At-Talaq","At-Tahrim","Al-Mulk","Al-Qalam","Al-Haqqah","Al-Ma'arij","Nuh","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyamah","Al-Insan","Al-Mursalat","An-Naba","An-Nazi'at","Abasa","At-Takwir","Al-Infitar","Al-Mutaffifin","Al-Inshiqaq","Al-Buruj","At-Tariq","Al-A'la","Al-Ghashiyah","Al-Fajr","Al-Balad","Ash-Shams","Al-Layl","Ad-Duha","Ash-Sharh","At-Tin","Al-Alaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-Adiyat","Al-Qari'ah","At-Takathur","Al-Asr","Al-Humazah","Al-Fil","Quraysh","Al-Ma'un","Al-Kawthar","Al-Kafirun","An-Nasr","Al-Masad","Al-Ikhlas","Al-Falaq","An-Nas"];
-    const pageMapping = [1,2,50,77,106,128,151,177,187,208,221,235,249,255,262,267,282,293,305,312,322,332,342,350,359,367,377,385,396,404,411,415,418,428,434,440,446,453,458,467,477,483,489,496,499,502,507,511,515,518,520,523,526,528,531,534,537,542,545,549,551,553,554,556,558,560,562,564,566,568,570,572,574,575,577,578,580,582,583,585,586,587,587,589,590,591,591,592,593,594,595,595,596,596,597,597,598,598,599,599,600,600,601,601,601,602,602,602,603,603,603,604,604,604];
+const content=document.getElementById("content");
+const audio=document.getElementById("audio");
 
-    window.onload = () => {
-        const sel = document.getElementById('surahSelect');
-        surahNames.forEach((n, i) => {
-            let o = document.createElement('option'); o.value = i + 1; o.textContent = `${i+1}. ${n}`;
-            sel.appendChild(o);
-        });
-        loadSurah(1);
-    };
+// ====== INIT ======
+window.onload=()=>{
+for(let i=1;i<=114;i++){
+let o=document.createElement("option");
+o.value=i;
+o.textContent="Surah "+i;
+surahSelect.appendChild(o);
+}
 
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none'; }
-    function setTheme(m) { if(m === 'light') document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode'); toggleSidebar(); }
-    function switchTab(t) { activeTab = t; document.querySelectorAll('.tab').forEach(el => el.classList.remove('active')); document.getElementById(`tab-${t}`).classList.add('active'); if(document.getElementById('sidebar').classList.contains('open')) toggleSidebar(); renderContent(); }
-    function setExtra(m) { extraMode = m; switchTab('tafsir'); }
-    function toggleRepeat() { isRepeat = !isRepeat; document.getElementById('repeatIcon').style.color = isRepeat ? 'var(--gold-light)' : 'var(--text-dim)'; }
-    
-    function changeFontSize(delta) {
-        let current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size'));
-        document.documentElement.style.setProperty('--font-size', (current + delta/10) + 'rem');
-    }
+// restore progress
+currentSurah=localStorage.getItem("s")||1;
+currentAyah=localStorage.getItem("a")||0;
+currentPage=localStorage.getItem("p")||0;
 
-    async function loadSurah(s) {
-        currentSurah = parseInt(s);
-        loader.style.display = 'flex';
-        try {
-            let edEx = extraMode === 'asbab' ? 'ar.asbab' : (extraMode === 'maani' ? 'ar.muyassar' : 'ar.jalalayn');
-            const [resAr, resIt, resExtra] = await Promise.all([
-                fetch(`https://api.alquran.cloud/v1/surah/${s}/ar.warsh`),
-                fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`),
-                fetch(`https://api.alquran.cloud/v1/surah/${s}/${edEx}`)
-            ]);
-            const dAr = await resAr.json(), dIt = await resIt.json(), dEx = await resExtra.json();
-            ayahsData = dAr.data.ayahs.map((a, i) => ({
-                num: a.numberInSurah, ar: a.text, it: dIt.data.ayahs[i].text, extra: dEx.data.ayahs[i].text
-            }));
-            renderContent();
-        } catch (e) { renderArea.innerHTML = "خطأ في الاتصال."; }
-        loader.style.display = 'none';
-    }
+loadSurah(currentSurah);
+};
 
-    function renderContent() {
-        renderArea.innerHTML = "";
-        if (activeTab === 'mushaf') {
-            const p = pageMapping[currentSurah - 1];
-            const p3 = String(p).padStart(3, '0');
-            // TRUCCO DEFINITIVO PER MUSHAF: i1.wp.com Proxy
-            const githubUrl = `raw.githubusercontent.com/muslimDevCommunity/quran-warsh/485fd1b62b0d6e1814eed7a7747d4a230a543e58/src/res/pages/page${p3}.png`;
-            renderArea.innerHTML = `<div class="mushaf-container"><img class="mushaf-img" src="https://i1.wp.com/${githubUrl}" onload="this.style.display='block'" onerror="this.src='https://wsrv.nl/?url=https://easyquran.com/quran-jpg-w/${p}.jpg'"></div>`;
-            return;
-        }
+// ====== LOAD ======
+async function loadSurah(s){
 
-        ayahsData.forEach((a, i) => {
-            const card = document.createElement('div');
-            card.className = `ayah-card ${currentAyahIdx === i && isPlaying ? 'active' : ''}`;
-            let text = (currentSurah === 1 && a.num === 4) ? "مَلِكِ يَوْمِ الدِّينِ" : a.ar;
-            let sub = activeTab === 'tafsir' ? `<div class="extra-box"><b style="color:var(--gold)">${extraMode.toUpperCase()}:</b> ${a.extra}</div>` : `<div style="color:var(--text-dim); font-style:italic; margin-top:10px;">${a.it}</div>`;
-            card.innerHTML = `<div class="arabic-text">${text} <span style="font-family:sans-serif; font-size:1.1rem; color:var(--gold);">(${a.num})</span></div>${sub}`;
-            card.onclick = () => playAyah(i);
-            renderArea.appendChild(card);
-        });
-    }
+currentSurah=s;
 
-    function playAyah(idx) {
-        currentAyahIdx = idx;
-        const s = String(currentSurah).padStart(3, '0'), v = String(ayahsData[idx].num).padStart(3, '0');
-        const rec = document.getElementById('reciterSelect').value;
-        audio.src = `https://www.everyayah.com/data/${rec}/${s}${v}.mp3`;
-        audio.play().then(() => { isPlaying = true; updateUI(); }).catch(() => {
-            audio.src = `https://www.everyayah.com/data/Husary_Warsh_64kbps/${s}${v}.mp3`;
-            audio.play();
-        });
-    }
+let cached=localStorage.getItem("surah_"+s);
 
-    function togglePlayback() { if (isPlaying) { audio.pause(); isPlaying = false; } else { if(!audio.src) playAyah(currentAyahIdx); else audio.play(); isPlaying = true; } updateUI(); }
+if(cached){
+ayahs=JSON.parse(cached);
+render();
+return;
+}
 
-    function updateUI() {
-        document.getElementById('playIcon').className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
-        document.getElementById('curAyahName').innerText = `${surahNames[currentSurah-1]} - آية ${ayahsData[currentAyahIdx]?.num || 1}`;
-        document.querySelectorAll('.ayah-card').forEach((c, i) => c.classList.toggle('active', i === currentAyahIdx && isPlaying));
-    }
+const [ar,it,ex]=await Promise.all([
+fetch(`https://api.alquran.cloud/v1/surah/${s}/ar.warsh`),
+fetch(`https://api.alquran.cloud/v1/surah/${s}/it.piccardo`),
+fetch(`https://api.alquran.cloud/v1/surah/${s}/ar.muyassar`)
+]);
 
-    audio.onended = () => {
-        if(isRepeat) { playAyah(currentAyahIdx); }
-        else if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1);
-        else { isPlaying = false; updateUI(); }
-    };
+const dAr=await ar.json();
+const dIt=await it.json();
+const dEx=await ex.json();
 
-    function nextAyah() { if (currentAyahIdx < ayahsData.length - 1) playAyah(currentAyahIdx + 1); }
+ayahs=dAr.data.ayahs.map((a,i)=>({
+n:a.numberInSurah,
+ar:a.text,
+it:dIt.data.ayahs[i].text,
+ex:dEx.data.ayahs[i].text
+}));
 
-    /* FUNZIONI EXTRA: SUBHA, ADHKAR, RUQYAH */
-    function openTool(type) {
-        const overlay = document.getElementById('toolOverlay');
-        const content = document.getElementById('toolContent');
-        const title = document.getElementById('toolTitle');
-        overlay.style.display = 'flex';
-        toggleSidebar();
+render();
+}
 
-        if(type === 'subha') {
-            title.innerText = "السبحة الإلكترونية";
-            content.innerHTML = `<div class="subha-circle" onclick="subhaPlus()">${subhaCount}</div><button class="tab" onclick="subhaCount=0; subhaPlus();" style="width:100%">Reset</button>`;
-        } else if(type === 'adhkar') {
-            title.innerText = "أذكار المسلم";
-            content.innerHTML = `<div class="ayah-card"><b>أذكار الصباح:</b><p>أصبحنا وأصبح الملك لله والحمد لله...</p></div><div class="ayah-card"><b>أذكار المساء:</b><p>أمسينا وأمسى الملك لله والحمد لله...</p></div>`;
-        } else if(type === 'ruqyah') {
-            title.innerText = "الرقية الشرعية";
-            content.innerHTML = `<div class="ayah-card"><p>سورة الفاتحة - آية الكرسي - المعوذات</p></div>`;
-        }
-    }
-    function closeTool() { document.getElementById('toolOverlay').style.display = 'none'; }
-    function subhaPlus() { subhaCount++; openTool('subha'); }
+// ====== RENDER ======
+function render(){
+
+if(tab==="mushaf"){
+renderMushaf();
+}else{
+content.innerHTML="reader";
+}
+
+}
+
+// ====== MUSHAF ======
+function renderMushaf(){
+
+content.innerHTML=`<div id="slider" style="display:flex;height:100%;transition:.4s"></div>`;
+const slider=document.getElementById("slider");
+
+let page="",count=0;
+
+ayahs.forEach((a,i)=>{
+
+page+=`
+<div class="ayah" onclick="play(${i})" id="ay${i}">
+<div style="direction:rtl;font-size:2rem">${a.ar} (${a.n})</div>
+<div>${a.it}</div>
+<div style="font-size:.8rem;color:#aaa">${a.ex}</div>
+</div>`;
+
+count++;
+
+if(count===8||i===ayahs.length-1){
+let p=document.createElement("div");
+p.style.minWidth="100%";
+p.style.overflowY="auto";
+p.innerHTML=`<div style="padding:10px;background:#111">${page}</div>`;
+slider.appendChild(p);
+page="";count=0;
+}
+
+});
+
+initSwipe();
+goToPage(currentPage);
+
+}
+
+// ====== AUDIO ======
+function play(i){
+
+currentAyah=i;
+
+let s=String(currentSurah).padStart(3,"0");
+let a=String(ayahs[i].n).padStart(3,"0");
+
+audio.src=`https://www.everyayah.com/data/Husary_Warsh_64kbps/${s}${a}.mp3`;
+
+audio.play();
+isPlaying=true;
+
+saveProgress();
+highlight();
+
+}
+
+audio.onended=()=>{
+if(currentAyah<ayahs.length-1){
+play(currentAyah+1);
+}
+};
+
+// ====== HIGHLIGHT ======
+function highlight(){
+
+document.querySelectorAll(".ayah").forEach((el,i)=>{
+el.style.background=i===currentAyah?"rgba(212,175,55,0.2)":"transparent";
+});
+
+}
+
+// ====== SWIPE ======
+let startX=0;
+
+function initSwipe(){
+const slider=document.getElementById("slider");
+
+slider.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+
+slider.addEventListener("touchend",e=>{
+let diff=startX-e.changedTouches[0].clientX;
+if(diff>50) next();
+if(diff<-50) prev();
+});
+}
+
+function next(){currentPage++;updateSlide()}
+function prev(){if(currentPage>0)currentPage--;updateSlide()}
+
+function updateSlide(){
+document.getElementById("slider").style.transform=`translateX(-${currentPage*100}%)`;
+saveProgress();
+}
+
+function goToPage(p){
+setTimeout(()=>updateSlide(),100);
+}
+
+// ====== DOWNLOAD ======
+async function downloadSurah(){
+
+localStorage.setItem("surah_"+currentSurah,JSON.stringify(ayahs));
+
+for(let i=0;i<ayahs.length;i++){
+let s=String(currentSurah).padStart(3,"0");
+let a=String(ayahs[i].n).padStart(3,"0");
+let url=`https://www.everyayah.com/data/Husary_Warsh_64kbps/${s}${a}.mp3`;
+
+fetch(url).then(r=>r.blob()).then(b=>{
+let reader=new FileReader();
+reader.onload=()=>localStorage.setItem(`audio_${s}${a}`,reader.result);
+reader.readAsDataURL(b);
+});
+}
+
+alert("Surah salvata offline!");
+}
+
+// ====== PROGRESS ======
+function saveProgress(){
+localStorage.setItem("s",currentSurah);
+localStorage.setItem("a",currentAyah);
+localStorage.setItem("p",currentPage);
+}
+
+// ====== TAB ======
+function switchTab(t){
+tab=t;
+document.querySelectorAll(".tab").forEach(el=>el.classList.remove("active"));
+document.getElementById("tab-"+t).classList.add("active");
+render();
+}
+
 </script>
+
 </body>
 </html>
