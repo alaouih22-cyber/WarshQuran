@@ -4,100 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Warsh Quran Pro</title>
+<title>Warsh Quran</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Amiri&family=Scheherazade+New&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New&display=swap" rel="stylesheet">
 
 <style>
-
-:root{
---bg:#031d1c;
---card:#0c2b2a;
---gold:#d4af37;
---text:#fff;
-}
-
 body{
 margin:0;
+background:#031d1c;
+color:#fff;
 font-family:'Scheherazade New';
-background:var(--bg);
-color:var(--text);
 }
 
-/* NAV */
 header{
-display:flex;
-justify-content:space-between;
-align-items:center;
 padding:15px;
 background:#000;
-color:var(--gold);
+color:#d4af37;
+text-align:center;
 font-weight:bold;
 }
 
-/* SELECT */
-.controls{
-display:flex;
-gap:5px;
+select{
+width:100%;
 padding:10px;
-background:#000;
-}
-
-select,button{
-flex:1;
-padding:10px;
-border-radius:10px;
-border:1px solid var(--gold);
 background:#111;
 color:#fff;
+border:1px solid #d4af37;
 }
 
-/* TABS */
-.tabs{
-display:flex;
-background:#000;
-}
-
-.tab{
-flex:1;
-padding:12px;
-text-align:center;
-color:var(--gold);
-cursor:pointer;
-}
-
-.tab.active{
-background:var(--gold);
-color:#000;
-}
-
-/* CONTENT */
 #content{
-height:75vh;
+height:80vh;
 overflow:hidden;
 }
 
-/* AYAH */
+.page{
+min-width:100%;
+overflow-y:auto;
+padding:10px;
+}
+
 .ayah{
-padding:12px;
-border-radius:12px;
-margin-bottom:10px;
+margin-bottom:15px;
+padding:10px;
+border-radius:10px;
 }
 
 .ar{
-font-size:2.2rem;
-text-align:right;
+font-size:2rem;
 line-height:2;
 }
 
 .it{
 font-size:.9rem;
-opacity:.85;
-}
-
-.ex{
-font-size:.8rem;
-color:#aaa;
+opacity:.8;
 }
 
 </style>
@@ -105,20 +64,9 @@ color:#aaa;
 
 <body>
 
-<header>📖 مصحف ورش</header>
+<header>مصحف ورش</header>
 
-<div class="controls">
-<select id="surah"></select>
-<select id="reciter">
-<option value="Husary_Warsh_64kbps">Warsh</option>
-</select>
-<button onclick="downloadSurah()">⬇️</button>
-</div>
-
-<div class="tabs">
-<div class="tab active" onclick="switchTab('mushaf')" id="mushafTab">المصحف</div>
-<div class="tab" onclick="switchTab('reader')" id="readerTab">قراءة</div>
-</div>
+<select id="surahSelect"></select>
 
 <div id="content"></div>
 
@@ -126,13 +74,14 @@ color:#aaa;
 
 <script>
 
-// ===== STATE =====
-let surah=1, ayahs=[], ayah=0, page=0, tab="mushaf";
+let surah=1;
+let ayahs=[];
+let page=0;
 
 const content=document.getElementById("content");
 const audio=document.getElementById("audio");
 
-// ===== INIT =====
+// init
 window.onload=()=>{
 for(let i=1;i<=114;i++){
 let o=document.createElement("option");
@@ -140,159 +89,102 @@ o.value=i;
 o.textContent="سورة "+i;
 surahSelect.appendChild(o);
 }
-
-// restore
-surah=localStorage.s||1;
-ayah=localStorage.a||0;
-page=localStorage.p||0;
-
-load();
+load(1);
 };
 
-// ===== LOAD =====
-async function load(){
+surahSelect.onchange=e=>{
+load(e.target.value);
+};
 
-let cached=localStorage["s"+surah];
+// load data
+async function load(s){
 
-if(cached){
-ayahs=JSON.parse(cached);
-render();
-return;
-}
+surah=s;
 
-const [ar,it,ex]=await Promise.all([
-fetch(`https://api.alquran.cloud/v1/surah/${surah}/ar.warsh`),
-fetch(`https://api.alquran.cloud/v1/surah/${surah}/it.piccardo`),
-fetch(`https://api.alquran.cloud/v1/surah/${surah}/ar.muyassar`)
-]);
+content.innerHTML="تحميل...";
 
-const dAr=await ar.json();
-const dIt=await it.json();
-const dEx=await ex.json();
+try{
+const res=await fetch(`https://api.alquran.cloud/v1/surah/${s}/ar.warsh`);
+const data=await res.json();
 
-ayahs=dAr.data.ayahs.map((a,i)=>({
-n:a.numberInSurah,
-ar:a.text,
-it:dIt.data.ayahs[i].text,
-ex:dEx.data.ayahs[i].text
-}));
+ayahs=data.data.ayahs;
 
 render();
+
+}catch(e){
+content.innerHTML="خطأ في الاتصال";
 }
 
-// ===== RENDER =====
+}
+
+// render mushaf
 function render(){
 
-if(tab==="mushaf") mushaf();
-else reader();
+content.innerHTML=`<div id="slider" style="display:flex;height:100%"></div>`;
 
-}
+const slider=document.getElementById("slider");
 
-// ===== MUSHAF =====
-function mushaf(){
-
-content.innerHTML=`<div id="slider" style="display:flex;height:100%;transition:.4s"></div>`;
-
-let slider=document.getElementById("slider");
-
-let block="",c=0;
+let block="",count=0;
 
 ayahs.forEach((a,i)=>{
 
 block+=`
-<div class="ayah" onclick="play(${i})" id="a${i}">
-<div class="ar">${a.ar} ﴿${a.n}﴾</div>
-<div class="it">${a.it}</div>
-<div class="ex">${a.ex}</div>
+<div class="ayah" onclick="play(${i})">
+<div class="ar">${a.text} ﴿${a.numberInSurah}﴾</div>
 </div>
 `;
 
-c++;
+count++;
 
-if(c==8||i==ayahs.length-1){
+if(count===8 || i===ayahs.length-1){
+
 let p=document.createElement("div");
-p.style.minWidth="100%";
-p.style.overflowY="auto";
-p.innerHTML=`<div style="padding:10px;background:var(--card);border-radius:15px">${block}</div>`;
+p.className="page";
+p.innerHTML=block;
+
 slider.appendChild(p);
-block="";c=0;
+
+block="";
+count=0;
 }
 
 });
 
-swipe();
-go(page);
+initSwipe();
 
 }
 
-// ===== AUDIO =====
+// play audio
 function play(i){
 
-ayah=i;
-
 let s=String(surah).padStart(3,"0");
-let a=String(ayahs[i].n).padStart(3,"0");
+let a=String(ayahs[i].numberInSurah).padStart(3,"0");
 
 audio.src=`https://www.everyayah.com/data/Husary_Warsh_64kbps/${s}${a}.mp3`;
 audio.play();
 
-save();
-highlight();
-
 }
 
-audio.onended=()=>{
-if(ayah<ayahs.length-1) play(ayah+1);
-};
-
-// ===== UI =====
-function highlight(){
-document.querySelectorAll(".ayah").forEach((el,i)=>{
-el.style.background=i==ayah?"rgba(212,175,55,0.2)":"transparent";
-});
-}
-
-// ===== SWIPE =====
+// swipe
 let startX=0;
 
-function swipe(){
-let s=document.getElementById("slider");
+function initSwipe(){
 
-s.ontouchstart=e=>startX=e.touches[0].clientX;
-s.ontouchend=e=>{
+const slider=document.getElementById("slider");
+
+slider.ontouchstart=e=>{
+startX=e.touches[0].clientX;
+};
+
+slider.ontouchend=e=>{
 let diff=startX-e.changedTouches[0].clientX;
+
 if(diff>50) page++;
 if(diff<-50 && page>0) page--;
-update();
+
+slider.style.transform=`translateX(-${page*100}%)`;
 };
-}
 
-function update(){
-document.getElementById("slider").style.transform=`translateX(-${page*100}%)`;
-save();
-}
-
-function go(p){setTimeout(update,100);}
-
-// ===== DOWNLOAD =====
-function downloadSurah(){
-localStorage["s"+surah]=JSON.stringify(ayahs);
-alert("Salvata offline");
-}
-
-// ===== SAVE =====
-function save(){
-localStorage.s=surah;
-localStorage.a=ayah;
-localStorage.p=page;
-}
-
-// ===== TAB =====
-function switchTab(t){
-tab=t;
-document.querySelectorAll(".tab").forEach(e=>e.classList.remove("active"));
-document.getElementById(t+"Tab").classList.add("active");
-render();
 }
 
 </script>
